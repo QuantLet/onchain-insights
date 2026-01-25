@@ -1,0 +1,14 @@
+
+Name of Quantlet: Onchain Insights
+
+Published in: Onchain Insights : a study of Decentralized finance metrics for stablecoin depeg risk
+
+Description: This study focuses on the study of the extensive open-access data available on the blockchain, and its use to predict depeg risks for various stablecoins. In particular, we focus on the dynamics of the liquidity curve from Uniswap's popular v3 liquidity pool protocol, focusing on stablecoin pools. 
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+

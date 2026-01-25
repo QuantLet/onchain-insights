@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights
+
+Published in: Onchain Insights - USDE Binance depeg
+
+Description: Uses minute OHLC data from binance and block by block metrics on the USDE/USDT Uniswap liquidity pool to plot the price divergence during the ethene depeg event on October 10th 2025.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: uniswap_usde.parquet, usde_minute_binance.parquet
+
