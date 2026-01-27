@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Uniswap liquidity curves dynamics
+
+Published in: Onchain Insights - Uniswap liquidity curves dynamics
+
+Description: Create animation of houry liquidity curve.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: uniswap_usde.parquet, usde_minute_binance.parquet
+
