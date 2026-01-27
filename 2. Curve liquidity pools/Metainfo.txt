@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Curve liquidity pools
+
+Published in: Onchain Insights - Curve liquidity pools
+
+Description: Computes the theoretical invariant curve for Curvefi's Stableswap pools. Plots historical partial quotes and pool imbalance.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: curve_3pool_hourly.parquet, hourly_pool_state_full.parquet
+
