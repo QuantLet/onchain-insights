@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Usage metrics: curve 3pool vs uniswap USDC/USDT
+
+Published in: Onchain Insights -  Usage metrics: curve 3pool vs uniswap USDC/USDT
+
+Description: PLots the historical TVL and volume/TVL of both the curve tri pool and uniswap USDC/USDT v3 pool 1bp fee tier.  
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: curve_3pool_hourly.parquet, USDC_USDT_hourly_metrics.parquet
+
