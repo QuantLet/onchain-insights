@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Functional PCA analysis of the liquidity curve
+
+Published in: Onchain Insights - Functional PCA analysis of the liquidity curve
+
+Description: PLots related to the functional PCA analysis of the log-liquidity curve. FPCA is applied in a rolling window manner to study stability of the PCs and reliability of the decomposition through time (CPVE).
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: hourly_liquidity_pricecentered_full.parquet, hourly_liquidity_full.parquet
+
