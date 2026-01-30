@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Uniswap liquidity curve 
+
+Published in: Onchain Insights - Uniswap liquidity curve
+
+Description: Visualize the uniswap liquidity curve of the USDC-USDT v3 pool. 
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: hourly_liquidity_full.parquet, hourly_pool_state_full.parquet
+
