@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Gegenbauer basis decomposition
+
+Published in: Onchain Insights - Gegenbauer basis decomposition
+
+Description: Plots related to the decomposition of the log-Liquidity curve into Gegenbauer polynomial bases. The effect of the $\alpha$ parameter is evaluated and highlighted through shock effects of the log-liqudiity profile. 
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.01.2026
+
+Datafile: hourly_liquidity_full.parquet
+
