@@ -11,6 +11,7 @@ Published in: Onchain Insights : a study of Decentralized finance metrics for st
 
 Description: This study focuses on the study of the extensive open-access data available on the blockchain, and its use to predict depeg risks for various stablecoins. In particular, we focus on the dynamics of the liquidity curve from Uniswap's popular v3 liquidity pool protocol, focusing on stablecoin pools.
 
+
 Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
 
 Author: Owen Chaffard
@@ -18,3 +19,12 @@ Author: Owen Chaffard
 Submitted: 25.01.2026
 
 ```
+
+# Repo Instructions
+
+Run this command to get up-to-date data :
+
+```
+bash update_data.sh
+```
+

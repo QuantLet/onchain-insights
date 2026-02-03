@@ -77,7 +77,6 @@ def plot_crv():
     )
     fig.update_xaxes(title=None)
     fig.write_html("./crv_balance.html")
-    fig.show()
 
 if __name__ == "__main__":
     plot_crv()
