@@ -1,0 +1,20 @@
+{
+  "model_name": "lightgbm",
+  "alpha": 2.0,
+  "dataset_path": "./preprocessed_datasets/dataset_alpha_2.0_full_binarytarget_win-24_thresh-15_both_dynamic-False.parquet",
+  "n_splits": 5,
+  "cv_val_frac": 0.3,
+  "scaler": "robust",
+  "learning_rate": 0.01,
+  "early_stopping_rounds": 200,
+  "eval_metric": "auc",
+  "n_estimators": 800,
+  "max_depth": 6,
+  "num_leaves": 31,
+  "rf_max_features": "sqrt",
+  "target_window": 24,
+  "target_threshold": 15,
+  "depeg_side": "both",
+  "dynamic_threshold": 0,
+  "n_features": 100
+}
