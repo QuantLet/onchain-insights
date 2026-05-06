@@ -17,16 +17,16 @@ cp -rf ./data/Uniswap/hourly_liquidity_full.parquet ./3.\ Uniswap\ liquidity\ cu
 cp -rf ./data/Uniswap/hourly_liquidity_pricecentered_full.parquet ./3.\ Uniswap\ liquidity\ curve;
 cp -rf ./data/Uniswap/hourly_positions_full.parquet ./3.\ Uniswap\ liquidity\ curve;
 
-cp -rf ./data/Curve/curve_3pool_hourly.parquet ./4.\ Stablecoin\ liquidity\ concentration;
-cp -rf ./data/Uniswap/USDC_USDT_hourly_metrics.parquet ./4.\ Stablecoin\ liquidity\ concentration;
 
-cp -rf ./data/Curve/3CRV_lpevents.parquet ./4.b\ Stablecoin\ liquidity\ ownership;
-cp -rf ./data/Curve/address_book.json ./4.b\ Stablecoin\ liquidity\ ownership;
-cp -rf ./data/Uniswap/hourly_positions_full.parquet ./4.b\ Stablecoin\ liquidity\ ownership;
-cp -rf ./data/Uniswap/hourly_liquidity_full.parquet ./4.b\ Stablecoin\ liquidity\ ownership;
-cp -rf ./data/Uniswap/hourly_pool_state_full.parquet ./4.b\ Stablecoin\ liquidity\ ownership;
-cp -rf ./data/Uniswap/hourly_non_nfpm_mint_burn_events_full.parquet ./4.b\ Stablecoin\ liquidity\ ownership;
-cp -rf ./data/ETH_blocks/hourly_blocks.parquet ./4.b\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Curve/curve_3pool_hourly.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Uniswap/USDC_USDT_hourly_metrics.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Curve/3CRV_lpevents.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Curve/address_book.json ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Uniswap/hourly_positions_full.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Uniswap/hourly_liquidity_full.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Uniswap/hourly_pool_state_full.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/Uniswap/hourly_non_nfpm_mint_burn_events_full.parquet ./4.\ Stablecoin\ liquidity\ ownership;
+cp -rf ./data/ETH_blocks/hourly_blocks.parquet ./4.\ Stablecoin\ liquidity\ ownership;
 
 cp -rf ./data/Uniswap/hourly_pool_state_full.parquet ./5.\ Functional\ PCA\ analysis\ of\ the\ liquidity\ curve;
 cp -rf ./data/Uniswap/hourly_liquidity_full.parquet ./5.\ Functional\ PCA\ analysis\ of\ the\ liquidity\ curve;
@@ -44,5 +44,7 @@ cp -rf ./data/Uniswap/USDC_USDT_hourly_metrics.parquet ./9.\ Parametric\ quantil
 
 cp -rf ./data/ ./Paper;
 rm -rf ./data;
+
+python safe_large_parquets.py;
 
 

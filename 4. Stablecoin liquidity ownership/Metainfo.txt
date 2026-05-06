@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Stablecoin Liquidity Ownership Graphs
+
+Published in: Onchain Insights - Stablecoin Liquidity Ownership Graphs
+
+Description: This quantlet analyses ownership graphs of stablecoin liquidity on the 3pool and uniswap. We highlight the distribution of whales on Curve's main stablecoin pool. Furthermore, we analyse the rise of MEV activity on the USDC-USDT v3 pool, showing a consistent volume of JIT (Just In Time) liquidity.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  04.05.2026
+
+Datafile: curve_3pool_hourly.parquet, USDC_USDT_hourly_metrics.parquet
+
