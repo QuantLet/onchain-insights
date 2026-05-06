@@ -333,6 +333,43 @@ View the detailed instructions in the README:
 ```
 
 ## Quantlet 9: Parametric Quantile Function Characterisation
+In this quantlet we evaluate the distribution of stablecoin depeg basis points. ARIMA/GARCH residuals show poor fit against Gaussian/Student's t innovations. In order to circumvent this issue we train a Neural Network to regress the quantile function in a non-distributional manner.
+We show the use of both Chebyshev and I-spline bases for quantile function regression, and their advantages/drawbacks. We also introduce the threshold weighted CRPS used to favor rare extreme events in the diustributional calibration. 
+Lastly we showcase the addition of spliced GPD tails for modeling extreme events/ closed form VaR+ES estimation.
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/ispline_basis_power_tails.png" alt="Image" />
+</div>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/ispline_basis_uniform.png" alt="Image" />
+</div>
+<p align="center">
+  <b>I spline bases generated with uniform and power-tails knots</b>
+</p>
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/quantile_function_comparison.png" alt="Image" />
+</div>
+<p align="center">
+  <b>Quantile function tail focus based on knot density</b>
+</p>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/gpd_spliced_quantile_logit.png" alt="Image" />
+</div>
+<p align="center">
+  <b>Spliced Quantile function with parametric GPD tails</b>
+</p>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/chaining_function.png" alt="Image" />
+</div>
+
+<p align="center">
+  <b>Weight and Chaining function of the threshold weighted CRPS</b>
+</p>
+
+
 
 ### Description and Output
 
