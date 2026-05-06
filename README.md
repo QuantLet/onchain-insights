@@ -333,6 +333,9 @@ View the detailed instructions in the README:
 ```
 
 ## Quantlet 9: Parametric Quantile Function Characterisation
+
+### Description and Output
+
 In this quantlet we evaluate the distribution of stablecoin depeg basis points. ARIMA/GARCH residuals show poor fit against Gaussian/Student's t innovations. In order to circumvent this issue we train a Neural Network to regress the quantile function in a non-distributional manner.
 We show the use of both Chebyshev and I-spline bases for quantile function regression, and their advantages/drawbacks. We also introduce the threshold weighted CRPS used to favor rare extreme events in the diustributional calibration. 
 Lastly we showcase the addition of spliced GPD tails for modeling extreme events/ closed form VaR+ES estimation.
@@ -370,13 +373,43 @@ Lastly we showcase the addition of spliced GPD tails for modeling extreme events
 </p>
 
 
-
-### Description and Output
-
 ### Recreate the plot
+
+Run the notebook:
+
+```bash
+9. Parametric quantile function characterisation/code.ipynb
+```
 
 ## Quantlet 10: Forecasting architecture
 
 ### Description and Output
 
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
+</div>
+<p align="center">
+  <b>Our custom Neural Network Forecasting architecture</b>
+</p>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/hard_concrete_plot.png" alt="Image" />
+</div>
+
+<p align="center">
+  <b>L0 regularisation with hard concrete gating</b>
+</p>
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/nhits_stack_decomposition_fixed.png" alt="Image" />
+</div>
+<p align="center">
+  <b>NHITS encoder stack decomposition</b>
+</p>
+
 ### Recreate the plot
+
+Run the notebook:
+
+```bash
+10. Forecasting architecture/code.ipynb
+```
