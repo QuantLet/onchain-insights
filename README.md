@@ -21,6 +21,20 @@ Author: Owen Chaffard
 
 Submitted: 25.01.2026
 ```
+# Table of Contents
+
+| Quantlet | Dedicated README |
+|---|---|
+| [Quantlet 1: Binance USDE depeg](#quantlet-1-binance-usde-depeg) | [View Quantlet](./1.%20USDE%20binance%20depeg/README.md) |
+| [Quantlet 2: Curve liquidity pools](#quantlet-2-curve-liquidity-pools) | [View Quantlet](./2.%20Curve%20liquidity%20pools/README.md) |
+| [Quantlet 3: Uniswap liquidity curve](#quantlet-3-uniswap-liquidity-curve) | [View Quantlet](./3.%20Uniswap%20liquidity%20curve/README.md) |
+| [Quantlet 4: Stablecoin Liquidity Ownership](#quantlet-4-stablecoin-liquidity-ownership) | [View Quantlet](./4.%20Stablecoin%20liquidity%20ownership/README.md) |
+| [Quantlet 5: Functional PCA analysis of the liquidity curve](#quantlet-5-functional-pca-analysis-of-the-liquidity-curve) | [View Quantlet](./5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/README.md) |
+| [Quantlet 6: Legendre basis Decomposition](#quantlet-6-legendre-basis-decomposition) | [View Quantlet](./6.%20Legendre%20basis%20decomposition/README.md) |
+| [Quantlet 7: Gegenbauer Polynomials](#quantlet-7-gegenbauer-polynomials) | [View Quantlet](./7.%20Gegenbauer%20Polynomials/README.md) |
+| [Quantlet 8: Early-Warning Model](#quantlet-8-early-warning-model) | [View Quantlet](./8.%20Early-Warning%20Model/README.md) |
+| [Quantlet 9: Parametric Quantile Function Characterisation](#quantlet-9-parametric-quantile-function-characterisation) | [View Quantlet](./9.%20Parametric%20Quantile%20Function%20Characterisation/README.md) |
+| [Quantlet 10: Forecasting architecture](#quantlet-10-forecasting-architecture) | [View Quantlet](./10.%20Forecasting%20architecture/README.md) |
 
 # Repo Instructions
 
