@@ -16,3 +16,6 @@ tqdm
 xgboost>=1.7
 pyarrow>=10.0
 seaborn
+neuralforecast
+torch
+pytorch-lightning>=2.0
