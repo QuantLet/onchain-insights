@@ -1,8 +1,12 @@
-<div style="margin: 0; padding: 0; text-align: center; border: none;">
-<a href="https://quantlet.com" target="_blank" style="text-decoration: none; border: none;">
-<img src="https://github.com/StefanGam/test-repo/blob/main/quantlet_design.png?raw=true" alt="Header Image" width="100%" style="margin: 0; padding: 0; display: block; border: none;" />
-</a>
-</div>
+<p align="center">
+  <a href="https://quantlet.com">
+    <img
+      src="https://github.com/StefanGam/test-repo/blob/main/quantlet_design.png?raw=true"
+      alt="Header Image"
+      width="100%"
+    />
+  </a>
+</p>
 
 ```
 Name of Quantlet: Onchain Insights - Early Warning Classifier Cross Validation
@@ -18,18 +22,17 @@ Author: Owen Chaffard
 Submitted: 04.05.2026
 
 Datafile: ./data/*
-
 ```
 
 # Running the code
 
-- Update data for all the repo (this shell script downloads the last release from the daily updated dataset and updates the corresponding files in all quantlets)
+- Update data for all the repo. This shell script downloads the last release from the daily updated dataset and updates the corresponding files in all quantlets.
 
 ```bash
 bash update_data.sh
 ```
 
-- move terminal in this specific quantlet :
+- Move terminal into this specific quantlet:
 
 ```bash
 cd 8.\ Early-Warning\ Model/
@@ -41,13 +44,13 @@ cd 8.\ Early-Warning\ Model/
 pip install -r requirements.txt
 ```
 
-- The first shell script runs full 5-fold cross-validation for all models (automatically updates the preprocessed datasets):
+- The first shell script runs full 5-fold cross-validation for all models and automatically updates the preprocessed datasets:
 
 ```bash
 bash compare_model_cv.sh
 ```
 
-- You can update the full retraining shell script with the best performing model in CV, the full retraining script then does last training + full suite of plots including shap explanations:
+- You can update the full retraining shell script with the best performing model in CV. The full retraining script then does last training plus the full suite of plots, including SHAP explanations:
 
 ```bash
 bash full_retraining.sh
@@ -55,69 +58,98 @@ bash full_retraining.sh
 
 # Generated plots
 
-<div style="display: flex; width: 100%;">
+<p align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison/plots_summary/heatmap_cv_auc.png"
     alt="CV AUC Heatmap"
-    style="width: 50%; height: auto;"
+    width="49%"
   />
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison/plots_summary/heatmap_cv_auprc.png"
     alt="CV AUPRC Heatmap"
-    style="width: 50%; height: auto;"
+    width="49%"
   />
-</div>
-<center> <b> 5-fold cross validation results </b></center>
+</p>
 
+<p align="center">
+  <b>5-fold cross validation results</b>
+</p>
 
-<div style="display: flex; width: 100%;margin-top: 10vh;">
+<br>
+
+<p align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/roc_pr.png"
+    alt="Final retraining ROC and PR curves"
+    width="100%"
   />
-</div>
+</p>
 
-<center> <b> Final retraining AUC/AUPRC </b></center>
+<p align="center">
+  <b>Final retraining AUC/AUPRC</b>
+</p>
 
-<div style="display: flex; width: 100%;margin-top: 10vh;">
+<br>
+
+<p align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/timeseries/predictions_over_time.png"
+    alt="Predictions over time"
+    width="100%"
   />
-</div>
+</p>
 
-<center> <b> 24-hour ahead predicted depeg probability out-of-sample </b></center>
+<p align="center">
+  <b>24-hour ahead predicted depeg probability out-of-sample</b>
+</p>
 
-<div style="display: flex; width: 100%;margin-top: 10vh;">
+<br>
+
+<p align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_beeswarm_global.png"
-    style="width: 50%; height: auto;"
+    alt="SHAP beeswarm summary plot"
+    width="49%"
   />
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/feature_importance/feature_importance_native.png"
-    style="width: 50%; height: auto;"
+    alt="Native model feature importance"
+    width="49%"
   />
-</div>
+</p>
 
-<center> <b> SHAP beeswarm summary plot / Native model feature importance </b></center>
+<p align="center">
+  <b>SHAP beeswarm summary plot / Native model feature importance</b>
+</p>
 
-<div style="display: flex; width: 100%;margin-top: 10vh;">
+<br>
+
+<p align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_curve_entropy.png"
-    style="width: 50%; height: auto;"
+    alt="SHAP scatter plot for curve entropy"
+    width="49%"
   />
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_tangent_up.png"
-    style="width: 50%; height: auto;"
+    alt="SHAP scatter plot for tangent up"
+    width="49%"
   />
-</div>
-<div style="display: flex; width: 100%;margin-top: 0vh;">
+</p>
+
+<p align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_tvlUSD_500.png"
-    style="width: 50%; height: auto;"
+    alt="SHAP scatter plot for TVL USD 500"
+    width="49%"
   />
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_swap_count_100.png"
-    style="width: 50%; height: auto;"
+    alt="SHAP scatter plot for swap count 100"
+    width="49%"
   />
-</div>
+</p>
 
-<center> <b> SHAP beeswarm summary plots </b></center>
+<p align="center">
+  <b>SHAP correlation scatter plots</b>
+</p>
