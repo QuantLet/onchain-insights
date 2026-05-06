@@ -1,0 +1,14 @@
+numpy>=1.23
+pandas>=1.5
+scikit-learn>=1.2
+matplotlib>=3.6
+
+xgboost>=1.7
+lightgbm>=4.0
+catboost>=1.2
+
+joblib>=1.2
+pyarrow>=10.0
+
+scipy>=1.10
+requests>=2.28

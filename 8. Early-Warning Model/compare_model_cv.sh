@@ -25,3 +25,5 @@ for ALPHA in "${ALPHAS[@]}"; do
 done
 
 echo "All CV runs completed."
+
+python plot_cv_metrics_heatmap.py
