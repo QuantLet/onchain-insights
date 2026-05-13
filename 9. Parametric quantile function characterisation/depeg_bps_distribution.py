@@ -84,12 +84,12 @@ def setup_plot_style():
     mpl.rcParams.update({
         "figure.dpi": DPI,
         "savefig.dpi": DPI,
-        "font.size": 11,
+        "font.size": 12,
         "axes.titlesize": 12,
-        "axes.labelsize": 11,
+        "axes.labelsize": 12,
         "legend.fontsize": 9,
-        "xtick.labelsize": 10,
-        "ytick.labelsize": 10,
+        "xtick.labelsize": 12,
+        "ytick.labelsize": 12,
     })
 
 
@@ -444,9 +444,9 @@ def qqplot_standardized_square(ax, x, dist, title, t_params=None, zoom_central=Q
 
     ax.scatter(
         q, x,
-        s=13,
+        s=15,
         alpha=QQ_MARKER_ALPHA,
-        facecolor="cornflowerblue",
+        facecolor="grey",
         edgecolor="none"
     )
 
@@ -622,7 +622,7 @@ def make_t_exceedance_figure(
     right_focus=1 - TAIL_FOCUS_EXTREME,
     standardized=False,
 ):
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(15, 5), constrained_layout=True)
 
     xlabel = "Standardized residual" if standardized else "Residual (bps)"
 
@@ -650,19 +650,19 @@ def make_t_exceedance_figure(
     savefig(fig, outname)
 
 def make_qq_figure_standardized(x_std, name_prefix, t_params, outname):
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
 
     qqplot_standardized_square(
         axes[0],
         x_std,
         stats.norm,
-        f"{name_prefix}: standardized QQ vs Gaussian",
+        f"",
     )
     qqplot_standardized_square(
         axes[1],
         x_std,
         stats.t,
-        f"{name_prefix}: standardized QQ vs Student-t",
+        f"",
         t_params=t_params,
     )
 

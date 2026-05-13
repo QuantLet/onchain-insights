@@ -33,7 +33,7 @@ Submitted: 25.01.2026
 | [Quantlet 6: Legendre basis Decomposition](#quantlet-6-legendre-basis-decomposition) | [View Quantlet](./6.%20Legendre%20basis%20decomposition/README.md) |
 | [Quantlet 7: Gegenbauer Polynomials](#quantlet-7-gegenbauer-polynomials) | [View Quantlet](./7.%20Gegenbauer%20Polynomials/README.md) |
 | [Quantlet 8: Early-Warning Model](#quantlet-8-early-warning-model) | [View Quantlet](./8.%20Early-Warning%20Model/README.md) |
-| [Quantlet 9: Parametric Quantile Function Characterisation](#quantlet-9-parametric-quantile-function-characterisation) | [View Quantlet](./9.%20Parametric%20Quantile%20Function%20Characterisation/README.md) |
+| [Quantlet 9: Parametric Quantile Function Characterisation](#quantlet-9-parametric-quantile-function-characterisation) | [View Quantlet](./9.%20Parametric%20quantile%20function%20characterisation/README.md) |
 | [Quantlet 10: Forecasting architecture](#quantlet-10-forecasting-architecture) | [View Quantlet](./10.%20Forecasting%20architecture/README.md) |
 
 # Repo Instructions
