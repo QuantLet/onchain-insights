@@ -25,6 +25,10 @@ Datafile: hourly_liquidity_full.parquet
 </div>
 
 <div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/alpha_impact_decomposition.png" alt="Image" />
+</div>
+
+<div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_scores_comparison.png" alt="Image" />
 </div>
 

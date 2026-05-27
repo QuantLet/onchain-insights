@@ -25,6 +25,10 @@ Datafile: hourly_liquidity_pricecentered_full.parquet, hourly_liquidity_full.par
 </div>
 
 <div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/6.%20Legendre%20basis%20decomposition/coeff_roughness.png" alt="Image" />
+</div>
+
+<div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/6.%20Legendre%20basis%20decomposition/legendre_reconstruction_pegvsprice.png" alt="Image" />
 </div>
 
