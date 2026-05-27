@@ -28,10 +28,6 @@ Datafile: curve_3pool_hourly.parquet, USDC_USDT_hourly_metrics.parquet
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/4.%20Stablecoin%20liquidity%20ownership/jit_share_over_time.png" alt="Image" />
-</div>
-
-<div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/4.%20Stablecoin%20liquidity%20ownership/liquidity_curve_24883875.png" alt="Image" />
 </div>
 
@@ -39,3 +35,10 @@ Datafile: curve_3pool_hourly.parquet, USDC_USDT_hourly_metrics.parquet
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/4.%20Stablecoin%20liquidity%20ownership/nfpm_in_range_share_over_time.png" alt="Image" />
 </div>
 
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/4.%20Stablecoin%20liquidity%20ownership/jit_share_over_time.png" alt="Image" />
+</div>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/4.%20Stablecoin%20liquidity%20ownership/hhi_tickwidth_over_time.png" alt="Image" />
+</div>
