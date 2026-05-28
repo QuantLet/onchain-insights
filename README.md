@@ -297,7 +297,7 @@ This quantlet provides code to run full cross-validation analysis of common tree
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/roc_pr.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/roc_pr.png"
     alt="Final retraining ROC and PR curves"
     width="100%"
   />
@@ -309,12 +309,12 @@ This quantlet provides code to run full cross-validation analysis of common tree
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_curve_entropy.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_curve_entropy.png"
     alt="SHAP scatter plot curve entropy"
     width="49%"
   />
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_tangent_up.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tangent_up.png"
     alt="SHAP scatter plot tangent up"
     width="49%"
   />

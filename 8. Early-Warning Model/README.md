@@ -144,7 +144,7 @@ bash full_retraining.sh
     width="49%"
   />
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_swap_count_100.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_swap_count_100.png"
     alt="SHAP scatter plot for swap count 100"
     width="49%"
   />
