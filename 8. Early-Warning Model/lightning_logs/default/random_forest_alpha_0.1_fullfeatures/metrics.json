@@ -1,8 +1,0 @@
-{
-  "best_iteration": -1.0,
-  "test_roc_auc": 0.8646491697911087,
-  "test_auprc": 0.07144492931740143,
-  "best_threshold_youdenJ": 0.17555501159625694,
-  "tpr_at_best_threshold": 0.9025641025641026,
-  "fpr_at_best_threshold": 0.2378146759507231
-}

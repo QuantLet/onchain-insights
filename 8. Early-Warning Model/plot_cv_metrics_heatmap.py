@@ -2,15 +2,14 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
+import argparse
 
 # ------------------------------------------------------------
 # Config
 # ------------------------------------------------------------
 BASE_DIR = Path("lightning_logs")
-EXPERIMENT_NAME = "cv_model_comparison"
-OUTPUT_DIR = BASE_DIR / EXPERIMENT_NAME / "plots_summary"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
 
 
 # ------------------------------------------------------------
@@ -180,6 +179,17 @@ def plot_three_heatmaps(
 # Main
 # ------------------------------------------------------------
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Plot CV metrics heatmaps for model comparison")
+    parser.add_argument(
+        "--experiment_name",
+        type=str,
+        default="cv_model_comparison",
+        help="Name of the experiment to load CV summaries from")
+    args = parser.parse_args()
+    EXPERIMENT_NAME = args.experiment_name
+    OUTPUT_DIR = BASE_DIR / EXPERIMENT_NAME / "plots_summary"
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    
     summary_df = load_cv_summaries(BASE_DIR, EXPERIMENT_NAME)
 
     required_cols = [

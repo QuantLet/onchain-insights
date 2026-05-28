@@ -1,6 +1,0 @@
-{"timestamp": "2026-05-04T11:38:07.908855Z", "key": "best_iteration", "value": -1.0, "step": null}
-{"timestamp": "2026-05-04T11:38:08.204592Z", "key": "test_roc_auc", "value": 0.8646491697911087, "step": null}
-{"timestamp": "2026-05-04T11:38:08.226227Z", "key": "test_auprc", "value": 0.07144492931740143, "step": null}
-{"timestamp": "2026-05-04T11:38:08.249721Z", "key": "best_threshold_youdenJ", "value": 0.17555501159625694, "step": null}
-{"timestamp": "2026-05-04T11:38:08.271680Z", "key": "tpr_at_best_threshold", "value": 0.9025641025641026, "step": null}
-{"timestamp": "2026-05-04T11:38:08.292255Z", "key": "fpr_at_best_threshold", "value": 0.2378146759507231, "step": null}

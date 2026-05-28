@@ -1,0 +1,15 @@
+{
+  "dataset_path": "./preprocessed_datasets/dataset_alpha_0.1_full_binarytarget_win-24_thresh-15_both_dynamic-False.parquet",
+  "alpha": 0.1,
+  "n_splits": 5,
+  "cv_val_frac": 0.3,
+  "scaler": "robust",
+  "models_compared": [
+    "xgboost",
+    "lightgbm",
+    "catboost",
+    "random_forest"
+  ],
+  "n_rows": 38038,
+  "n_features": 105
+}

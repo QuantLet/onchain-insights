@@ -682,7 +682,7 @@ if __name__ == "__main__":
     cv_args.add_argument(
         "--cv_min_train_frac",
         type=float,
-        default=0.65,
+        default=0.68,
         help="minimum fraction of the full dataset used as training set in the first fold"
     )
     cv_args.add_argument(

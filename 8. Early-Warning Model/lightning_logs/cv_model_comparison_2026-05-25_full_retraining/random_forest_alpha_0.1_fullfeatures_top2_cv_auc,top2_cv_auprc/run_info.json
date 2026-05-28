@@ -1,0 +1,5 @@
+{
+  "experiment_name": "cv_model_comparison_2026-05-25_full_retraining",
+  "run_name": "random_forest_alpha_0.1_fullfeatures_top2_cv_auc,top2_cv_auprc",
+  "created_at": "2026-05-25T09:21:06.309974Z"
+}
