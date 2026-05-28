@@ -60,12 +60,12 @@ bash full_retraining.sh
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison/plots_summary/heatmap_cv_auc.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25/plots_summary/heatmap_cv_auc.png"
     alt="CV AUC Heatmap"
     width="49%"
   />
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison/plots_summary/heatmap_cv_auprc.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25/plots_summary/heatmap_cv_auprc.png"
     alt="CV AUPRC Heatmap"
     width="49%"
   />
@@ -79,7 +79,7 @@ bash full_retraining.sh
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/roc_pr.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/roc_pr.png"
     alt="Final retraining ROC and PR curves"
     width="100%"
   />
@@ -93,7 +93,7 @@ bash full_retraining.sh
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/timeseries/predictions_over_time.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/timeseries/predictions_over_time.png"
     alt="Predictions over time"
     width="100%"
   />
@@ -107,12 +107,12 @@ bash full_retraining.sh
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_beeswarm_global.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_beeswarm_global.png"
     alt="SHAP beeswarm summary plot"
     width="49%"
   />
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/feature_importance/feature_importance_native.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/feature_importance/feature_importance_native.png"
     alt="Native model feature importance"
     width="49%"
   />
@@ -126,12 +126,12 @@ bash full_retraining.sh
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_curve_entropy.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_curve_entropy.png"
     alt="SHAP scatter plot for curve entropy"
     width="49%"
   />
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_tangent_up.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tangent_up.png"
     alt="SHAP scatter plot for tangent up"
     width="49%"
   />
@@ -139,12 +139,12 @@ bash full_retraining.sh
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_tvlUSD_500.png"
-    alt="SHAP scatter plot for TVL USD 500"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tvlUSD_500.png"
+    alt="SHAP scatter plot for tvl USD 500"
     width="49%"
   />
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/default/random_forest_alpha_0.1_fullfeatures/artifacts/plots/shap/shap_scatter_swap_count_100.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_swap_count_100.png"
     alt="SHAP scatter plot for swap count 100"
     width="49%"
   />
