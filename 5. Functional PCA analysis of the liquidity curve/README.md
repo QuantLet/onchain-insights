@@ -30,10 +30,6 @@ Datafile: hourly_liquidity_pricecentered_full.parquet, hourly_liquidity_full.par
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/alpha_impact_decomposition.png" alt="Image" />
-</div>
-
-<div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/4PCs_pegcentered.png" alt="Image" />
 </div>
 
@@ -51,10 +47,6 @@ Datafile: hourly_liquidity_pricecentered_full.parquet, hourly_liquidity_full.par
 
 <div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/uniswap_liquidity_surface_comparison.png" alt="Image" />
-</div>
-
-<div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/coeff_roughness.png" alt="Image" />
 </div>
 
 

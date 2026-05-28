@@ -191,16 +191,16 @@ This quantlet contains plots related to the functional PCA analysis of the log-l
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/uniswap_liquidity_surface_comparison.png"
-    alt="Uniswap liquidity surface comparison"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/log_liquidity_heatmaps.png"
+    alt="Uniswap liquidity heatmap comparison"
     width="100%"
   />
 </p>
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/4PCs_pegcentered.png"
-    alt="Four principal components peg centered"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/spatiotemporal_spectrum_comparison.png"
+    alt="Spatio temporal spectra comparison"
     width="100%"
   />
 </p>
