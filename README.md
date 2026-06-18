@@ -393,17 +393,17 @@ Run the notebook:
 </p>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/hard_concrete_plot.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />
 </div>
 
 <p align="center">
-  <b>L0 regularisation with hard concrete gating</b>
+  <b>Dilated TCN target encoder</b>
 </p>
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/nhits_stack_decomposition_fixed.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/timexer_style_fusion_diagnostics.png" alt="Image" />
 </div>
 <p align="center">
-  <b>NHITS encoder stack decomposition</b>
+  <b>Sparse variate cross attention with selection weights.</b>
 </p>
 
 ### Recreate the plot

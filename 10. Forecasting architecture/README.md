@@ -25,10 +25,9 @@ Datafile:
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/hard_concrete_plot.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/nhits_stack_decomposition_fixed.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/timexer_style_fusion_diagnostics.png" alt="Image" />
 </div>
-
