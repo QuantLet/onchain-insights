@@ -107,14 +107,17 @@ def make_overlapping_expanding_window_splits(
     n_splits=5,
     test_frac=0.30,
     min_train_frac=0.20,
+    embargo_periods=0,
 ):
     """
     Create expanding-window CV splits with:
       - fixed test size = test_frac * n_samples for every fold
       - overlapping test windows allowed
       - train always strictly before test
+      - embargo_periods rows dropped between train end and test start
 
-    Example with n=1000, test_frac=0.30, min_train_frac=0.20, n_splits=5:
+    Example with n=1000, test_frac=0.30, min_train_frac=0.20, n_splits=5,
+    embargo_periods=0:
       fold 1: train [0:200), test [200:500)
       fold 2: train [0:325), test [325:625)
       fold 3: train [0:450), test [450:750)
@@ -127,21 +130,24 @@ def make_overlapping_expanding_window_splits(
         raise ValueError("min_train_frac must be in (0, 1)")
     if n_splits < 2:
         raise ValueError("n_splits must be at least 2")
+    if embargo_periods < 0:
+        raise ValueError("embargo_periods must be >= 0")
 
     test_size = int(np.ceil(test_frac * n_samples))
     min_train_size = int(np.ceil(min_train_frac * n_samples))
-    max_train_end = n_samples - test_size
+    # The latest a training window can end so the embargoed test fits
+    max_train_end = n_samples - test_size - embargo_periods
 
     if max_train_end <= 0:
         raise ValueError(
-            f"Dataset too small for test_frac={test_frac}; "
+            f"Dataset too small for test_frac={test_frac} with embargo_periods={embargo_periods}; "
             f"test_size={test_size}, n_samples={n_samples}"
         )
 
     if min_train_size >= max_train_end:
         raise ValueError(
             f"min_train_frac={min_train_frac} leaves no room for {n_splits} folds. "
-            f"Need min_train_size < n_samples - test_size "
+            f"Need min_train_size < n_samples - test_size - embargo_periods "
             f"({min_train_size} < {max_train_end})."
         )
 
@@ -161,7 +167,7 @@ def make_overlapping_expanding_window_splits(
 
     splits = []
     for train_end in train_ends:
-        test_start = train_end
+        test_start = train_end + embargo_periods
         test_end = test_start + test_size
 
         train_idx = np.arange(0, train_end)
@@ -427,7 +433,7 @@ def apply_scaling(X_train, X_val, X_test, scaler_name):
     return X_train_s, X_val_s, X_test_s, scaler
 
 
-def split_train_val_tail(X_train_full, y_train_full, val_frac):
+def split_train_val_tail(X_train_full, y_train_full, val_frac, embargo_periods=0):
     n = len(X_train_full)
     val_n = max(1, int(n * val_frac))
 
@@ -438,10 +444,15 @@ def split_train_val_tail(X_train_full, y_train_full, val_frac):
     if split_idx <= 0:
         return X_train_full, y_train_full, None, None
 
+    val_start = split_idx + embargo_periods
+    if val_start >= n:
+        # Embargo eats the entire val window — fall back to no early stopping
+        return X_train_full.iloc[:split_idx], y_train_full.iloc[:split_idx], None, None
+
     X_train = X_train_full.iloc[:split_idx]
     y_train = y_train_full.iloc[:split_idx]
-    X_val = X_train_full.iloc[split_idx:]
-    y_val = y_train_full.iloc[split_idx:]
+    X_val = X_train_full.iloc[val_start:]
+    y_val = y_train_full.iloc[val_start:]
 
     return X_train, y_train, X_val, y_val
 
@@ -461,6 +472,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         n_splits=args.n_splits,
         test_frac=args.cv_test_frac,
         min_train_frac=args.cv_min_train_frac,
+        embargo_periods=args.cv_embargo_hours,
     )
 
     fold_rows = []
@@ -471,9 +483,10 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         X_test = X.iloc[test_idx].copy()
         y_test = y.iloc[test_idx].copy()
 
-        # Tail validation split from the training fold
+        # Tail validation split from the training fold (with the same embargo)
         X_train, y_train, X_val, y_val = split_train_val_tail(
-            X_train_full, y_train_full, val_frac=args.cv_val_frac
+            X_train_full, y_train_full, val_frac=args.cv_val_frac,
+            embargo_periods=args.cv_embargo_hours,
         )
 
         X_train_s, X_val_s, X_test_s, scaler = apply_scaling(
@@ -524,6 +537,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             "test_neg": int((y_test == 0).sum()),
             "scale_pos_weight": w_pos,
             "train_end_timestamp": df.iloc[train_idx]["timestamp"].iloc[-1],
+            "embargo_hours": args.cv_embargo_hours,
             "test_start": df.iloc[test_idx]["timestamp"].iloc[0],
             "test_end": df.iloc[test_idx]["timestamp"].iloc[-1],
             **fold_metrics,
@@ -691,6 +705,12 @@ if __name__ == "__main__":
         default=0.30,
         help="fraction of each training fold used as tail validation set for early stopping"
     )
+    cv_args.add_argument(
+        "--cv_embargo_hours",
+        type=int,
+        default=24,
+        help="number of hourly periods to drop between train/val and train/test boundaries (leakage embargo)"
+    )
 
     model_args = parser.add_argument_group("Model arguments")
     model_args.add_argument("--learning_rate", type=float, default=0.01, help="learning rate")
@@ -739,6 +759,7 @@ if __name__ == "__main__":
         "alpha": args.alpha,
         "n_splits": args.n_splits,
         "cv_val_frac": args.cv_val_frac,
+        "cv_embargo_hours": args.cv_embargo_hours,
         "scaler": args.scaler,
         "models_compared": args.model_names,
         "n_rows": len(df),
@@ -764,6 +785,7 @@ if __name__ == "__main__":
             "dataset_path": dataset_path,
             "n_splits": args.n_splits,
             "cv_val_frac": args.cv_val_frac,
+            "cv_embargo_hours": args.cv_embargo_hours,
             "scaler": args.scaler,
             "learning_rate": args.learning_rate,
             "early_stopping_rounds": args.early_stopping_rounds,

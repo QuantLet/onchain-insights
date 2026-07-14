@@ -42,7 +42,8 @@ for ALPHA in "${ALPHAS[@]}"; do
     --early_stopping_rounds "${EARLY_STOPPING_ROUNDS}" \
     --depeg_side "${DEPEG_SIDE}" \
     --model_names "${MODELS[@]}" \
-    --scaler "${SCALER}"
+    --scaler "${SCALER}" \
+    --cv_embargo_hours 24 
 done
 
 echo "All CV runs completed."
