@@ -1,0 +1,13 @@
+run_id=20260720_124420
+target_threshold_bps=20
+target_window_hours=24
+alphas=0.1 0.3 0.5 1.0 1.5 2.0
+models=xgboost lightgbm catboost random_forest
+max_depth=6
+n_estimators=800
+early_stopping_rounds=200
+scaler=robust
+depeg_side=both
+eval_metric=auc
+cv_experiment=cv_model_comparison_threshold_20_20260720_124420
+full_retraining_experiment=cv_model_comparison_threshold_20_20260720_124420_full_retraining

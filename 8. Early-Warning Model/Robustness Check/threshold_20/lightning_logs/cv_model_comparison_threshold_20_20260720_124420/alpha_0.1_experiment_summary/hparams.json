@@ -1,0 +1,16 @@
+{
+  "dataset_path": "/Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/preprocessed_datasets/dataset_alpha_0.1_full_binarytarget_win-24_thresh-20_both_dynamic-False.parquet",
+  "alpha": 0.1,
+  "n_splits": 5,
+  "cv_val_frac": 0.3,
+  "cv_embargo_hours": 24,
+  "scaler": "robust",
+  "models_compared": [
+    "xgboost",
+    "lightgbm",
+    "catboost",
+    "random_forest"
+  ],
+  "n_rows": 37990,
+  "n_features": 105
+}

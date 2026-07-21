@@ -1,0 +1,21 @@
+{
+  "model_name": "lightgbm",
+  "alpha": 0.5,
+  "dataset_path": "/Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/preprocessed_datasets/dataset_alpha_0.5_full_binarytarget_win-24_thresh-25_both_dynamic-False.parquet",
+  "n_splits": 5,
+  "cv_val_frac": 0.3,
+  "cv_embargo_hours": 24,
+  "scaler": "robust",
+  "learning_rate": 0.01,
+  "early_stopping_rounds": 200,
+  "eval_metric": "auc",
+  "n_estimators": 800,
+  "max_depth": 6,
+  "num_leaves": 31,
+  "rf_max_features": "sqrt",
+  "target_window": 24,
+  "target_threshold": 25,
+  "depeg_side": "both",
+  "dynamic_threshold": 0,
+  "n_features": 105
+}

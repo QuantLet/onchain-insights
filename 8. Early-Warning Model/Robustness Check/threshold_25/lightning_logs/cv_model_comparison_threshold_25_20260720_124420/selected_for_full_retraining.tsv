@@ -1,0 +1,4 @@
+alpha	model_name	cv_auc_mean	cv_auprc_mean	selection_reason
+2.0	lightgbm	0.9925078402063364	0.1493291543978661	top2_cv_auc,top2_cv_auprc
+0.5	random_forest	0.9899059175239602	0.1034198438067828	top2_cv_auc
+0.3	xgboost	0.9611715613001554	0.1503299672129205	top2_cv_auprc
