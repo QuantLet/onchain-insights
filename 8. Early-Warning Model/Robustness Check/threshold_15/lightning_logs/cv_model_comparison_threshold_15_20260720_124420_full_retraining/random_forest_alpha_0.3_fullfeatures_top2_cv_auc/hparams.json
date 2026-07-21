@@ -1,0 +1,21 @@
+{
+  "model_name": "random_forest",
+  "dataset_path": "/Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/preprocessed_datasets/dataset_alpha_0.3_full_binarytarget_win-24_thresh-15_both_dynamic-False.parquet",
+  "test_size": 0.3,
+  "val_size": 0.15,
+  "scaler": "robust",
+  "learning_rate": 0.01,
+  "early_stopping_rounds": 200,
+  "eval_metric": "auc",
+  "n_estimators": 800,
+  "max_depth": 6,
+  "num_leaves": 31,
+  "rf_max_features": "sqrt",
+  "target_window": 24,
+  "target_threshold": 15,
+  "depeg_side": "both",
+  "dynamic_threshold": 0,
+  "alpha": 0.3,
+  "scale_pos_weight_used": 13.530598052851182,
+  "n_features": 105
+}

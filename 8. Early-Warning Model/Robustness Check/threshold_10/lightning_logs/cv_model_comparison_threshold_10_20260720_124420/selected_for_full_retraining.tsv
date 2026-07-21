@@ -1,0 +1,4 @@
+alpha	model_name	cv_auc_mean	cv_auprc_mean	selection_reason
+2.0	random_forest	0.928450850860444	0.7653831780087987	top2_cv_auc,top2_cv_auprc
+0.1	random_forest	0.9252738338343562	0.7616014427049127	top2_cv_auc
+1.5	random_forest	0.9244875932704504	0.762633340387978	top2_cv_auprc

@@ -1,0 +1,1694 @@
+====================================================
+Running threshold robustness check
+Run ID: 20260720_124420
+Thresholds (bps): 10 15 20 25
+Python: /tmp/stablecoin-threshold-venv/bin/python
+Output folder: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check
+====================================================
+
+====================================================
+Threshold 10 bps: CV comparison
+Experiment: cv_model_comparison_threshold_10_20260720_124420
+====================================================
+========================================
+Threshold=10 bps, alpha=0.1
+========================================
+Matplotlib is building the font cache; this may take a moment.
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8615183413062577 auprc=0.6766900570144363 lift=4.645037524243191
+[xgboost] fold=2 train=26018 test=11397 auc=0.8427452597567945 auprc=0.6104817598198963 lift=8.784341600438477
+[xgboost] fold=3 train=26202 test=11397 auc=0.8710583022901158 auprc=0.6676048161092438 lift=5.523719785475096
+[xgboost] fold=4 train=26385 test=11397 auc=0.8555637986462161 auprc=0.5974310688637006 lift=6.6443567262805345
+[xgboost] fold=5 train=26569 test=11397 auc=0.7970402669980168 auprc=0.5230686404648199 lift=2.0774785956700152
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.86139161582595 auprc=0.6926893707667242 lift=3.975684921620139
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8734779257804703 auprc=0.6884861690922084 lift=7.531358885017421
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8853005650823171 auprc=0.6745569334943465 lift=5.811597712079253
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.8687605714442727 auprc=0.6410426690037919 lift=5.526827704626255
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.7591274492743992 auprc=0.20739340087946628 lift=2.0503559463513974
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.885108564071345 auprc=0.4847684341944082 lift=3.27363702141842
+[catboost] fold=2 train=26018 test=11397 auc=0.8966574201341306 auprc=0.6898534069338207 lift=4.286961514095661
+[catboost] fold=3 train=26202 test=11397 auc=0.8545998410466994 auprc=0.4215946712808564 lift=4.694025367598985
+[catboost] fold=4 train=26385 test=11397 auc=0.8877027464827882 auprc=0.6464784104916371 lift=5.026139897697204
+[catboost] fold=5 train=26569 test=11397 auc=0.9003883774453394 auprc=0.7026702872761716 lift=5.083017690312262
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9255566116690288 auprc=0.7805796118176892 lift=5.360435218863665
+[random_forest] fold=2 train=26018 test=11397 auc=0.928945604619198 auprc=0.7909331809448032 lift=5.183976567751107
+[random_forest] fold=3 train=26202 test=11397 auc=0.9270580638405557 auprc=0.7640392830525125 lift=5.869523039931403
+[random_forest] fold=4 train=26385 test=11397 auc=0.9194577622543554 auprc=0.7289156276443266 lift=6.054155701055431
+[random_forest] fold=5 train=26569 test=11397 auc=0.9253511267886436 auprc=0.7435395100652319 lift=6.823451310681706
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/alpha_0.1_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.1     0.925274    0.003181
+2       catboost    0.1     0.884891    0.016150
+1       lightgbm    0.1     0.849612    0.045905
+0        xgboost    0.1     0.845585    0.025950
+========================================
+Threshold=10 bps, alpha=0.3
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8667485846208074 auprc=0.6634688131936993 lift=3.2870430456413584
+[xgboost] fold=2 train=26018 test=11397 auc=0.8192340852154183 auprc=0.4765088369341104 lift=5.300311985187993
+[xgboost] fold=3 train=26202 test=11397 auc=0.8734769671647503 auprc=0.6499178265440532 lift=5.599796555829775
+[xgboost] fold=4 train=26385 test=11397 auc=0.8290897391413256 auprc=0.5960306238712707 lift=3.4114466815809097
+[xgboost] fold=5 train=26569 test=11397 auc=0.7924079270446762 auprc=0.3904098062198483 lift=2.1148542146308342
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8440663509391844 auprc=0.6290020038029853 lift=5.484586174432666
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8904772897024371 auprc=0.7057919818637699 lift=4.043247951784537
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8921768248597785 auprc=0.6953717457773068 lift=4.671698972086062
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.8796539648520579 auprc=0.6494276314335409 lift=3.630386389372221
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8208516125337092 auprc=0.2891958504187985 lift=2.3553977800454993
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9097605551544277 auprc=0.7511086472252152 lift=5.166961499826655
+[catboost] fold=2 train=26018 test=11397 auc=0.9110836172340091 auprc=0.7483177112564735 lift=4.775548165499719
+[catboost] fold=3 train=26202 test=11397 auc=0.9009416600599536 auprc=0.6416903105175255 lift=4.615535309509781
+[catboost] fold=4 train=26385 test=11397 auc=0.8899865298952616 auprc=0.6122156348948016 lift=4.84520020288598
+[catboost] fold=5 train=26569 test=11397 auc=0.9088109826478395 auprc=0.7085563363685623 lift=5.669835829970704
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9279615887136131 auprc=0.7748757988406552 lift=4.150087587183183
+[random_forest] fold=2 train=26018 test=11397 auc=0.9272578815371808 auprc=0.7897850618595846 lift=5.609977494857349
+[random_forest] fold=3 train=26202 test=11397 auc=0.9253262650817876 auprc=0.754808540832972 lift=5.949048249717002
+[random_forest] fold=4 train=26385 test=11397 auc=0.9180445088555715 auprc=0.7221211741278559 lift=5.025445745465487
+[random_forest] fold=5 train=26569 test=11397 auc=0.9250890714792882 auprc=0.7351218259858314 lift=5.408827251634676
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/alpha_0.3_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.3     0.924736    0.003522
+2       catboost    0.3     0.904117    0.007902
+1       lightgbm    0.3     0.865445    0.028244
+0        xgboost    0.3     0.836191    0.030262
+========================================
+Threshold=10 bps, alpha=0.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8718401825302559 auprc=0.6797652686186437 lift=4.686302933688366
+[xgboost] fold=2 train=26018 test=11397 auc=0.8509889891526767 auprc=0.5034740724224269 lift=3.225694168586637
+[xgboost] fold=3 train=26202 test=11397 auc=0.8702300038179382 auprc=0.5914330454400734 lift=4.547144197138223
+[xgboost] fold=4 train=26385 test=11397 auc=0.8476512836110957 auprc=0.6073186282147364 lift=6.220360940676899
+[xgboost] fold=5 train=26569 test=11397 auc=0.8673645991094818 auprc=0.5248899346093332 lift=5.474286383494404
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8953111653650759 auprc=0.7126071275616934 lift=4.644946928254654
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8659827609594274 auprc=0.6599457773075375 lift=3.937171485431309
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8842013635942036 auprc=0.679495682155836 lift=5.109013000708196
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.8885143288132655 auprc=0.6640982152313898 lift=5.358955263111781
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8124527262059245 auprc=0.26843168015972974 lift=2.2690029769350075
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9090772546191946 auprc=0.751244749771277 lift=4.727612595264856
+[catboost] fold=2 train=26018 test=11397 auc=0.9104122676368869 auprc=0.7308727843543913 lift=5.438918043650199
+[catboost] fold=3 train=26202 test=11397 auc=0.9038963462115052 auprc=0.7100471074367946 lift=5.273545273301013
+[catboost] fold=4 train=26385 test=11397 auc=0.8929309853091937 auprc=0.6598950132218074 lift=5.4601304292769415
+[catboost] fold=5 train=26569 test=11397 auc=0.9046447677692628 auprc=0.6769711547641782 lift=5.377956707362744
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9245084719339878 auprc=0.7778115902772113 lift=4.875926219964009
+[random_forest] fold=2 train=26018 test=11397 auc=0.9297241712712347 auprc=0.7912355127313644 lift=5.9199479650280855
+[random_forest] fold=3 train=26202 test=11397 auc=0.9244864461230473 auprc=0.7594443734812917 lift=6.376484054593704
+[random_forest] fold=4 train=26385 test=11397 auc=0.9122944206204214 auprc=0.7277068692851628 lift=5.133745026838088
+[random_forest] fold=5 train=26569 test=11397 auc=0.920414758955023 auprc=0.7415888099891935 lift=5.263924279604939
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/alpha_0.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.5     0.922286    0.005804
+2       catboost    0.5     0.904192    0.006159
+1       lightgbm    0.5     0.869292    0.030035
+0        xgboost    0.5     0.861615    0.010195
+========================================
+Threshold=10 bps, alpha=1.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8441035345953645 auprc=0.6562274432308376 lift=5.347219155700786
+[xgboost] fold=2 train=26018 test=11397 auc=0.8357683319491015 auprc=0.5548945442340081 lift=2.2550455085081125
+[xgboost] fold=3 train=26202 test=11397 auc=0.8690085381022199 auprc=0.6551810545628909 lift=5.256480477788664
+[xgboost] fold=4 train=26385 test=11397 auc=0.8432276513730711 auprc=0.6180946630458678 lift=5.007134010611057
+[xgboost] fold=5 train=26569 test=11397 auc=0.8002703514503272 auprc=0.526383209986315 lift=2.068856869641323
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.891550286704703 auprc=0.722202847210229 lift=4.512280937654072
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8859595123243094 auprc=0.6841627151311218 lift=4.130989406730118
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8941085408279181 auprc=0.6895164533495561 lift=5.617322646545191
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.8897085652101956 auprc=0.6515225213822808 lift=5.518568983379128
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8534823352314262 auprc=0.357779802244489 lift=3.910676849042787
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9170439546616507 auprc=0.7648257104091287 lift=3.9292326185914255
+[catboost] fold=2 train=26018 test=11397 auc=0.9140666566263114 auprc=0.7581259933373692 lift=5.426581970117522
+[catboost] fold=3 train=26202 test=11397 auc=0.9080781847870358 auprc=0.7251419828703553 lift=5.904323029040663
+[catboost] fold=4 train=26385 test=11397 auc=0.8873244056614483 auprc=0.6525234047698549 lift=4.979117672336336
+[catboost] fold=5 train=26569 test=11397 auc=0.8928350635359794 auprc=0.6777134191448699 lift=3.7998444098688595
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.925580532883289 auprc=0.7817108968419653 lift=5.007028350311932
+[random_forest] fold=2 train=26018 test=11397 auc=0.9295929440553901 auprc=0.7886613827439003 lift=5.837947184328619
+[random_forest] fold=3 train=26202 test=11397 auc=0.9222324016478903 auprc=0.7571042174543546 lift=6.645998086513618
+[random_forest] fold=4 train=26385 test=11397 auc=0.9113898638952842 auprc=0.724001657866193 lift=6.102733885242275
+[random_forest] fold=5 train=26569 test=11397 auc=0.9205651606675038 auprc=0.7397384247840588 lift=5.658584903932966
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/alpha_1.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    1.0     0.921872    0.006084
+2       catboost    1.0     0.903870    0.011754
+1       lightgbm    1.0     0.882962    0.014977
+0        xgboost    1.0     0.838476    0.022152
+========================================
+Threshold=10 bps, alpha=1.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8573695972432347 auprc=0.6749241557802393 lift=5.742843474933027
+[xgboost] fold=2 train=26018 test=11397 auc=0.8825339210454118 auprc=0.6607662159461662 lift=5.05611504734272
+[xgboost] fold=3 train=26202 test=11397 auc=0.8822678827855694 auprc=0.573919870047413 lift=5.084377345951733
+[xgboost] fold=4 train=26385 test=11397 auc=0.8745322791549278 auprc=0.5921466460620017 lift=5.658062534324997
+[xgboost] fold=5 train=26569 test=11397 auc=0.87198535288439 auprc=0.5985086125639361 lift=4.489845426554288
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8910696248909509 auprc=0.7051152492130801 lift=4.9452914638278145
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8920235015704769 auprc=0.711239642299956 lift=4.701750326655052
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8970560205474496 auprc=0.6911485985763873 lift=5.82073544433095
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.882418541969792 auprc=0.6319036055298628 lift=4.981582366755278
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8139109997866394 auprc=0.2862507488531815 lift=2.4449167750784655
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9081126764047165 auprc=0.7528914665409081 lift=5.266983561101208
+[catboost] fold=2 train=26018 test=11397 auc=0.9090539299661426 auprc=0.7353199902186975 lift=4.89136561245084
+[catboost] fold=3 train=26202 test=11397 auc=0.7636916815812028 auprc=0.17539282700666992 lift=2.7460727701077468
+[catboost] fold=4 train=26385 test=11397 auc=0.7924906296081167 auprc=0.2702955713064031 lift=2.2073375722259407
+[catboost] fold=5 train=26569 test=11397 auc=0.896794585363465 auprc=0.692164315488408 lift=5.3913045941400375
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9250261953569087 auprc=0.7768280334739054 lift=4.605649245098257
+[random_forest] fold=2 train=26018 test=11397 auc=0.9332949284080745 auprc=0.7953363832358973 lift=5.837947184328619
+[random_forest] fold=3 train=26202 test=11397 auc=0.9251936079046029 auprc=0.7663919873715882 lift=6.5430164848683665
+[random_forest] fold=4 train=26385 test=11397 auc=0.9147447165942362 auprc=0.7308951961154599 lift=6.346527427551694
+[random_forest] fold=5 train=26569 test=11397 auc=0.9241785180884292 auprc=0.7437151017430396 lift=5.499371764791991
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/alpha_1.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    1.5     0.924488    0.005889
+1       lightgbm    1.5     0.875296    0.031051
+0        xgboost    1.5     0.873738    0.009184
+2       catboost    1.5     0.854029    0.062816
+========================================
+Threshold=10 bps, alpha=2.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8728072423673019 auprc=0.6919420904737594 lift=4.692834234295493
+[xgboost] fold=2 train=26018 test=11397 auc=0.8908967238411634 auprc=0.7047758844735752 lift=3.8489188034376283
+[xgboost] fold=3 train=26202 test=11397 auc=0.872115392723092 auprc=0.6607906203541242 lift=5.715970587521538
+[xgboost] fold=4 train=26385 test=11397 auc=0.8902601813352145 auprc=0.6440229624452842 lift=5.444421416539523
+[xgboost] fold=5 train=26569 test=11397 auc=0.8746009873172882 auprc=0.5915590096024403 lift=6.2030759182657915
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.894568305888215 auprc=0.7333663545187757 lift=5.066172837232713
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8928309229114899 auprc=0.6949899838664284 lift=4.777362985350454
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8893924948393124 auprc=0.680484804141008 lift=7.912056410425385
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.899499365367219 auprc=0.6791549615353135 lift=5.3157797719293844
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8831598940717241 auprc=0.6369023536462914 lift=7.356565065611976
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9143128273199144 auprc=0.7424595929919052 lift=4.54456131254398
+[catboost] fold=2 train=26018 test=11397 auc=0.9114489116470275 auprc=0.7570830764583454 lift=4.783298955438534
+[catboost] fold=3 train=26202 test=11397 auc=0.754815661429862 auprc=0.18445780449875424 lift=2.735044365408519
+[catboost] fold=4 train=26385 test=11397 auc=0.7428538580965788 auprc=0.16223756043338974 lift=2.684629405086461
+[catboost] fold=5 train=26569 test=11397 auc=0.8641608021657846 auprc=0.5956409545761776 lift=4.414441028459543
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9271697477027905 auprc=0.786418540873635 lift=4.98220405047667
+[random_forest] fold=2 train=26018 test=11397 auc=0.9338964148112692 auprc=0.7943283137918444 lift=4.924682497933419
+[random_forest] fold=3 train=26202 test=11397 auc=0.9307685429339612 auprc=0.7660692153088743 lift=4.839246176845701
+[random_forest] fold=4 train=26385 test=11397 auc=0.9239627071502529 auprc=0.7331449739887803 lift=5.367714588484635
+[random_forest] fold=5 train=26569 test=11397 auc=0.9264568417039465 auprc=0.7469548460808593 lift=5.499127854157835
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/alpha_2.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    2.0     0.928451    0.003487
+1       lightgbm    2.0     0.891890    0.005448
+0        xgboost    2.0     0.880136    0.008567
+2       catboost    2.0     0.837518    0.074665
+Threshold 10 bps: all CV runs completed.
+
+Pivot Table: Mean CV AUC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.925274  0.924736  0.922286  0.921872  0.924488  0.928451
+catboost       0.884891  0.904117  0.904192  0.903870  0.854029  0.837518
+lightgbm       0.849612  0.865445  0.869292  0.882962  0.875296  0.891890
+xgboost        0.845585  0.836191  0.861615  0.838476  0.873738  0.880136
+
+Pivot Table: Mean CV AUPRC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.761601  0.755342  0.759557  0.758243  0.762633  0.765383
+catboost       0.589073  0.692378  0.705806  0.715666  0.525213  0.488376
+lightgbm       0.580834  0.593758  0.596916  0.621037  0.605132  0.684980
+xgboost        0.615055  0.555267  0.581376  0.602156  0.620053  0.658618
+
+Pivot Table: Mean CV Lift @ Best Threshold by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  5.858308  5.228677  5.514006  5.850458  5.766502  5.122595
+catboost       4.472756  5.014616  5.255633  4.807820  4.100613  3.832395
+lightgbm       4.979165  4.037063  4.263818  4.737968  4.578855  6.085587
+xgboost        5.534987  3.942690  4.830758  3.986947  5.206249  5.181044
+
+Saved plots and pivot tables to: lightning_logs/cv_model_comparison_threshold_10_20260720_124420/plots_summary
+====================================================
+Threshold 10 bps: selecting top 2 by CV AUC and CV AUPRC
+====================================================
+
+Selected model-alpha pairs for full retraining:
+
+ alpha    model_name  cv_auc_mean  cv_auprc_mean          selection_reason
+   2.0 random_forest     0.928451       0.765383 top2_cv_auc,top2_cv_auprc
+   0.1 random_forest     0.925274       0.761601               top2_cv_auc
+   1.5 random_forest     0.924488       0.762633             top2_cv_auprc
+
+Saved selection table to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420/selected_for_full_retraining.tsv
+====================================================
+Threshold 10 bps: full retraining
+====================================================
+----------------------------------------
+Model=random_forest, alpha=2.0, reason=top2_cv_auc,top2_cv_auprc
+CV AUC=0.928450850860444, CV AUPRC=0.7653831780087987
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining/random_forest_alpha_2.0_fullfeatures_top2_cv_auc,top2_cv_auprc
+Train positives=3331, negatives=17564, w_pos=5.273
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining/random_forest_alpha_2.0_fullfeatures_top2_cv_auc,top2_cv_auprc
+----------------------------------------
+Model=random_forest, alpha=0.1, reason=top2_cv_auc
+CV AUC=0.9252738338343562, CV AUPRC=0.7616014427049127
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc
+Train positives=3331, negatives=17564, w_pos=5.273
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc
+----------------------------------------
+Model=random_forest, alpha=1.5, reason=top2_cv_auprc
+CV AUC=0.9244875932704504, CV AUPRC=0.762633340387978
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining/random_forest_alpha_1.5_fullfeatures_top2_cv_auprc
+Train positives=3331, negatives=17564, w_pos=5.273
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining/random_forest_alpha_1.5_fullfeatures_top2_cv_auprc
+Threshold 10 bps completed.
+CV output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420
+Full retraining output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_10/lightning_logs/cv_model_comparison_threshold_10_20260720_124420_full_retraining
+
+====================================================
+Threshold 15 bps: CV comparison
+Experiment: cv_model_comparison_threshold_15_20260720_124420
+====================================================
+========================================
+Threshold=15 bps, alpha=0.1
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.711169929874976 auprc=0.07868411923898845 lift=2.1181165710932057
+[xgboost] fold=2 train=26018 test=11397 auc=0.8909555415111364 auprc=0.18549268071830408 lift=4.4878744328485105
+[xgboost] fold=3 train=26202 test=11397 auc=0.7211392386788472 auprc=0.14904804178290929 lift=1.6859058612411184
+[xgboost] fold=4 train=26385 test=11397 auc=0.8100085149629874 auprc=0.1344988202057662 lift=2.7790657244135377
+[xgboost] fold=5 train=26569 test=11397 auc=0.7917054646835042 auprc=0.05972857835705106 lift=2.5325141055759697
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.46546642791276194 auprc=0.03719121817386385 lift=1.4176287772878804
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.6155441377482539 auprc=0.06186042084873234 lift=2.274318263272544
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8413009211530524 auprc=0.11958777289323554 lift=5.0546885686218435
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.6335585678381608 auprc=0.023231401035943258 lift=1.7780855881497224
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.735471687748067 auprc=0.05892048005268276 lift=2.1433212715458545
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8883156054984881 auprc=0.41092524083263243 lift=5.552308888313035
+[catboost] fold=2 train=26018 test=11397 auc=0.8932030963677371 auprc=0.23751865322807356 lift=5.215865285886115
+[catboost] fold=3 train=26202 test=11397 auc=0.9014785566305368 auprc=0.367913384229609 lift=8.649303251493032
+[catboost] fold=4 train=26385 test=11397 auc=0.8363053300921539 auprc=0.23728782283756394 lift=5.6919057189841045
+[catboost] fold=5 train=26569 test=11397 auc=0.8279954586864068 auprc=0.13402947378081626 lift=6.422654268808116
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9086513263708691 auprc=0.3592564422201371 lift=5.837023566524402
+[random_forest] fold=2 train=26018 test=11397 auc=0.9326477907775577 auprc=0.4282789883997484 lift=6.097322898221556
+[random_forest] fold=3 train=26202 test=11397 auc=0.9170381487428889 auprc=0.2916009713496003 lift=5.32267766052959
+[random_forest] fold=4 train=26385 test=11397 auc=0.8882227990422956 auprc=0.20505439998017108 lift=4.859924749163881
+[random_forest] fold=5 train=26569 test=11397 auc=0.8884159879874931 auprc=0.2336989716064963 lift=5.69080971659919
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/alpha_0.1_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.1     0.906995    0.017084
+2       catboost    0.1     0.869460    0.030864
+0        xgboost    0.1     0.784996    0.065462
+1       lightgbm    0.1     0.658268    0.125754
+========================================
+Threshold=15 bps, alpha=0.3
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.6088322146211748 auprc=0.067811242308869 lift=1.5438473300907969
+[xgboost] fold=2 train=26018 test=11397 auc=0.8878868148347628 auprc=0.2025367669371638 lift=5.413511185667194
+[xgboost] fold=3 train=26202 test=11397 auc=0.601723856203789 auprc=0.051118207284675664 lift=1.3213393940206923
+[xgboost] fold=4 train=26385 test=11397 auc=0.7442313414729055 auprc=0.050076370998997 lift=2.292887573964497
+[xgboost] fold=5 train=26569 test=11397 auc=0.7141025641025642 auprc=0.0496524345294364 lift=2.356441200050635
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.2353676738650254 auprc=0.029320735914947396 lift=1.0151503085150144
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.6137759158649732 auprc=0.04550407677567779 lift=1.6628473517344273
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.6054332083648598 auprc=0.03480021399664724 lift=1.7537594647358568
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.5975759823108511 auprc=0.02399792865294739 lift=1.6268045949359478
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.71310068257042 auprc=0.033559637131338714 lift=2.1201436033552823
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8971245523364285 auprc=0.4765272244502341 lift=6.5051824053063365
+[catboost] fold=2 train=26018 test=11397 auc=0.9139513157002647 auprc=0.4101259745286845 lift=5.582763002842024
+[catboost] fold=3 train=26202 test=11397 auc=0.887229788214202 auprc=0.2893019506981898 lift=6.007139548627195
+[catboost] fold=4 train=26385 test=11397 auc=0.8586832021754358 auprc=0.20087149306649316 lift=2.4422744402571492
+[catboost] fold=5 train=26569 test=11397 auc=0.856549883491501 auprc=0.21175791861482476 lift=2.66906782351074
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.905141429521134 auprc=0.35243352098226605 lift=5.534078743561111
+[random_forest] fold=2 train=26018 test=11397 auc=0.9278760333987459 auprc=0.36686854840867456 lift=5.944252644450081
+[random_forest] fold=3 train=26202 test=11397 auc=0.9108406924299028 auprc=0.20209009868990668 lift=5.254580914183596
+[random_forest] fold=4 train=26385 test=11397 auc=0.8877558494591167 auprc=0.1527528120147438 lift=4.802503511526068
+[random_forest] fold=5 train=26569 test=11397 auc=0.8733229871955099 auprc=0.1554085449424661 lift=3.620558202859088
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/alpha_0.3_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.3     0.900987    0.018856
+2       catboost    0.3     0.882708    0.022208
+0        xgboost    0.3     0.711355    0.104673
+1       lightgbm    0.3     0.553051    0.164288
+========================================
+Threshold=15 bps, alpha=0.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.7928033925929103 auprc=0.09962494947161032 lift=3.0899219982666284
+[xgboost] fold=2 train=26018 test=11397 auc=0.8663576051557452 auprc=0.17439122969761908 lift=3.865026558049929
+[xgboost] fold=3 train=26202 test=11397 auc=0.5541440731410092 auprc=0.038590104280447485 lift=1.269362158870716
+[xgboost] fold=4 train=26385 test=11397 auc=0.7105251351635925 auprc=0.07054907062213824 lift=3.5930012610340483
+[xgboost] fold=5 train=26569 test=11397 auc=0.6583673245162265 auprc=0.03283448834742122 lift=2.4606614696778637
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.379415732023761 auprc=0.038986241111818226 lift=1.187553125962427
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.41047069929038804 auprc=0.03966485878888887 lift=1.2346441338966525
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.31557973843899434 auprc=0.02260975816581907 lift=1.1104940076001169
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.3984963765627933 auprc=0.02164888937339231 lift=1.127299703264095
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.3704370556539812 auprc=0.016247745864681282 lift=1.1449668474984933
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8919283309386461 auprc=0.4206826279384538 lift=6.192827135130603
+[catboost] fold=2 train=26018 test=11397 auc=0.9164187426304333 auprc=0.49155088898219396 lift=9.177163142575868
+[catboost] fold=3 train=26202 test=11397 auc=0.8988099886406217 auprc=0.3582922297405953 lift=7.71863947625856
+[catboost] fold=4 train=26385 test=11397 auc=0.8456749939342334 auprc=0.23877527159552217 lift=2.6068619688572188
+[catboost] fold=5 train=26569 test=11397 auc=0.8542696130269779 auprc=0.17195292431561834 lift=2.587061288632792
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.8937953292873839 auprc=0.2287008938559344 lift=5.08383200730403
+[random_forest] fold=2 train=26018 test=11397 auc=0.9150094278300439 auprc=0.27060883596120267 lift=6.62651193467679
+[random_forest] fold=3 train=26202 test=11397 auc=0.9029957653340124 auprc=0.2651362248933751 lift=5.138870129607538
+[random_forest] fold=4 train=26385 test=11397 auc=0.8711741035254694 auprc=0.20724105107621735 lift=3.564636709824829
+[random_forest] fold=5 train=26569 test=11397 auc=0.8669747618328228 auprc=0.14155145967921023 lift=3.3016950067476385
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/alpha_0.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.5      0.88999    0.018403
+2       catboost    0.5      0.88142    0.027028
+0        xgboost    0.5      0.71644    0.107753
+1       lightgbm    0.5      0.37488    0.032806
+========================================
+Threshold=15 bps, alpha=1.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.7539114537539404 auprc=0.11280522659428087 lift=2.1196117177163067
+[xgboost] fold=2 train=26018 test=11397 auc=0.8811765087965424 auprc=0.2418810882615416 lift=5.048526486610813
+[xgboost] fold=3 train=26202 test=11397 auc=0.7796918793241596 auprc=0.1366297068631382 lift=2.3218838403241016
+[xgboost] fold=4 train=26385 test=11397 auc=0.8329437508869754 auprc=0.08700742004118904 lift=4.398456275765284
+[xgboost] fold=5 train=26569 test=11397 auc=0.7352716318972345 auprc=0.08879190578150627 lift=1.8254113901150593
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.5950434260470503 auprc=0.04714203444239548 lift=1.520967867141241
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.41276531032661495 auprc=0.029668935488487473 lift=1.2993542112731893
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.6774559979945546 auprc=0.03959612445425593 lift=2.2394158821684225
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.7115174030278475 auprc=0.03162713012845448 lift=1.8890306733764677
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.6999842061170395 auprc=0.028991938368395895 lift=1.9725128624699093
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8866307820977463 auprc=0.4990565506066696 lift=5.788498647960184
+[catboost] fold=2 train=26018 test=11397 auc=0.9018859690088239 auprc=0.38952380844337897 lift=5.4232859606535655
+[catboost] fold=3 train=26202 test=11397 auc=0.7630183331572443 auprc=0.04597452699339377 lift=2.4540889538610093
+[catboost] fold=4 train=26385 test=11397 auc=0.8513385888051127 auprc=0.1882719726819063 lift=5.603244837758113
+[catboost] fold=5 train=26569 test=11397 auc=0.8496408608352904 auprc=0.14957968949348205 lift=2.625058429021441
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.8928650468572409 auprc=0.24973131107233593 lift=5.503319404264438
+[random_forest] fold=2 train=26018 test=11397 auc=0.9277947222168226 auprc=0.3444844180769222 lift=6.317496580877782
+[random_forest] fold=3 train=26202 test=11397 auc=0.9047295306430878 auprc=0.32253560809430765 lift=5.6013069515991045
+[random_forest] fold=4 train=26385 test=11397 auc=0.8743832374255514 auprc=0.27771288167543995 lift=3.3727145024442327
+[random_forest] fold=5 train=26569 test=11397 auc=0.8662830355385256 auprc=0.2821109918109637 lift=3.5421911421911427
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/alpha_1.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    1.0     0.893211    0.021947
+2       catboost    1.0     0.850503    0.048167
+0        xgboost    1.0     0.796599    0.053560
+1       lightgbm    1.0     0.619353    0.111032
+========================================
+Threshold=15 bps, alpha=1.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.6950611181402929 auprc=0.10375361060167373 lift=2.105538739280879
+[xgboost] fold=2 train=26018 test=11397 auc=0.7027725453623941 auprc=0.07695907150446005 lift=1.9826626407970251
+[xgboost] fold=3 train=26202 test=11397 auc=0.7250113364101871 auprc=0.09990478496459224 lift=1.908526887114914
+[xgboost] fold=4 train=26385 test=11397 auc=0.830246430353554 auprc=0.206561469589704 lift=4.401374107503704
+[xgboost] fold=5 train=26569 test=11397 auc=0.7504454332788558 auprc=0.23868640578182823 lift=5.197942253824608
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.7157318093114022 auprc=0.09684347355758388 lift=2.369978635522006
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.6426684101554112 auprc=0.05559143860519856 lift=2.2262609802060274
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.4534226115282925 auprc=0.03846399046473477 lift=1.214556169712844
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.7779045866351705 auprc=0.059764509337602516 lift=4.692156013001084
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.7217378764781014 auprc=0.0317324506133827 lift=2.1601437613989916
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8819017391863782 auprc=0.34981510794644755 lift=4.95603113607252
+[catboost] fold=2 train=26018 test=11397 auc=0.9116427181925116 auprc=0.406066647746717 lift=5.872881564544689
+[catboost] fold=3 train=26202 test=11397 auc=0.843654989890744 auprc=0.08260448258520851 lift=3.878925959825928
+[catboost] fold=4 train=26385 test=11397 auc=0.8591895220175884 auprc=0.14212946004637447 lift=2.8172992651520263
+[catboost] fold=5 train=26569 test=11397 auc=0.8373715316404122 auprc=0.13508543011262314 lift=2.6239855281009747
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.8965049001737042 auprc=0.29186947340367647 lift=5.591589795696193
+[random_forest] fold=2 train=26018 test=11397 auc=0.9168414185411304 auprc=0.3555461661426916 lift=5.820073862644935
+[random_forest] fold=3 train=26202 test=11397 auc=0.8997785872765776 auprc=0.3284442455355419 lift=8.465075858116668
+[random_forest] fold=4 train=26385 test=11397 auc=0.8864474750387981 auprc=0.32635579570284834 lift=3.6774588292593835
+[random_forest] fold=5 train=26569 test=11397 auc=0.8663874125041773 auprc=0.2748659953568576 lift=6.184528395675408
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/alpha_1.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    1.5     0.893192    0.016599
+2       catboost    1.5     0.866752    0.027198
+0        xgboost    1.5     0.740707    0.048746
+1       lightgbm    1.5     0.662293    0.112931
+========================================
+Threshold=15 bps, alpha=2.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.6658087967232098 auprc=0.07482096996147952 lift=1.9075321570103392
+[xgboost] fold=2 train=26018 test=11397 auc=0.5897546251364867 auprc=0.06448557336692586 lift=1.342081220129208
+[xgboost] fold=3 train=26202 test=11397 auc=0.650282573558701 auprc=0.16198916834590213 lift=3.3527367666256045
+[xgboost] fold=4 train=26385 test=11397 auc=0.686312654791498 auprc=0.05827525952373274 lift=2.766826721665432
+[xgboost] fold=5 train=26569 test=11397 auc=0.7338188235617267 auprc=0.2154598103857635 lift=4.174725274725275
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.4940430185927816 auprc=0.045701889894393895 lift=1.3963687391078017
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.7580294199502082 auprc=0.07254796320666088 lift=2.2497578234381503
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.5774929766755411 auprc=0.03817716911995519 lift=1.5561659738035736
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.2863939131748452 auprc=0.01449161575161378 lift=1.050899031811895
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.7692358049615682 auprc=0.14174044157675975 lift=2.379223961878829
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8979363513542493 auprc=0.428321562187753 lift=5.625832990538873
+[catboost] fold=2 train=26018 test=11397 auc=0.9143436480795151 auprc=0.46253986595894564 lift=8.123207716310944
+[catboost] fold=3 train=26202 test=11397 auc=0.8158031854820452 auprc=0.10167021855913584 lift=3.378900470238798
+[catboost] fold=4 train=26385 test=11397 auc=0.7523400125435477 auprc=0.045017428552349026 lift=2.281681681681682
+[catboost] fold=5 train=26569 test=11397 auc=0.8554218797925279 auprc=0.2508020015298178 lift=2.665296918065648
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.8959985846325406 auprc=0.29576654768746713 lift=6.186982790336427
+[random_forest] fold=2 train=26018 test=11397 auc=0.9264188327127924 auprc=0.3977905401320568 lift=6.468952207969122
+[random_forest] fold=3 train=26202 test=11397 auc=0.9072304313216975 auprc=0.29978035457730173 lift=8.255775989352632
+[random_forest] fold=4 train=26385 test=11397 auc=0.8742339966764177 auprc=0.2404134498982792 lift=6.7498243922594865
+[random_forest] fold=5 train=26569 test=11397 auc=0.8714817408979165 auprc=0.3816704827402658 lift=6.449575574126473
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/alpha_2.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    2.0     0.895073    0.020601
+2       catboost    2.0     0.847169    0.058539
+0        xgboost    2.0     0.665195    0.047051
+1       lightgbm    2.0     0.577039    0.179477
+Threshold 15 bps: all CV runs completed.
+
+Pivot Table: Mean CV AUC by Model and Alpha
+================================================================================
+alpha               0.1       0.3      0.5       1.0       1.5       2.0
+model_name
+random_forest  0.906995  0.900987  0.88999  0.893211  0.893192  0.895073
+catboost       0.869460  0.882708  0.88142  0.850503  0.866752  0.847169
+xgboost        0.784996  0.711355  0.71644  0.796599  0.740707  0.665195
+lightgbm       0.658268  0.553051  0.37488  0.619353  0.662293  0.577039
+
+Pivot Table: Mean CV AUPRC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.303578  0.245911  0.222648  0.295315  0.315416  0.323084
+catboost       0.277535  0.317717  0.336251  0.254481  0.223140  0.257670
+xgboost        0.121490  0.084239  0.083198  0.133423  0.145173  0.115006
+lightgbm       0.060158  0.033437  0.027831  0.035405  0.056479  0.062532
+
+Pivot Table: Mean CV Lift @ Best Threshold by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  5.561552  5.031195  4.743109  4.867406  5.947745  6.822222
+catboost       6.306407  4.641285  5.656511  4.378835  4.029825  4.414984
+xgboost        2.720695  2.585605  2.855595  3.142778  3.119209  2.708780
+lightgbm       2.533608  1.635741  1.160992  1.784256  2.532619  1.726483
+
+Saved plots and pivot tables to: lightning_logs/cv_model_comparison_threshold_15_20260720_124420/plots_summary
+====================================================
+Threshold 15 bps: selecting top 2 by CV AUC and CV AUPRC
+====================================================
+
+Selected model-alpha pairs for full retraining:
+
+ alpha    model_name  cv_auc_mean  cv_auprc_mean selection_reason
+   0.1 random_forest     0.906995       0.303578      top2_cv_auc
+   0.3 random_forest     0.900987       0.245911      top2_cv_auc
+   2.0 random_forest     0.895073       0.323084    top2_cv_auprc
+   0.5      catboost     0.881420       0.336251    top2_cv_auprc
+
+Saved selection table to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420/selected_for_full_retraining.tsv
+====================================================
+Threshold 15 bps: full retraining
+====================================================
+----------------------------------------
+Model=random_forest, alpha=0.1, reason=top2_cv_auc
+CV AUC=0.9069952105842208, CV AUPRC=0.3035779547112306
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc
+Train positives=1438, negatives=19457, w_pos=13.531
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc
+----------------------------------------
+Model=random_forest, alpha=0.3, reason=top2_cv_auc
+CV AUC=0.9009873984008818, CV AUPRC=0.2459107050076114
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/random_forest_alpha_0.3_fullfeatures_top2_cv_auc
+Train positives=1438, negatives=19457, w_pos=13.531
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/random_forest_alpha_0.3_fullfeatures_top2_cv_auc
+----------------------------------------
+Model=random_forest, alpha=2.0, reason=top2_cv_auprc
+CV AUC=0.8950727172482729, CV AUPRC=0.3230842750070741
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/random_forest_alpha_2.0_fullfeatures_top2_cv_auprc
+Train positives=1438, negatives=19457, w_pos=13.531
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/random_forest_alpha_2.0_fullfeatures_top2_cv_auprc
+----------------------------------------
+Model=catboost, alpha=0.5, reason=top2_cv_auprc
+CV AUC=0.8814203338341825, CV AUPRC=0.3362507885144767
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/catboost_alpha_0.5_fullfeatures_top2_cv_auprc
+Train positives=1438, negatives=19457, w_pos=13.531
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining/catboost_alpha_0.5_fullfeatures_top2_cv_auprc
+Threshold 15 bps completed.
+CV output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420
+Full retraining output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_15/lightning_logs/cv_model_comparison_threshold_15_20260720_124420_full_retraining
+
+====================================================
+Threshold 20 bps: CV comparison
+Experiment: cv_model_comparison_threshold_20_20260720_124420
+====================================================
+========================================
+Threshold=20 bps, alpha=0.1
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8631914507477338 auprc=0.10746582088791995 lift=7.902107309210293
+[xgboost] fold=2 train=26018 test=11397 auc=0.8378965685153067 auprc=0.04335097660065294 lift=4.185324087996484
+[xgboost] fold=3 train=26202 test=11397 auc=0.8463607533208928 auprc=0.03654722009122148 lift=4.283059292090256
+[xgboost] fold=4 train=26385 test=11397 auc=0.866941678170996 auprc=0.040455044299996246 lift=10.093908919490316
+[xgboost] fold=5 train=26569 test=11397 auc=0.8632220588175052 auprc=0.02673721128256904 lift=10.093908919490316
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.6854179473972785 auprc=0.039000688754778697 lift=4.773774685994713
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8816365276938158 auprc=0.058937142382355326 lift=4.013837245209154
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.879651769517357 auprc=0.03896112446570637 lift=4.551517571884984
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.8898646517363002 auprc=0.03360652211842964 lift=4.549224964598321
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.7647504618800464 auprc=0.023457518551180483 lift=8.26548373060001
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.8839086130278581 auprc=0.055742823387003856 lift=3.4442119032047094
+[catboost] fold=2 train=26018 test=11397 auc=0.9403627923740241 auprc=0.10493597391516868 lift=6.549575474755331
+[catboost] fold=3 train=26202 test=11397 auc=0.9814408741279202 auprc=0.239429919938783 lift=16.05211267605634
+[catboost] fold=4 train=26385 test=11397 auc=0.9699378561392153 auprc=0.08102468018751441 lift=10.314027149321268
+[catboost] fold=5 train=26569 test=11397 auc=0.9791181061074674 auprc=0.19678284764655593 lift=20.071483404831792
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9750604206632917 auprc=0.1819685996996023 lift=13.984049079754602
+[random_forest] fold=2 train=26018 test=11397 auc=0.9821415562522445 auprc=0.25580662235465 lift=13.175722543352602
+[random_forest] fold=3 train=26202 test=11397 auc=0.9765741324716026 auprc=0.1873839175671443 lift=20.065140845070424
+[random_forest] fold=4 train=26385 test=11397 auc=0.9820655357603713 auprc=0.1650839616876439 lift=16.711143695014663
+[random_forest] fold=5 train=26569 test=11397 auc=0.9830159230841707 auprc=0.13498866581378582 lift=19.316949152542374
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/alpha_0.1_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.1     0.979772    0.003281
+2       catboost    0.1     0.950954    0.036580
+0        xgboost    0.1     0.855523    0.011341
+1       lightgbm    0.1     0.820264    0.081735
+========================================
+Threshold=20 bps, alpha=0.3
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8719826412808286 auprc=0.050517473281657496 lift=4.170142700329309
+[xgboost] fold=2 train=26018 test=11397 auc=0.8214411238818503 auprc=0.04180107481030837 lift=3.4515445184736526
+[xgboost] fold=3 train=26202 test=11397 auc=0.9441495068238415 auprc=0.07470333829861728 lift=8.38014705882353
+[xgboost] fold=4 train=26385 test=11397 auc=0.9082794302591853 auprc=0.024235104288155708 lift=9.766066838046273
+[xgboost] fold=5 train=26569 test=11397 auc=0.9656590649335753 auprc=0.05374652894201837 lift=11.1298828125
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8830960813157966 auprc=0.05373208316984083 lift=5.913797812075719
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.724313709451696 auprc=0.030726909604303132 lift=2.552519596864502
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8329540504164527 auprc=0.03503101449521584 lift=4.043531959473707
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9457562338444397 auprc=0.11667674978715711 lift=9.201445365575093
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8440637660736304 auprc=0.018052057094878254 lift=4.7846347607052895
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9534310373694294 auprc=0.11907056093268473 lift=6.19321685508736
+[catboost] fold=2 train=26018 test=11397 auc=0.927766473976619 auprc=0.07608936918443956 lift=5.279984691668037
+[catboost] fold=3 train=26202 test=11397 auc=0.9772909771845071 auprc=0.2253025184484476 lift=9.684768753835744
+[catboost] fold=4 train=26385 test=11397 auc=0.9869833805113247 auprc=0.24780108955220817 lift=17.164156626506024
+[catboost] fold=5 train=26569 test=11397 auc=0.9844230698329858 auprc=0.1705410422481759 lift=15.65521978021978
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9688132244249014 auprc=0.1499733345953465 lift=14.705806451612904
+[random_forest] fold=2 train=26018 test=11397 auc=0.9793566461451554 auprc=0.23409244323231687 lift=13.74788902291918
+[random_forest] fold=3 train=26202 test=11397 auc=0.974747885226822 auprc=0.15215449316925744 lift=17.587962962962965
+[random_forest] fold=4 train=26385 test=11397 auc=0.9832412304238646 auprc=0.15108489511604847 lift=19.51541095890411
+[random_forest] fold=5 train=26569 test=11397 auc=0.9820184260438899 auprc=0.15368648422702647 lift=17.587962962962965
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/alpha_0.3_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.3     0.977635    0.005287
+2       catboost    0.3     0.965979    0.022481
+0        xgboost    0.3     0.902302    0.051495
+1       lightgbm    0.3     0.846037    0.072538
+========================================
+Threshold=20 bps, alpha=0.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.830767505377471 auprc=0.04317481080071008 lift=3.564904598060682
+[xgboost] fold=2 train=26018 test=11397 auc=0.8401833516310064 auprc=0.04465658041909076 lift=3.687156260109997
+[xgboost] fold=3 train=26202 test=11397 auc=0.8465956378129897 auprc=0.037037911542767005 lift=3.9070963318477894
+[xgboost] fold=4 train=26385 test=11397 auc=0.8493042099700546 auprc=0.015412186379928316 lift=4.08494623655914
+[xgboost] fold=5 train=26569 test=11397 auc=0.8249515589219658 auprc=0.013992840872111943 lift=3.70875366091767
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8388388241263447 auprc=0.03772695072419041 lift=4.13534107402032
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.4140211724739945 auprc=0.017625050884027382 lift=1.4548123563952007
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8545207543612118 auprc=0.05700559949458843 lift=4.584831655287243
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.7455081909459221 auprc=0.011042629686697484 lift=2.9268104776579356
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.791174916329047 auprc=0.012767220902612826 lift=3.3839073634204273
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.7351469330841953 auprc=0.024125061559041913 lift=2.0438786362214576
+[catboost] fold=2 train=26018 test=11397 auc=0.885842329866787 auprc=0.11759694743512987 lift=6.711154919480786
+[catboost] fold=3 train=26202 test=11397 auc=0.9354998244461928 auprc=0.0918450338575058 lift=6.760604018728727
+[catboost] fold=4 train=26385 test=11397 auc=0.9673181462531389 auprc=0.11214776471813323 lift=7.784836065573771
+[catboost] fold=5 train=26569 test=11397 auc=0.9801995813379979 auprc=0.1807502423217816 lift=12.83445945945946
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9761851204770772 auprc=0.20945335484790198 lift=13.329824561403509
+[random_forest] fold=2 train=26018 test=11397 auc=0.9845021477932239 auprc=0.33069184275352587 lift=11.921548117154813
+[random_forest] fold=3 train=26202 test=11397 auc=0.9786027542441759 auprc=0.26842683816648943 lift=15.612328767123289
+[random_forest] fold=4 train=26385 test=11397 auc=0.9845725919766007 auprc=0.4025538246063222 lift=17.61514683153014
+[random_forest] fold=5 train=26569 test=11397 auc=0.9813220215393816 auprc=0.1923035047852476 lift=15.698347107438018
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/alpha_0.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.5     0.981037    0.003288
+2       catboost    0.5     0.900801    0.088992
+0        xgboost    0.5     0.838360    0.009256
+1       lightgbm    0.5     0.728813    0.161969
+========================================
+Threshold=20 bps, alpha=1.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.9360959624554753 auprc=0.10494924462616226 lift=6.626162790697674
+[xgboost] fold=2 train=26018 test=11397 auc=0.9017574712658368 auprc=0.06254656110696799 lift=5.945226917057903
+[xgboost] fold=3 train=26202 test=11397 auc=0.9159747462597286 auprc=0.051642855621722876 lift=6.812313209802749
+[xgboost] fold=4 train=26385 test=11397 auc=0.8493042099700546 auprc=0.015412186379928316 lift=4.08494623655914
+[xgboost] fold=5 train=26569 test=11397 auc=0.8249515589219658 auprc=0.013992840872111943 lift=3.70875366091767
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.7793361331542333 auprc=0.03297702794565252 lift=3.1861895443108748
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.718337783139983 auprc=0.023792806279693574 lift=2.440471092077088
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8239179058381394 auprc=0.027550651341093326 lift=4.0045678144764585
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.47133476164531707 auprc=0.004995914165917923 lift=1.3284765124140343
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.8743839892507915 auprc=0.027875577297229504 lift=4.008793527963419
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9259838886751675 auprc=0.07871939612854675 lift=5.720428308515978
+[catboost] fold=2 train=26018 test=11397 auc=0.9421156625951681 auprc=0.09934855264268633 lift=6.132039863859621
+[catboost] fold=3 train=26202 test=11397 auc=0.9750924908484451 auprc=0.18170707944974535 lift=13.43985849056604
+[catboost] fold=4 train=26385 test=11397 auc=0.972991794716338 auprc=0.11465025669439474 lift=11.847193347193349
+[catboost] fold=5 train=26569 test=11397 auc=0.9858834710439104 auprc=0.364341102988814 lift=17.138345864661655
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9838931484054184 auprc=0.35687280391831544 lift=13.100000000000001
+[random_forest] fold=2 train=26018 test=11397 auc=0.9855188508635266 auprc=0.443069747165401 lift=12.834459459459461
+[random_forest] fold=3 train=26202 test=11397 auc=0.985732189416056 auprc=0.423327252587998 lift=16.007022471910116
+[random_forest] fold=4 train=26385 test=11397 auc=0.9847385001085571 auprc=0.624420586500893 lift=16.637956204379563
+[random_forest] fold=5 train=26569 test=11397 auc=0.9836508801323988 auprc=0.6026856880244363 lift=15.829166666666667
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/alpha_1.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    1.0     0.984707    0.000835
+2       catboost    1.0     0.960413    0.022550
+0        xgboost    1.0     0.885617    0.041783
+1       lightgbm    1.0     0.733462    0.140773
+========================================
+Threshold=20 bps, alpha=1.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8719826412808286 auprc=0.050517473281657496 lift=4.170142700329309
+[xgboost] fold=2 train=26018 test=11397 auc=0.743363312547688 auprc=0.033010559407000095 lift=2.725902894044487
+[xgboost] fold=3 train=26202 test=11397 auc=0.747198047451544 auprc=0.02674439441335075 lift=2.821738053973756
+[xgboost] fold=4 train=26385 test=11397 auc=0.7581469085784746 auprc=0.011241830065359478 lift=2.9796078431372552
+[xgboost] fold=5 train=26569 test=11397 auc=0.7748370618284305 auprc=0.011806699615595826 lift=3.129324546952224
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8235052036537406 auprc=0.04028410042340651 lift=3.785121222185321
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.7107540473217446 auprc=0.027634776850711175 lift=2.1783256880733948
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8325001300398572 auprc=0.02863907988377524 lift=4.304003021148036
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.7841135794781883 auprc=0.01609571147272227 lift=2.4895150720838792
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.807434937385042 auprc=0.018825130472039847 lift=2.6647182604629416
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9191561300613089 auprc=0.07174135538100909 lift=5.810850225499642
+[catboost] fold=2 train=26018 test=11397 auc=0.863578385825715 auprc=0.05365711932200369 lift=3.3669128508124078
+[catboost] fold=3 train=26202 test=11397 auc=0.8628181100007153 auprc=0.03854267987283139 lift=3.6330889384762517
+[catboost] fold=4 train=26385 test=11397 auc=0.8379999262630524 auprc=0.01289349138693375 lift=3.8296370967741935
+[catboost] fold=5 train=26569 test=11397 auc=0.8267478728938884 auprc=0.012007238966948908 lift=3.608929702343255
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9787201682959903 auprc=0.25650110849865804 lift=15.698347107438018
+[random_forest] fold=2 train=26018 test=11397 auc=0.9778747263336959 auprc=0.2793914160776622 lift=14.917539267015709
+[random_forest] fold=3 train=26202 test=11397 auc=0.9827624041768802 auprc=0.26717280414975547 lift=18.11923688394277
+[random_forest] fold=4 train=26385 test=11397 auc=0.9884540229649627 auprc=0.5529771491386892 lift=22.4792899408284
+[random_forest] fold=5 train=26569 test=11397 auc=0.9860903441467201 auprc=0.39519572635548633 lift=20.315508021390375
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/alpha_1.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    1.5     0.982780    0.004091
+2       catboost    1.5     0.862060    0.031902
+1       lightgbm    1.5     0.791662    0.043666
+0        xgboost    1.5     0.779106    0.047706
+========================================
+Threshold=20 bps, alpha=2.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8214960808045694 auprc=0.04180107481030837 lift=3.4515445184736526
+[xgboost] fold=2 train=26018 test=11397 auc=0.8176225763038529 auprc=0.0383252843482308 lift=3.5515736989716427
+[xgboost] fold=3 train=26202 test=11397 auc=0.8413513741961911 auprc=0.036290597445727706 lift=3.8283506886126974
+[xgboost] fold=4 train=26385 test=11397 auc=0.7432622864188831 auprc=0.010766149223835753 lift=2.8535302954431647
+[xgboost] fold=5 train=26569 test=11397 auc=0.8608860313545887 auprc=0.016135084427767354 lift=4.2765478424015
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.85625665394137 auprc=0.0451520922193803 lift=3.796469020652898
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8457806503065446 auprc=0.04749492949874497 lift=3.4204681872749103
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.8647122217959805 auprc=0.038967491449115994 lift=3.9724642732659468
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.7681526027094232 auprc=0.01147022038784402 lift=2.57094518384841
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.832175731531967 auprc=0.012372114716308058 lift=4.118826909524584
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.920986962428636 auprc=0.07553639135576953 lift=4.5771084337349395
+[catboost] fold=2 train=26018 test=11397 auc=0.944637290700394 auprc=0.1012929791030335 lift=6.174430555223596
+[catboost] fold=3 train=26202 test=11397 auc=0.946720232251185 auprc=0.08308361396488642 lift=7.136716742380832
+[catboost] fold=4 train=26385 test=11397 auc=0.9077806817390449 auprc=0.02509255892996972 lift=3.7838645418326693
+[catboost] fold=5 train=26569 test=11397 auc=0.9215909975380052 auprc=0.027406294111651654 lift=4.573434991974318
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9702587192992097 auprc=0.16837525279578455 lift=12.80561797752809
+[random_forest] fold=2 train=26018 test=11397 auc=0.9720071162824582 auprc=0.19808625391932394 lift=14.426582278481012
+[random_forest] fold=3 train=26202 test=11397 auc=0.9762197738606883 auprc=0.19973295940797625 lift=16.834564254062037
+[random_forest] fold=4 train=26385 test=11397 auc=0.9860432344302387 auprc=0.2600465592036594 lift=21.14471243042672
+[random_forest] fold=5 train=26569 test=11397 auc=0.9851030883491526 auprc=0.24639090075886008 lift=20.68421052631579
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/alpha_2.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    2.0     0.977926    0.006544
+2       catboost    2.0     0.928343    0.015005
+1       lightgbm    2.0     0.833416    0.034394
+0        xgboost    2.0     0.816924    0.039942
+Threshold 20 bps: all CV runs completed.
+
+Pivot Table: Mean CV AUC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.979772  0.977635  0.981037  0.984707  0.982780  0.977926
+catboost       0.950954  0.965979  0.900801  0.960413  0.862060  0.928343
+xgboost        0.855523  0.902302  0.838360  0.885617  0.779106  0.816924
+lightgbm       0.820264  0.846037  0.728813  0.733462  0.791662  0.833416
+
+Pivot Table: Mean CV AUPRC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.185046  0.168198  0.280686  0.490075  0.350248  0.214526
+catboost       0.135583  0.167761  0.105293  0.167753  0.037768  0.062482
+xgboost        0.050911  0.049001  0.030855  0.049709  0.026664  0.028664
+lightgbm       0.038793  0.050844  0.027233  0.023438  0.026296  0.031091
+
+Pivot Table: Mean CV Lift @ Best Threshold by Model and Alpha
+================================================================================
+alpha                0.1        0.3        0.5        1.0        1.5        2.0
+model_name
+random_forest  16.650601  16.629006  14.835439  14.881721  18.305984  17.179137
+catboost       11.286282  10.795469   7.226987  10.855573   4.049884   5.249111
+xgboost         7.311662   7.379557   3.790571   5.435481   3.165343   3.592309
+lightgbm        5.230768   5.299186   3.297141   2.993700   3.084337   3.575835
+
+Saved plots and pivot tables to: lightning_logs/cv_model_comparison_threshold_20_20260720_124420/plots_summary
+====================================================
+Threshold 20 bps: selecting top 2 by CV AUC and CV AUPRC
+====================================================
+
+Selected model-alpha pairs for full retraining:
+
+ alpha    model_name  cv_auc_mean  cv_auprc_mean          selection_reason
+   1.0 random_forest     0.984707       0.490075 top2_cv_auc,top2_cv_auprc
+   1.5 random_forest     0.982780       0.350248 top2_cv_auc,top2_cv_auprc
+
+Saved selection table to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420/selected_for_full_retraining.tsv
+====================================================
+Threshold 20 bps: full retraining
+====================================================
+----------------------------------------
+Model=random_forest, alpha=1.0, reason=top2_cv_auc,top2_cv_auprc
+CV AUC=0.9847067137851914, CV AUPRC=0.4900752156394087
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420_full_retraining/random_forest_alpha_1.0_fullfeatures_top2_cv_auc,top2_cv_auprc
+Train positives=713, negatives=20182, w_pos=28.306
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420_full_retraining/random_forest_alpha_1.0_fullfeatures_top2_cv_auc,top2_cv_auprc
+----------------------------------------
+Model=random_forest, alpha=1.5, reason=top2_cv_auc,top2_cv_auprc
+CV AUC=0.98278033318365, CV AUPRC=0.3502476408440502
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420_full_retraining/random_forest_alpha_1.5_fullfeatures_top2_cv_auc,top2_cv_auprc
+Train positives=713, negatives=20182, w_pos=28.306
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420_full_retraining/random_forest_alpha_1.5_fullfeatures_top2_cv_auc,top2_cv_auprc
+Threshold 20 bps completed.
+CV output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420
+Full retraining output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_20/lightning_logs/cv_model_comparison_threshold_20_20260720_124420_full_retraining
+
+====================================================
+Threshold 25 bps: CV comparison
+Experiment: cv_model_comparison_threshold_25_20260720_124420
+====================================================
+========================================
+Threshold=25 bps, alpha=0.1
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.8076584894047305 auprc=0.005466786085809827 lift=3.529575720037163
+[xgboost] fold=2 train=26018 test=11397 auc=0.8008129634514494 auprc=0.005280450597961809 lift=3.360955470362725
+[xgboost] fold=3 train=26202 test=11397 auc=0.8084956329317975 auprc=0.005316905219897141 lift=3.439046469523235
+[xgboost] fold=4 train=26385 test=11397 auc=0.817790307453325 auprc=0.00590785377056193 lift=3.801534356237492
+[xgboost] fold=5 train=26569 test=11397 auc=0.8332710513203786 auprc=0.006243291994356447 lift=3.9600416956219595
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.9290937600750315 auprc=0.01475202599277409 lift=6.296685082872928
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.8620856414314605 auprc=0.007482153165684841 lift=4.504743083003953
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.9209476391453443 auprc=0.013438551075939094 lift=5.82073544433095
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9219166739939624 auprc=0.013366027061520213 lift=6.534977064220184
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.9283134030891877 auprc=0.015112826073218155 lift=5.288631090487239
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.6872820129546586 auprc=0.005343480220711334 lift=1.8825569871159564
+[catboost] fold=2 train=26018 test=11397 auc=0.8683779565637914 auprc=0.01333081347794816 lift=6.740161290322582
+[catboost] fold=3 train=26202 test=11397 auc=0.9599838066766319 auprc=0.047228189019664024 lift=13.143351383874851
+[catboost] fold=4 train=26385 test=11397 auc=0.414237668161435 auprc=0.002511264557074332 lift=1.4051288373813342
+[catboost] fold=5 train=26569 test=11397 auc=0.8881121955508661 auprc=0.009342156481121059 lift=4.436356558972363
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.967943081567455 auprc=0.03031975349510337 lift=17.97634069400631
+[random_forest] fold=2 train=26018 test=11397 auc=0.9795238723292007 auprc=0.04801616041319682 lift=19.924825174825177
+[random_forest] fold=3 train=26202 test=11397 auc=0.9828468009027228 auprc=0.05928764494405041 lift=21.917307692307695
+[random_forest] fold=4 train=26385 test=11397 auc=0.9829127465634984 auprc=0.05832819457469528 lift=19.786458333333332
+[random_forest] fold=5 train=26569 test=11397 auc=0.987950262317184 auprc=0.07758912665147598 lift=35.95268138801262
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/alpha_0.1_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.1     0.980235    0.006710
+1       lightgbm    0.1     0.912471    0.025405
+0        xgboost    0.1     0.813606    0.011219
+2       catboost    0.1     0.763599    0.196432
+========================================
+Threshold=25 bps, alpha=0.3
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.9218232509745303 auprc=0.014542756343224897 lift=10.417733089579524
+[xgboost] fold=2 train=26018 test=11397 auc=0.9311215891438788 auprc=0.019126255713219877 lift=12.22854077253219
+[xgboost] fold=3 train=26202 test=11397 auc=0.9704764940355814 auprc=0.03917211866047146 lift=20.461400359066428
+[xgboost] fold=4 train=26385 test=11397 auc=0.9855982004161904 auprc=0.12238612795043641 lift=18.41195476575121
+[xgboost] fold=5 train=26569 test=11397 auc=0.9968382719305959 auprc=0.5564225773972503 lift=32.9393063583815
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.9604802309563586 auprc=0.029954992618056255 lift=7.030845157310302
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.9390772003868813 auprc=0.01698486142924352 lift=8.312910284463895
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.9073042146604531 auprc=0.011576555768190671 lift=5.859640102827764
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9641933380228025 auprc=0.03018135634750961 lift=9.341803278688525
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.9342924763328351 auprc=0.016843674228920514 lift=6.075159914712153
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9862594888478561 auprc=0.13700128296106776 lift=45.32002074688796
+[catboost] fold=2 train=26018 test=11397 auc=0.7462264427445119 auprc=0.0052581829016324685 lift=2.6898171987641604
+[catboost] fold=3 train=26202 test=11397 auc=0.399366921656555 auprc=0.0024484812153475104 lift=1.3721406212376597
+[catboost] fold=4 train=26385 test=11397 auc=0.414237668161435 auprc=0.002511264557074332 lift=1.4051288373813342
+[catboost] fold=5 train=26569 test=11397 auc=0.9573991031390134 auprc=0.0314920111105547 lift=15.422192151556157
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9806229666754593 auprc=0.05249245708352068 lift=18.622549019607845
+[random_forest] fold=2 train=26018 test=11397 auc=0.983956886192444 auprc=0.06110969303474352 lift=23.943277310924373
+[random_forest] fold=3 train=26202 test=11397 auc=0.9806596031536681 auprc=0.05151380504695417 lift=19.994736842105265
+[random_forest] fold=4 train=26385 test=11397 auc=0.9876718250827985 auprc=0.07729282337828665 lift=30.71967654986523
+[random_forest] fold=5 train=26569 test=11397 auc=0.9902986605703568 auprc=0.10025539882919758 lift=40.70357142857143
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/alpha_0.3_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.3     0.984642    0.003838
+0        xgboost    0.3     0.961172    0.029687
+1       lightgbm    0.3     0.941069    0.020501
+2       catboost    0.3     0.700698    0.253919
+========================================
+Threshold=25 bps, alpha=0.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.976644245142003 auprc=0.0410692236529067 lift=23.743750000000002
+[xgboost] fold=2 train=26018 test=11397 auc=0.9920407251091766 auprc=0.14176102518638062 lift=37.99
+[xgboost] fold=3 train=26202 test=11397 auc=0.9878586711216624 auprc=0.09310645901193304 lift=53.50704225352113
+[xgboost] fold=4 train=26385 test=11397 auc=0.9891904071045459 auprc=0.1059102820447318 lift=34.432024169184295
+[xgboost] fold=5 train=26569 test=11397 auc=0.9914838506404057 auprc=0.13129399973346445 lift=38.765306122448976
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.882541619039245 auprc=0.012652103724354151 lift=5.644873699851412
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.9452870834432427 auprc=0.02541384392081384 lift=14.035714285714286
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.9107590345555262 auprc=0.020179644316270128 lift=5.998421052631579
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9139958674052581 auprc=0.012446103199451206 lift=7.986685353889279
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.9438509334974649 auprc=0.021114420001223815 lift=15.075396825396826
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9820737712125208 auprc=0.10345738709148236 lift=12.820022497187852
+[catboost] fold=2 train=26018 test=11397 auc=0.9850211758844046 auprc=0.12281117812173374 lift=12.965870307167236
+[catboost] fold=3 train=26202 test=11397 auc=0.399366921656555 auprc=0.0024484812153475104 lift=1.3721406212376597
+[catboost] fold=4 train=26385 test=11397 auc=0.414237668161435 auprc=0.002511264557074332 lift=1.4051288373813342
+[catboost] fold=5 train=26569 test=11397 auc=0.8398729446935725 auprc=0.007402161267631038 lift=3.9057573680603155
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9921671209589965 auprc=0.12818037074144245 lift=40.27208480565371
+[random_forest] fold=2 train=26018 test=11397 auc=0.9906027433394883 auprc=0.10300397733878452 lift=38.50337837837838
+[random_forest] fold=3 train=26202 test=11397 auc=0.983161874615317 auprc=0.05629185505151839 lift=27.52898550724638
+[random_forest] fold=4 train=26385 test=11397 auc=0.9913831003253318 auprc=0.1132581943259479 lift=42.36802973977695
+[random_forest] fold=5 train=26569 test=11397 auc=0.9922147483806676 auprc=0.1163648215762208 lift=56.142857142857146
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/alpha_0.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+3  random_forest    0.5     0.989906    0.003423
+0        xgboost    0.5     0.987444    0.005609
+1       lightgbm    0.5     0.919287    0.023368
+2       catboost    0.5     0.724114    0.264386
+========================================
+Threshold=25 bps, alpha=1.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.9830849380110789 auprc=0.07424853387594399 lift=17.138345864661655
+[xgboost] fold=2 train=26018 test=11397 auc=0.9821855124710572 auprc=0.0724864294851848 lift=18.38225806451613
+[xgboost] fold=3 train=26202 test=11397 auc=0.98840089099915 auprc=0.10603306172969866 lift=24.50967741935484
+[xgboost] fold=4 train=26385 test=11397 auc=0.9883825727600457 auprc=0.10821874204227146 lift=27.135714285714286
+[xgboost] fold=5 train=26569 test=11397 auc=0.9874739881004719 auprc=0.10664572981430771 lift=20.83546617915905
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.9673971980421465 auprc=0.034449173219510604 lift=18.173252911813645
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.905243412761218 auprc=0.012053207213071924 lift=7.958798882681564
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.9132539787215335 auprc=0.011809180307363212 lift=8.258695652173914
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9805203845364752 auprc=0.0873002407101362 lift=45.32002074688796
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.9761643072774702 auprc=0.07172058028986306 lift=43.00049212598426
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9876498431958732 auprc=0.17181924882629107 lift=32.10422535211267
+[catboost] fold=2 train=26018 test=11397 auc=0.9717093115273014 auprc=0.049815685591547657 lift=17.863636363636367
+[catboost] fold=3 train=26202 test=11397 auc=0.917164922770304 auprc=0.017735735885957324 lift=7.208728652751423
+[catboost] fold=4 train=26385 test=11397 auc=0.9924345672499194 auprc=0.1312047986197437 lift=44.87007874015748
+[catboost] fold=5 train=26569 test=11397 auc=0.9809050675576658 auprc=0.06254367436327284 lift=15.257028112449799
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9766259269028987 auprc=0.042598163889021594 lift=18.441747572815533
+[random_forest] fold=2 train=26018 test=11397 auc=0.9819931709604619 auprc=0.056588547147509397 lift=20.64673913043478
+[random_forest] fold=3 train=26202 test=11397 auc=0.9798279550983323 auprc=0.048544644426026795 lift=19.090452261306535
+[random_forest] fold=4 train=26385 test=11397 auc=0.9883789091122249 auprc=0.094876535874906 lift=25.048351648351648
+[random_forest] fold=5 train=26569 test=11397 auc=0.9857007825551746 auprc=0.06911061579189771 lift=28.78030303030303
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/alpha_1.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+0        xgboost    1.0     0.985906    0.002706
+3  random_forest    1.0     0.982505    0.004164
+2       catboost    1.0     0.969973    0.027306
+1       lightgbm    1.0     0.948516    0.032438
+========================================
+Threshold=25 bps, alpha=1.5
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.9939897857498755 auprc=0.2066860465116279 lift=108.54285714285714
+[xgboost] fold=2 train=26018 test=11397 auc=0.9876150385415751 auprc=0.11811252485479828 lift=29.298200514138816
+[xgboost] fold=3 train=26202 test=11397 auc=0.9807218851666226 auprc=0.07509997647612326 lift=26.139908256880737
+[xgboost] fold=4 train=26385 test=11397 auc=0.9904195609484452 auprc=0.12515393980337927 lift=41.144404332129966
+[xgboost] fold=5 train=26569 test=11397 auc=0.9754389050089393 auprc=0.06322173215717723 lift=26.2
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.8993211260587943 auprc=0.01158159402339816 lift=8.020408163265307
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.9365492833904863 auprc=0.018434992486995795 lift=8.952867242733701
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.9711176324042322 auprc=0.04285770044521317 lift=16.909495548961427
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9477911867288021 auprc=0.023074782046914898 lift=13.665467625899282
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.9929181687622732 auprc=0.13597482512029185 lift=74.98026315789474
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9757319968346083 auprc=0.061141926619510456 lift=24.938730853391686
+[catboost] fold=2 train=26018 test=11397 auc=0.9779521674140508 auprc=0.06988804342558039 lift=25.961275626423692
+[catboost] fold=3 train=26202 test=11397 auc=0.9090059790732437 auprc=0.024873061616577468 lift=8.211095100864554
+[catboost] fold=4 train=26385 test=11397 auc=0.9793480172337994 auprc=0.05595356384772839 lift=16.007022471910112
+[catboost] fold=5 train=26569 test=11397 auc=0.9946364195902576 auprc=0.18906009244992295 lift=103.60909090909091
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9682691462235119 auprc=0.030452607234982016 lift=17.347031963470318
+[random_forest] fold=2 train=26018 test=11397 auc=0.9809380403880537 auprc=0.052060214303018736 lift=22.74850299401198
+[random_forest] fold=3 train=26202 test=11397 auc=0.9654847738796565 auprc=0.028212462451919086 lift=15.03562005277045
+[random_forest] fold=4 train=26385 test=11397 auc=0.9876095430698437 auprc=0.07508850029906748 lift=35.06769230769231
+[random_forest] fold=5 train=26569 test=11397 auc=0.9895329581757965 auprc=0.08880605578811904 lift=38.24496644295302
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/alpha_1.5_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+0        xgboost    1.5     0.985637    0.006704
+3  random_forest    1.5     0.978367    0.009845
+2       catboost    1.5     0.967335    0.029917
+1       lightgbm    1.5     0.949539    0.031752
+========================================
+Threshold=25 bps, alpha=2.0
+========================================
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Experiment logs will be saved under: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+
+Running expanding-window CV for model=xgboost
+[xgboost] fold=1 train=25834 test=11397 auc=0.9875692429438143 auprc=0.07649620801066861 lift=55.59512195121952
+[xgboost] fold=2 train=26018 test=11397 auc=0.9713173012104692 auprc=0.05132218579680968 lift=23.743750000000002
+[xgboost] fold=3 train=26202 test=11397 auc=0.9657687065857733 auprc=0.05163732007789161 lift=13.236933797909408
+[xgboost] fold=4 train=26385 test=11397 auc=0.9805441982473109 auprc=0.08434104333744713 lift=29.449612403100776
+[xgboost] fold=5 train=26569 test=11397 auc=0.9828614554940063 auprc=0.07998869805089653 lift=49.76855895196506
+
+Running expanding-window CV for model=lightgbm
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=1 train=25834 test=11397 auc=0.994574137577303 auprc=0.20318408303928132 lift=49.552173913043475
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=2 train=26018 test=11397 auc=0.9872743192942348 auprc=0.09415764317381875 lift=26.32101616628176
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=3 train=26202 test=11397 auc=0.9937882851197279 auprc=0.15075896588357884 lift=62.620879120879124
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=4 train=26385 test=11397 auc=0.9940777132975761 auprc=0.1725712593892143 lift=121.24468085106382
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+[lightgbm] fold=5 train=26569 test=11397 auc=0.9928247457428412 auprc=0.1259738205034377 lift=77.53061224489795
+
+Running expanding-window CV for model=catboost
+[catboost] fold=1 train=25834 test=11397 auc=0.9866350127494945 auprc=0.15144987572493784 lift=32.10422535211267
+[catboost] fold=2 train=26018 test=11397 auc=0.9835135848061197 auprc=0.10524290524290524 lift=29.602597402597404
+[catboost] fold=3 train=26202 test=11397 auc=0.9688956300008793 auprc=0.032273217228407584 lift=12.965870307167236
+[catboost] fold=4 train=26385 test=11397 auc=0.8219467159060934 auprc=0.037196004956481496 lift=4.16861741038771
+[catboost] fold=5 train=26569 test=11397 auc=0.9695056273630529 auprc=0.043868238259949954 lift=25.496644295302016
+
+Running expanding-window CV for model=random_forest
+[random_forest] fold=1 train=25834 test=11397 auc=0.9681592367888859 auprc=0.031089503546975907 lift=16.711143695014666
+[random_forest] fold=2 train=26018 test=11397 auc=0.9733652803423313 auprc=0.036060339116959286 lift=21.959537572254334
+[random_forest] fold=3 train=26202 test=11397 auc=0.9717312934142267 auprc=0.03506686939328403 lift=13.74788902291918
+[random_forest] fold=4 train=26385 test=11397 auc=0.9862356751370205 auprc=0.07087639841671094 lift=25.496644295302016
+[random_forest] fold=5 train=26569 test=11397 auc=0.9864188575280636 auprc=0.07081609882917511 lift=29.14833759590793
+
+Done.
+Summary saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/alpha_2.0_experiment_summary
+      model_name  alpha  cv_auc_mean  cv_auc_std
+1       lightgbm    2.0     0.992508    0.002678
+0        xgboost    2.0     0.977612    0.007940
+3  random_forest    2.0     0.977182    0.007655
+2       catboost    2.0     0.946099    0.062489
+Threshold 25 bps: all CV runs completed.
+
+Pivot Table: Mean CV AUC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.980235  0.984642  0.989906  0.982505  0.978367  0.977182
+xgboost        0.813606  0.961172  0.987444  0.985906  0.985637  0.977612
+lightgbm       0.912471  0.941069  0.919287  0.948516  0.949539  0.992508
+catboost       0.763599  0.700698  0.724114  0.969973  0.967335  0.946099
+
+Pivot Table: Mean CV AUPRC by Model and Alpha
+================================================================================
+alpha               0.1       0.3       0.5       1.0       1.5       2.0
+model_name
+random_forest  0.054708  0.068533  0.103420  0.062344  0.054924  0.048782
+xgboost        0.005643  0.150330  0.102628  0.093526  0.117655  0.068757
+lightgbm       0.012830  0.021108  0.018361  0.043466  0.046385  0.149329
+catboost       0.015551  0.035742  0.047726  0.086624  0.080183  0.074006
+
+Pivot Table: Mean CV Lift @ Best Threshold by Model and Alpha
+================================================================================
+alpha                0.1        0.3        0.5        1.0        1.5        2.0
+model_name
+random_forest  23.111523  26.796762  40.963067  22.401519  25.688763  21.412710
+xgboost         3.618231  18.891787  37.687625  21.600292  46.265074  34.358795
+lightgbm        5.689154   7.324072   9.748218  24.542252  24.505700  67.453872
+catboost        5.521511  13.241860   6.493784  23.460739  35.745443  20.867591
+
+Saved plots and pivot tables to: lightning_logs/cv_model_comparison_threshold_25_20260720_124420/plots_summary
+====================================================
+Threshold 25 bps: selecting top 2 by CV AUC and CV AUPRC
+====================================================
+
+Selected model-alpha pairs for full retraining:
+
+ alpha    model_name  cv_auc_mean  cv_auprc_mean          selection_reason
+   2.0      lightgbm     0.992508       0.149329 top2_cv_auc,top2_cv_auprc
+   0.5 random_forest     0.989906       0.103420               top2_cv_auc
+   0.3       xgboost     0.961172       0.150330             top2_cv_auprc
+
+Saved selection table to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420/selected_for_full_retraining.tsv
+====================================================
+Threshold 25 bps: full retraining
+====================================================
+----------------------------------------
+Model=lightgbm, alpha=2.0, reason=top2_cv_auc,top2_cv_auprc
+CV AUC=0.9925078402063364, CV AUPRC=0.1493291543978661
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining/lightgbm_alpha_2.0_fullfeatures_top2_cv_auc,top2_cv_auprc
+Train positives=579, negatives=20316, w_pos=35.088
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/lightgbm/sklearn.py:1106: LGBMDeprecationWarning: The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead.
+  eval_set = _validate_eval_set_Xy(eval_set=eval_set, eval_X=eval_X, eval_y=eval_y)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining/lightgbm_alpha_2.0_fullfeatures_top2_cv_auc,top2_cv_auprc
+----------------------------------------
+Model=random_forest, alpha=0.5, reason=top2_cv_auc
+CV AUC=0.9899059175239602, CV AUPRC=0.1034198438067828
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining/random_forest_alpha_0.5_fullfeatures_top2_cv_auc
+Train positives=579, negatives=20316, w_pos=35.088
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining/random_forest_alpha_0.5_fullfeatures_top2_cv_auc
+----------------------------------------
+Model=xgboost, alpha=0.3, reason=top2_cv_auprc
+CV AUC=0.9611715613001554, CV AUPRC=0.1503299672129205
+----------------------------------------
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: invalid value encountered in log1p
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/pandas/core/internals/blocks.py:347: RuntimeWarning: invalid value encountered in log1p
+  result = func(self.values, **kwargs)
+Local logs will be saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining/xgboost_alpha_0.3_fullfeatures_top2_cv_auprc
+Train positives=579, negatives=20316, w_pos=35.088
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/xgboost/callback.py:265: UserWarning: [13:21:57] WARNING: /Users/runner/work/xgboost/xgboost/src/metric/auc.cc:324: Dataset is empty, or contains only positive or negative samples.
+  score: str = model.eval_set(evals, epoch, self.metric, self._output_margin)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/xgboost/callback.py:265: UserWarning: [13:21:58] WARNING: /Users/runner/work/xgboost/xgboost/src/metric/auc.cc:324: Dataset is empty, or contains only positive or negative samples.
+  score: str = model.eval_set(evals, epoch, self.metric, self._output_margin)
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/shap/explainers/_tree.py:263: FutureWarning: In the future, passing feature_perturbation='interventional' without providing a background dataset will raise an error. Please provide a background dataset to continue using the interventional approach or set feature_perturbation='auto' to automatically switch approaches.
+  warnings.warn(
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/private/tmp/stablecoin-threshold-venv/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3024: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+Done. All logs/artifacts saved to: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining/xgboost_alpha_0.3_fullfeatures_top2_cv_auprc
+Threshold 25 bps completed.
+CV output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420
+Full retraining output: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/threshold_25/lightning_logs/cv_model_comparison_threshold_25_20260720_124420_full_retraining
+====================================================
+Building combined robustness-check tables
+====================================================
+Combined CV results: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/cv_results_all_thresholds_20260720_124420.csv
+Combined selected models: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/selected_models_all_thresholds_20260720_124420.csv
+Combined full-retraining metrics: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/full_retraining_metrics_all_thresholds_20260720_124420.csv
+====================================================
+Robustness check completed.
+Run ID: 20260720_124420
+All outputs: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check
+Execution log: /Users/johnnyjheng/Documents/Codex/Stablecoin Depag/onchain-insights/8. Early-Warning Model/Robustness Check/robustness_check_20260720_124420.log
+====================================================
