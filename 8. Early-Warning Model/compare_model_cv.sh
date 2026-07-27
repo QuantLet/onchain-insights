@@ -34,6 +34,7 @@ for ALPHA in "${ALPHAS[@]}"; do
     --experiment_name "${EXPERIMENT_NAME}" \
     --run_name "alpha_${ALPHA}" \
     --alpha "${ALPHA}" \
+    --train_pct 0.68 \
     --target \
     --target_window "${TARGET_WINDOW}" \
     --target_threshold "${TARGET_THRESHOLD}" \
