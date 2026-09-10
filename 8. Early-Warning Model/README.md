@@ -58,7 +58,7 @@ bash full_retraining.sh
 
 # Generated plots
 
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25/plots_summary/heatmap_cv_auc.png"
     alt="CV AUC Heatmap"
@@ -69,7 +69,7 @@ bash full_retraining.sh
     alt="CV AUPRC Heatmap"
     width="49%"
   />
-</p>
+</div>
 
 <p align="center">
   <b>5-fold cross validation results</b>
@@ -77,13 +77,13 @@ bash full_retraining.sh
 
 <br>
 
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/roc_pr.png"
     alt="Final retraining ROC and PR curves"
     width="100%"
   />
-</p>
+</div>
 
 <p align="center">
   <b>Final retraining AUC/AUPRC</b>
@@ -91,13 +91,13 @@ bash full_retraining.sh
 
 <br>
 
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/timeseries/predictions_over_time.png"
     alt="Predictions over time"
     width="100%"
   />
-</p>
+</div>
 
 <p align="center">
   <b>24-hour ahead predicted depeg probability out-of-sample</b>
@@ -105,7 +105,7 @@ bash full_retraining.sh
 
 <br>
 
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_beeswarm_global.png"
     alt="SHAP beeswarm summary plot"
@@ -116,7 +116,7 @@ bash full_retraining.sh
     alt="Native model feature importance"
     width="49%"
   />
-</p>
+</div>
 
 <p align="center">
   <b>SHAP beeswarm summary plot / Native model feature importance</b>
@@ -124,7 +124,7 @@ bash full_retraining.sh
 
 <br>
 
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_curve_entropy.png"
     alt="SHAP scatter plot for curve entropy"
@@ -135,9 +135,9 @@ bash full_retraining.sh
     alt="SHAP scatter plot for tangent up"
     width="49%"
   />
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tvlUSD_500.png"
     alt="SHAP scatter plot for tvl USD 500"
@@ -148,7 +148,7 @@ bash full_retraining.sh
     alt="SHAP scatter plot for swap count 100"
     width="49%"
   />
-</p>
+</div>
 
 <p align="center">
   <b>SHAP correlation scatter plots</b>
