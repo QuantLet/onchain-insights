@@ -9,7 +9,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import roc_auc_score, average_precision_score, roc_curve
+from sklearn.metrics import (
+    roc_auc_score,
+    average_precision_score,
+    brier_score_loss,
+    roc_curve,
+)
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler, RobustScaler
 
@@ -48,11 +53,26 @@ def safe_auprc(y_true, proba):
     return average_precision_score(y_true, proba)
 
 
+def safe_brier_skill_score(y_true, proba):
+    """Brier skill score relative to predicting the test-fold prevalence."""
+    y_true = np.asarray(y_true).astype(int)
+    if len(y_true) == 0:
+        return np.nan
+
+    prevalence = float(y_true.mean())
+    reference_brier = prevalence * (1.0 - prevalence)
+    if reference_brier == 0:
+        return np.nan
+
+    return float(1.0 - brier_score_loss(y_true, proba) / reference_brier)
+
+
 def compute_fold_metrics(y_true, proba):
     """
     Computes:
       - ROC AUC
       - AUPRC
+      - Brier score and Brier skill score (vs. test-fold prevalence)
       - best threshold by Youden J
       - TPR/FPR at best threshold
       - lift at best threshold
@@ -67,6 +87,8 @@ def compute_fold_metrics(y_true, proba):
 
     auc = safe_auc(y_true, proba)
     auprc = safe_auprc(y_true, proba)
+    brier = brier_score_loss(y_true, proba) if len(y_true) else np.nan
+    brier_skill = safe_brier_skill_score(y_true, proba)
 
     best_threshold = np.nan
     tpr_best = np.nan
@@ -95,6 +117,8 @@ def compute_fold_metrics(y_true, proba):
     return {
         "fold_auc": None if np.isnan(auc) else float(auc),
         "fold_auprc": None if np.isnan(auprc) else float(auprc),
+        "fold_brier_score": None if np.isnan(brier) else float(brier),
+        "fold_brier_skill_score": None if np.isnan(brier_skill) else float(brier_skill),
         "best_threshold_youdenJ": None if np.isnan(best_threshold) else float(best_threshold),
         "tpr_at_best_threshold": None if np.isnan(tpr_best) else float(tpr_best),
         "fpr_at_best_threshold": None if np.isnan(fpr_best) else float(fpr_best),
@@ -546,6 +570,8 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
         logger.log_metric(f"fold_{fold}_auc", fold_metrics["fold_auc"])
         logger.log_metric(f"fold_{fold}_auprc", fold_metrics["fold_auprc"])
+        logger.log_metric(f"fold_{fold}_brier_score", fold_metrics["fold_brier_score"])
+        logger.log_metric(f"fold_{fold}_brier_skill_score", fold_metrics["fold_brier_skill_score"])
         logger.log_metric(f"fold_{fold}_lift_at_best_threshold", fold_metrics["lift_at_best_threshold"])
         logger.log_metric(f"fold_{fold}_best_threshold_youdenJ", fold_metrics["best_threshold_youdenJ"])
         logger.log_metric(f"fold_{fold}_tpr_at_best_threshold", fold_metrics["tpr_at_best_threshold"])
@@ -556,6 +582,8 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             f"train={len(train_idx)} test={len(test_idx)} "
             f"auc={fold_metrics['fold_auc']} "
             f"auprc={fold_metrics['fold_auprc']} "
+            f"brier={fold_metrics['fold_brier_score']} "
+            f"bss={fold_metrics['fold_brier_skill_score']} "
             f"lift={fold_metrics['lift_at_best_threshold']}"
         )
 
@@ -569,6 +597,8 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
     cv_auc_mean, cv_auc_std = col_mean_std(fold_df, "fold_auc")
     cv_auprc_mean, cv_auprc_std = col_mean_std(fold_df, "fold_auprc")
+    cv_brier_mean, cv_brier_std = col_mean_std(fold_df, "fold_brier_score")
+    cv_brier_skill_mean, cv_brier_skill_std = col_mean_std(fold_df, "fold_brier_skill_score")
     cv_lift_mean, cv_lift_std = col_mean_std(fold_df, "lift_at_best_threshold")
     cv_best_threshold_mean, cv_best_threshold_std = col_mean_std(fold_df, "best_threshold_youdenJ")
     cv_tpr_best_mean, cv_tpr_best_std = col_mean_std(fold_df, "tpr_at_best_threshold")
@@ -580,6 +610,10 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
     logger.log_metric("cv_auprc_mean", cv_auprc_mean)
     logger.log_metric("cv_auprc_std", cv_auprc_std)
+    logger.log_metric("cv_brier_score_mean", cv_brier_mean)
+    logger.log_metric("cv_brier_score_std", cv_brier_std)
+    logger.log_metric("cv_brier_skill_score_mean", cv_brier_skill_mean)
+    logger.log_metric("cv_brier_skill_score_std", cv_brier_skill_std)
 
     logger.log_metric("cv_lift_at_best_threshold_mean", cv_lift_mean)
     logger.log_metric("cv_lift_at_best_threshold_std", cv_lift_std)
@@ -623,6 +657,11 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         "cv_auprc_mean": None if np.isnan(cv_auprc_mean) else cv_auprc_mean,
         "cv_auprc_std": None if np.isnan(cv_auprc_std) else cv_auprc_std,
 
+        "cv_brier_score_mean": None if np.isnan(cv_brier_mean) else cv_brier_mean,
+        "cv_brier_score_std": None if np.isnan(cv_brier_std) else cv_brier_std,
+        "cv_brier_skill_score_mean": None if np.isnan(cv_brier_skill_mean) else cv_brier_skill_mean,
+        "cv_brier_skill_score_std": None if np.isnan(cv_brier_skill_std) else cv_brier_skill_std,
+
         "cv_lift_at_best_threshold_mean": None if np.isnan(cv_lift_mean) else cv_lift_mean,
         "cv_lift_at_best_threshold_std": None if np.isnan(cv_lift_std) else cv_lift_std,
 
@@ -637,6 +676,8 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
         **{f"fold_{int(r['fold'])}_auc": r["fold_auc"] for _, r in fold_df.iterrows()},
         **{f"fold_{int(r['fold'])}_auprc": r["fold_auprc"] for _, r in fold_df.iterrows()},
+        **{f"fold_{int(r['fold'])}_brier_score": r["fold_brier_score"] for _, r in fold_df.iterrows()},
+        **{f"fold_{int(r['fold'])}_brier_skill_score": r["fold_brier_skill_score"] for _, r in fold_df.iterrows()},
     }
 
 # -------------------------------------------------------------------
@@ -711,6 +752,13 @@ if __name__ == "__main__":
         default=24,
         help="number of hourly periods to drop between train/val and train/test boundaries (leakage embargo)"
     )
+    cv_args.add_argument(
+        "--auprc_tolerance",
+        type=float,
+        default=0.01,
+        help=("models within this absolute mean AUPRC of the leader are treated as similar; "
+              "Brier skill then selects among them")
+    )
 
     model_args = parser.add_argument_group("Model arguments")
     model_args.add_argument("--learning_rate", type=float, default=0.01, help="learning rate")
@@ -764,6 +812,7 @@ if __name__ == "__main__":
         "models_compared": args.model_names,
         "n_rows": len(df),
         "n_features": len(feature_cols),
+        "auprc_tolerance": args.auprc_tolerance,
     })
 
     print(f"Experiment logs will be saved under: {experiment_logger.exp_dir}")
@@ -812,7 +861,44 @@ if __name__ == "__main__":
         summaries.append(summary)
 
     # Save overall comparison
-    summary_df = pd.DataFrame(summaries).sort_values("cv_auc_mean", ascending=False)
+    summary_df = pd.DataFrame(summaries)
+    if summary_df.empty:
+        raise RuntimeError("No CV summaries were produced.")
+
+    # Selection policy: AUPRC is primary.  For models statistically/operationally
+    # close to the AUPRC leader, prefer calibrated probabilities (Brier skill),
+    # then lower fold-to-fold AUPRC variation.
+    best_auprc = summary_df["cv_auprc_mean"].max()
+    summary_df["within_auprc_tolerance"] = (
+        summary_df["cv_auprc_mean"] >= best_auprc - args.auprc_tolerance
+    )
+    candidates = summary_df[summary_df["within_auprc_tolerance"]].copy()
+    candidates["_bss_sort"] = candidates["cv_brier_skill_score_mean"].fillna(-np.inf)
+    candidates["_stability_sort"] = candidates["cv_auprc_std"].fillna(np.inf)
+    candidates = candidates.sort_values(
+        ["_bss_sort", "_stability_sort", "cv_auprc_mean"],
+        ascending=[False, True, False],
+    )
+    selected_model = candidates.iloc[0]["model_name"]
+    summary_df["selected_model"] = summary_df["model_name"] == selected_model
+    summary_df["selection_rank"] = np.nan
+    summary_df.loc[candidates.index, "selection_rank"] = np.arange(1, len(candidates) + 1)
+    summary_df["selection_policy"] = (
+        "Primary: highest mean OOS AUPRC. Among models within "
+        f"{args.auprc_tolerance:.4f} AUPRC of the leader: higher Brier skill, "
+        "then lower AUPRC fold standard deviation."
+    )
+    summary_df = summary_df.sort_values(
+        ["selected_model", "cv_auprc_mean"], ascending=[False, False]
+    )
+    experiment_logger.save_json(
+        {
+            "selected_model": selected_model,
+            "auprc_tolerance": args.auprc_tolerance,
+            "selection_policy": summary_df["selection_policy"].iloc[0],
+        },
+        "comparison/selected_model.json",
+    )
     experiment_logger.save_dataframe(summary_df, "comparison/model_comparison_summary.parquet")
     experiment_logger.save_dataframe(summary_df, "comparison/model_comparison_summary.csv")
     experiment_logger.save_json(
@@ -820,9 +906,29 @@ if __name__ == "__main__":
         "comparison/model_comparison_summary.json"
     )
 
-    # Overall comparison plot
+    # Overall comparison: selection metrics, not in-sample fit metrics.
+    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+    colors = ["darkorange" if selected else "steelblue" for selected in summary_df["selected_model"]]
+    ax[0].bar(summary_df["model_name"], summary_df["cv_auprc_mean"],
+              yerr=summary_df["cv_auprc_std"], color=colors, capsize=4)
+    ax[0].set_title("Mean OOS AUPRC (primary)")
+    ax[0].set_xlabel("Model")
+    ax[0].set_ylabel("AUPRC")
+    ax[0].grid(axis="y", alpha=0.3)
+    ax[1].bar(summary_df["model_name"], summary_df["cv_brier_skill_score_mean"],
+              yerr=summary_df["cv_brier_skill_score_std"], color=colors, capsize=4)
+    ax[1].axhline(0, color="gray", linestyle="--", linewidth=1)
+    ax[1].set_title("Mean Brier skill score (secondary)")
+    ax[1].set_xlabel("Model")
+    ax[1].set_ylabel("Brier skill vs. prevalence")
+    ax[1].grid(axis="y", alpha=0.3)
+    fig.tight_layout()
+    experiment_logger.save_figure(fig, "plots/model_comparison_auprc_brier_skill.png", dpi=200)
+    plt.close(fig)
+
+    # Retain the legacy AUC comparison artifact for existing downstream reports.
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.bar(summary_df["model_name"], summary_df["cv_auc_mean"], color="steelblue")
+    ax.bar(summary_df["model_name"], summary_df["cv_auc_mean"], color=colors)
     ax.set_title(f"5-fold expanding-window CV AUC comparison (alpha={args.alpha})")
     ax.set_xlabel("Model")
     ax.set_ylabel("Mean CV AUC")
@@ -833,4 +939,5 @@ if __name__ == "__main__":
 
     print("\nDone.")
     print(f"Summary saved to: {experiment_logger.run_dir}")
-    print(summary_df[["model_name", "alpha", "cv_auc_mean", "cv_auc_std"]])
+    print(f"Selected model: {selected_model}")
+    print(summary_df[["model_name", "selected_model", "cv_auprc_mean", "cv_auprc_std", "cv_brier_skill_score_mean"]])

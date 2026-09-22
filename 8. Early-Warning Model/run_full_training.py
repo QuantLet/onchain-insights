@@ -16,9 +16,12 @@ from sklearn.metrics import (
     average_precision_score,
     confusion_matrix,
     classification_report,
+    brier_score_loss,
+    log_loss,
     roc_curve,
     precision_recall_curve,
 )
+from sklearn.calibration import calibration_curve
 
 import matplotlib.pyplot as plt
 
@@ -119,6 +122,129 @@ def compute_earliest_future_depeg_hour(df, args, max_horizon):
         earliest_hour.loc[mask] = h
 
     return earliest_hour
+
+
+def compute_event_level_metrics(df, proba_test, test_start_idx, threshold, args, max_horizon):
+    """Evaluate warnings against contiguous depeg episodes, rather than rows.
+
+    An event is a contiguous run of current depeg observations. An event is
+    caught when at least one alert occurs in the preceding ``max_horizon``
+    hours. Lead time is the time from the earliest such alert to event onset.
+    Alerts outside every event's warning window are counted as false alarms;
+    contiguous false-alert rows are also collapsed into false-alarm episodes.
+    """
+    event_now = infer_depeg_event_now(df, args).to_numpy(dtype=bool)
+    proba_test = np.asarray(proba_test, dtype=float)
+    test_end_idx = test_start_idx + len(proba_test)
+    alert_global = np.zeros(len(df), dtype=bool)
+    alert_global[test_start_idx:test_end_idx] = proba_test >= threshold
+
+    event_starts = np.flatnonzero(event_now & ~np.r_[False, event_now[:-1]])
+    event_ends = np.flatnonzero(event_now & ~np.r_[event_now[1:], False])
+    rows = []
+    warning_window = np.zeros(len(df), dtype=bool)
+
+    for event_id, (start, end) in enumerate(zip(event_starts, event_ends), start=1):
+        # Only score events whose onset belongs to the held-out test period.
+        if start < test_start_idx or start >= test_end_idx:
+            continue
+        warning_start = max(test_start_idx, start - max_horizon)
+        warning_end = start  # event onset is excluded: this is advance warning.
+        candidate_alerts = np.flatnonzero(alert_global[warning_start:warning_end]) + warning_start
+        caught = len(candidate_alerts) > 0
+        first_alert = int(candidate_alerts[0]) if caught else None
+        lead_time = float(start - first_alert) if caught else np.nan
+        warning_window[warning_start:warning_end] = True
+        rows.append({
+            "event_id": event_id,
+            "event_start_timestamp": df.iloc[start]["timestamp"],
+            "event_end_timestamp": df.iloc[end]["timestamp"],
+            "event_duration_hours": int(end - start + 1),
+            "warning_window_start_timestamp": df.iloc[warning_start]["timestamp"],
+            "caught": bool(caught),
+            "first_alert_timestamp": df.iloc[first_alert]["timestamp"] if caught else pd.NaT,
+            "lead_time_hours": lead_time,
+        })
+
+    event_df = pd.DataFrame(rows)
+    test_alert_mask = alert_global[test_start_idx:test_end_idx]
+    false_alert_mask = test_alert_mask & ~warning_window[test_start_idx:test_end_idx]
+    # Contiguous alert runs are one operational alarm episode.
+    false_alarm_episodes = int(np.sum(false_alert_mask & ~np.r_[False, false_alert_mask[:-1]]))
+    n_events = len(event_df)
+    n_caught = int(event_df["caught"].sum()) if n_events else 0
+    summary = {
+        "n_depeg_events": n_events,
+        "n_caught_depeg_events": n_caught,
+        "event_recall": n_caught / n_events if n_events else np.nan,
+        "mean_warning_lead_time_hours": event_df.loc[event_df["caught"], "lead_time_hours"].mean() if n_caught else np.nan,
+        "median_warning_lead_time_hours": event_df.loc[event_df["caught"], "lead_time_hours"].median() if n_caught else np.nan,
+        "n_alert_rows": int(test_alert_mask.sum()),
+        "n_false_alarm_rows": int(false_alert_mask.sum()),
+        "n_false_alarm_episodes": false_alarm_episodes,
+    }
+    return event_df, summary
+
+
+def plot_event_level_diagnostics(event_df, event_summary, logger):
+    """Save concise operational plots for event recall and lead time."""
+    n_caught = event_summary["n_caught_depeg_events"]
+    n_events = event_summary["n_depeg_events"]
+    fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+    ax[0].bar(["Caught", "Missed"], [n_caught, n_events - n_caught],
+              color=["seagreen", "firebrick"])
+    ax[0].set_title(f"Event recall = {event_summary['event_recall']:.3f}" if n_events else "No test depeg events")
+    ax[0].set_ylabel("Number of depeg events")
+    ax[0].grid(axis="y", alpha=0.3)
+
+    caught = event_df[event_df["caught"]] if not event_df.empty else event_df
+    if not caught.empty:
+        ax[1].bar(caught["event_id"].astype(str), caught["lead_time_hours"], color="steelblue")
+        ax[1].set_title("Lead time for caught events")
+        ax[1].set_xlabel("Event ID")
+        ax[1].set_ylabel("Hours before event onset")
+        ax[1].grid(axis="y", alpha=0.3)
+    else:
+        ax[1].text(0.5, 0.5, "No caught events", ha="center", va="center")
+        ax[1].set_axis_off()
+    fig.tight_layout()
+    log_fig(logger, fig, "plots/event_level_recall_and_lead_time.png")
+    plt.close(fig)
+
+
+def plot_calibration(y_true, proba, logger, n_bins=10):
+    """Reliability diagram plus the distribution of predicted probabilities."""
+    y_true = np.asarray(y_true).astype(int)
+    proba = np.asarray(proba, dtype=float)
+    frac_pos, mean_pred = calibration_curve(y_true, proba, n_bins=n_bins, strategy="uniform")
+    bin_id = np.minimum((proba * n_bins).astype(int), n_bins - 1)
+    calibration_df = pd.DataFrame({
+        "bin": np.arange(n_bins),
+        "bin_lower": np.arange(n_bins) / n_bins,
+        "bin_upper": (np.arange(n_bins) + 1) / n_bins,
+        "n_samples": [int((bin_id == i).sum()) for i in range(n_bins)],
+    })
+    # calibration_curve omits empty bins; map returned values to their occupied bins.
+    occupied = calibration_df["n_samples"] > 0
+    calibration_df.loc[occupied, "mean_predicted_probability"] = mean_pred
+    calibration_df.loc[occupied, "observed_positive_rate"] = frac_pos
+    logger.save_dataframe(calibration_df, "reports/calibration_bins.csv")
+
+    fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+    ax[0].plot([0, 1], [0, 1], "--", color="gray", label="Perfect calibration")
+    ax[0].plot(mean_pred, frac_pos, marker="o", color="steelblue", label="Model")
+    ax[0].set_title("Calibration (reliability) curve")
+    ax[0].set_xlabel("Mean predicted probability")
+    ax[0].set_ylabel("Observed positive rate")
+    ax[0].legend()
+    ax[0].grid(alpha=0.3)
+    ax[1].hist(proba, bins=n_bins, range=(0, 1), color="steelblue", edgecolor="white")
+    ax[1].set_title("Predicted-probability distribution")
+    ax[1].set_xlabel("Predicted probability")
+    ax[1].set_ylabel("Test observations")
+    fig.tight_layout()
+    log_fig(logger, fig, "plots/calibration_curve.png")
+    plt.close(fig)
 
 
 def default_time_to_depeg_bins(max_horizon):
@@ -1314,9 +1440,20 @@ if __name__ == "__main__":
 
     auc = roc_auc_score(y_test, proba_test)
     auprc = average_precision_score(y_test, proba_test)
+    brier = brier_score_loss(y_test, proba_test)
+    test_prevalence = float(y_test.mean())
+    prevalence_brier = test_prevalence * (1.0 - test_prevalence)
+    brier_skill = 1.0 - brier / prevalence_brier if prevalence_brier > 0 else np.nan
+    # Clip only for log loss, which is undefined at exactly 0 or 1.
+    test_log_loss = log_loss(y_test, np.clip(proba_test, 1e-15, 1 - 1e-15), labels=[0, 1])
 
     logger.log_metric("test_roc_auc", float(auc))
     logger.log_metric("test_auprc", float(auprc))
+    logger.log_metric("test_brier_score", float(brier))
+    logger.log_metric("test_brier_skill_score", brier_skill)
+    logger.log_metric("test_log_loss", float(test_log_loss))
+    logger.log_metric("test_positive_rows", int(y_test.sum()))
+    logger.log_metric("test_prevalence", test_prevalence)
 
     # Threshold by Youden J
     fpr, tpr, thresholds = roc_curve(y_test, proba_test)
@@ -1329,6 +1466,9 @@ if __name__ == "__main__":
     logger.log_metric("fpr_at_best_threshold", float(fpr[best_idx]))
 
     yhat = (proba_test >= thresh).astype(int)
+
+    # Calibration is assessed on the final held-out test period.
+    plot_calibration(y_test, proba_test, logger)
 
     # ---------------------------
     # ROC + PR plot
@@ -1384,10 +1524,25 @@ if __name__ == "__main__":
     logger.save_json(clf_report, "reports/classification_report.json")
 
     # ---------------------------
-    # Time-to-depeg bin metrics
+    # Event-level operational performance
     # ---------------------------
     max_horizon = int(getattr(args, "target_window", 24) or 24)
+    event_metrics, event_summary = compute_event_level_metrics(
+        df=df,
+        proba_test=proba_test,
+        test_start_idx=val_end,
+        threshold=thresh,
+        args=args,
+        max_horizon=max_horizon,
+    )
+    logger.save_dataframe(event_metrics, "reports/event_level_metrics.csv")
+    logger.save_json(event_summary, "reports/event_level_summary.json")
+    logger.log_metrics({f"test_{key}": value for key, value in event_summary.items()})
+    plot_event_level_diagnostics(event_metrics, event_summary, logger)
 
+    # ---------------------------
+    # Time-to-depeg bin metrics
+    # ---------------------------
     ttd_metrics, earliest_test_depeg_hour = compute_time_to_depeg_bin_metrics(
         df=df,
         y_test=y_test,
