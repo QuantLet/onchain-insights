@@ -87,7 +87,10 @@ def alert_episode_times(
         if score >= threshold and (next_allowed is None or time >= next_allowed):
             episodes.append(time)
             next_allowed = time + cooldown
-    return pd.DatetimeIndex(episodes)
+    # ``DatetimeIndex(list_of_timestamps)`` can infer a tz-naive dtype under
+    # some pandas versions.  The realised event timestamps are explicitly UTC,
+    # so force the same representation for episode/window comparisons.
+    return pd.DatetimeIndex(pd.to_datetime(episodes, utc=True))
 
 
 def lead_time_utility(
@@ -215,7 +218,9 @@ def evaluate_early_warning(
         "event_utilities": np.asarray(event_utilities, dtype=float),
         "detected": np.asarray(detected, dtype=float),
         "lead_hours": np.asarray(lead_hours, dtype=float),
-        "false_alert_times": np.asarray(false_alert_times, dtype="datetime64[ns]"),
+        # Keep the timezone. Casting to numpy datetime64 silently strips UTC and
+        # later causes naive/aware comparisons in the block bootstrap.
+        "false_alert_times": pd.DatetimeIndex(false_alert_times),
         "score_start": score_start,
         "duration_hours": np.asarray(duration_hours),
     }
@@ -356,7 +361,7 @@ def _empty_bootstrap_inputs() -> Dict[str, np.ndarray]:
         "event_utilities": np.asarray([], dtype=float),
         "detected": np.asarray([], dtype=float),
         "lead_hours": np.asarray([], dtype=float),
-        "false_alert_times": np.asarray([], dtype="datetime64[ns]"),
+        "false_alert_times": pd.DatetimeIndex([], tz="UTC"),
         "score_start": pd.Timestamp("1970-01-01", tz="UTC"),
         "duration_hours": np.asarray(0.0),
     }
