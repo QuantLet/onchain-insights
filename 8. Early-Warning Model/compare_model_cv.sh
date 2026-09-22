@@ -3,6 +3,7 @@ set -euo pipefail
 
 CV_SCRIPT="cv_model_comparison.py"
 PLOT_SCRIPT="plot_cv_metrics_heatmap.py"
+SELECTION_PLOT_SCRIPT="plot_model_selection_by_budget.py"
 FULL_TRAIN_SCRIPT="run_full_training.py"
 
 LOG_DIR="lightning_logs"
@@ -20,9 +21,19 @@ EARLY_STOPPING_ROUNDS=200
 SCALER="robust"
 DEPEG_SIDE="both"
 EVAL_METRIC="auc"
-# Models within this mean OOS AUPRC distance are treated as comparable; Brier
-# skill and fold-to-fold AUPRC stability break the tie.
-AUPRC_TOLERANCE=0.01
+# Model selection is event-level utility at this operating point.  The full
+# list is also evaluated so the selection-frontier plot can show sensitivity.
+FALSE_ALERT_BUDGET=2.0
+FALSE_ALERT_BUDGETS=(0.5 1.0 2.0)
+UTILITY_TOLERANCE=0.01
+FALSE_ALERT_COST=0.05
+MIN_LEAD_HOURS=1
+MIN_LEAD_UTILITY=0.10
+# Keep operational scoring aligned with "depeg within TARGET_WINDOW hours".
+MAX_LEAD_HOURS="${TARGET_WINDOW}"
+UTILITY_TARGET_LEAD_HOURS="${TARGET_WINDOW}"
+ALERT_COOLDOWN_HOURS=24
+N_BOOTSTRAP=1000
 
 echo "===================================================="
 echo "Running CV comparison experiment: ${EXPERIMENT_NAME}"
@@ -48,20 +59,32 @@ for ALPHA in "${ALPHAS[@]}"; do
     --model_names "${MODELS[@]}" \
     --scaler "${SCALER}" \
     --cv_embargo_hours 48 \
-    --auprc_tolerance "${AUPRC_TOLERANCE}"
+    --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
+    --false_alert_budgets "${FALSE_ALERT_BUDGETS[@]}" \
+    --false_alert_cost "${FALSE_ALERT_COST}" \
+    --min_lead_hours "${MIN_LEAD_HOURS}" \
+    --min_lead_utility "${MIN_LEAD_UTILITY}" \
+    --max_lead_hours "${MAX_LEAD_HOURS}" \
+    --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
+    --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}" \
+    --n_bootstrap "${N_BOOTSTRAP}" \
+    --utility_tolerance "${UTILITY_TOLERANCE}"
 done
 
 echo "All CV runs completed."
 
 python "${PLOT_SCRIPT}" --experiment_name "${EXPERIMENT_NAME}"
+python "${SELECTION_PLOT_SCRIPT}" \
+  --experiment_name "${EXPERIMENT_NAME}" \
+  --utility_tolerance "${UTILITY_TOLERANCE}"
 
 echo "===================================================="
-echo "Selecting the CV winner by OOS AUPRC, Brier skill, and stability"
+echo "Selecting the CV winner by event utility at the false-alert budget"
 echo "===================================================="
 
 SELECTED_TSV="${LOG_DIR}/${EXPERIMENT_NAME}/selected_for_full_retraining.tsv"
 
-LOG_DIR="${LOG_DIR}" EXPERIMENT_NAME="${EXPERIMENT_NAME}" SELECTED_TSV="${SELECTED_TSV}" AUPRC_TOLERANCE="${AUPRC_TOLERANCE}" python - <<'PY'
+LOG_DIR="${LOG_DIR}" EXPERIMENT_NAME="${EXPERIMENT_NAME}" SELECTED_TSV="${SELECTED_TSV}" UTILITY_TOLERANCE="${UTILITY_TOLERANCE}" python - <<'PY'
 from pathlib import Path
 import pandas as pd
 import os
@@ -69,7 +92,7 @@ import os
 log_dir = Path(os.environ["LOG_DIR"])
 experiment_name = os.environ["EXPERIMENT_NAME"]
 selected_tsv = Path(os.environ["SELECTED_TSV"])
-auprc_tolerance = float(os.environ["AUPRC_TOLERANCE"])
+utility_tolerance = float(os.environ["UTILITY_TOLERANCE"])
 
 exp_dir = log_dir / experiment_name
 if not exp_dir.exists():
@@ -102,9 +125,10 @@ all_df = pd.concat(dfs, ignore_index=True)
 required_cols = [
     "model_name",
     "alpha",
-    "cv_auprc_mean",
-    "cv_auprc_std",
-    "cv_brier_skill_score_mean",
+    "cv_event_utility_score_mean",
+    "cv_event_utility_score_std",
+    "cv_timely_event_recall_mean",
+    "cv_false_alerts_per_month_mean",
     "selected_model",
 ]
 missing = [c for c in required_cols if c not in all_df.columns]
@@ -112,11 +136,10 @@ if missing:
     raise SystemExit(f"Missing expected columns in summary data: {missing}")
 
 all_df["alpha"] = pd.to_numeric(all_df["alpha"], errors="coerce")
-all_df["cv_auprc_mean"] = pd.to_numeric(all_df["cv_auprc_mean"], errors="coerce")
-all_df["cv_auprc_std"] = pd.to_numeric(all_df["cv_auprc_std"], errors="coerce")
-all_df["cv_brier_skill_score_mean"] = pd.to_numeric(
-    all_df["cv_brier_skill_score_mean"], errors="coerce"
-)
+all_df["cv_event_utility_score_mean"] = pd.to_numeric(all_df["cv_event_utility_score_mean"], errors="coerce")
+all_df["cv_event_utility_score_std"] = pd.to_numeric(all_df["cv_event_utility_score_std"], errors="coerce")
+all_df["cv_timely_event_recall_mean"] = pd.to_numeric(all_df["cv_timely_event_recall_mean"], errors="coerce")
+all_df["cv_false_alerts_per_month_mean"] = pd.to_numeric(all_df["cv_false_alerts_per_month_mean"], errors="coerce")
 all_df["selected_model"] = all_df["selected_model"].astype(str).str.lower().eq("true")
 
 # Keep the latest row for each (alpha, model_name) in case of reruns
@@ -127,28 +150,29 @@ all_df = (
 )
 
 # Each CV summary has already selected its model for that alpha. Select one
-# full-retraining candidate across alphas with the same stated hierarchy.
-candidates = all_df[all_df["selected_model"]].dropna(subset=["cv_auprc_mean"]).copy()
+# full-retraining candidate across alphas with the same operational hierarchy.
+candidates = all_df[all_df["selected_model"]].dropna(subset=["cv_event_utility_score_mean"]).copy()
 if candidates.empty:
     raise SystemExit("No CV-selected candidates found for full retraining.")
 
-best_auprc = candidates["cv_auprc_mean"].max()
+best_utility = candidates["cv_event_utility_score_mean"].max()
 comparable = candidates[
-    candidates["cv_auprc_mean"] >= best_auprc - auprc_tolerance
+    candidates["cv_event_utility_score_mean"] >= best_utility - utility_tolerance
 ].copy()
-comparable["_bss_sort"] = comparable["cv_brier_skill_score_mean"].fillna(float("-inf"))
-comparable["_stability_sort"] = comparable["cv_auprc_std"].fillna(float("inf"))
+comparable["_recall_sort"] = comparable["cv_timely_event_recall_mean"].fillna(float("-inf"))
+comparable["_fa_sort"] = comparable["cv_false_alerts_per_month_mean"].fillna(float("inf"))
+comparable["_stability_sort"] = comparable["cv_event_utility_score_std"].fillna(float("inf"))
 selected = (
     comparable.sort_values(
-        ["_bss_sort", "_stability_sort", "cv_auprc_mean"],
-        ascending=[False, True, False],
+        ["_recall_sort", "_fa_sort", "_stability_sort", "cv_event_utility_score_mean"],
+        ascending=[False, True, True, False],
     )
     .head(1)
-    [["alpha", "model_name", "cv_auprc_mean", "cv_auprc_std", "cv_brier_skill_score_mean"]]
+    [["alpha", "model_name", "cv_event_utility_score_mean", "cv_event_utility_score_std", "cv_timely_event_recall_mean", "cv_false_alerts_per_month_mean"]]
     .copy()
 )
 selected["selection_reason"] = (
-    "cv_selected; global_auprc_then_brier_skill_then_auprc_stability"
+    "cv_selected; global_event_utility_then_timely_recall_then_false_alert_burden"
 )
 
 selected_tsv.parent.mkdir(parents=True, exist_ok=True)
@@ -163,10 +187,10 @@ echo "===================================================="
 echo "Running full retraining for selected candidates"
 echo "===================================================="
 
-tail -n +2 "${SELECTED_TSV}" | while IFS=$'\t' read -r ALPHA MODEL CV_AUPRC CV_AUPRC_STD BRIER_SKILL REASON; do
+tail -n +2 "${SELECTED_TSV}" | while IFS=$'\t' read -r ALPHA MODEL CV_UTILITY CV_UTILITY_STD EVENT_RECALL FALSE_ALERTS REASON; do
   echo "----------------------------------------"
   echo "Full retraining: model=${MODEL}, alpha=${ALPHA}, reason=${REASON}"
-  echo "CV AUPRC=${CV_AUPRC}, AUPRC std=${CV_AUPRC_STD}, Brier skill=${BRIER_SKILL}"
+  echo "CV utility=${CV_UTILITY}, utility std=${CV_UTILITY_STD}, event recall=${EVENT_RECALL}, false alerts/month=${FALSE_ALERTS}"
   echo "----------------------------------------"
 
   python "${FULL_TRAIN_SCRIPT}" \

@@ -19,6 +19,11 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from utils.build_dataset import build_dataset, add_dataset_args
+from early_warning_evaluation import (
+    choose_threshold_by_utility,
+    evaluate_early_warning,
+    event_block_bootstrap_ci,
+)
 
 import argparse
 import json
@@ -496,10 +501,28 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         n_splits=args.n_splits,
         test_frac=args.cv_test_frac,
         min_train_frac=args.cv_min_train_frac,
-        embargo_periods=args.cv_embargo_hours,
+        embargo_periods=args.effective_embargo_hours,
     )
 
     fold_rows = []
+    budget_rows = []
+    bootstrap_ci_rows = []
+    bootstrap_samples_by_fold = []
+    primary_budget = float(args.false_alert_budget_per_month)
+    budgets = sorted({float(x) for x in args.false_alert_budgets} | {primary_budget})
+    evaluation_kwargs = {
+        "timestamp_col": "timestamp",
+        "depeg_col": "depeg_bps",
+        "threshold_bps": args.target_threshold,
+        "depeg_side": args.depeg_side,
+        "dynamic_threshold": args.dynamic_threshold,
+        "min_lead_hours": args.min_lead_hours,
+        "max_lead_hours": args.max_lead_hours,
+        "target_lead_hours": args.utility_target_lead_hours,
+        "min_lead_utility": args.min_lead_utility,
+        "cooldown_hours": args.alert_cooldown_hours,
+        "false_alert_cost": args.false_alert_cost,
+    }
 
     for fold, (train_idx, test_idx) in enumerate(splits, start=1):
         X_train_full = X.iloc[train_idx].copy()
@@ -510,7 +533,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         # Tail validation split from the training fold (with the same embargo)
         X_train, y_train, X_val, y_val = split_train_val_tail(
             X_train_full, y_train_full, val_frac=args.cv_val_frac,
-            embargo_periods=args.cv_embargo_hours,
+            embargo_periods=args.effective_embargo_hours,
         )
 
         X_train_s, X_val_s, X_test_s, scaler = apply_scaling(
@@ -547,6 +570,59 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         proba_test = model.predict_proba(X_test_s)[:, 1]
         fold_metrics = compute_fold_metrics(y_test, proba_test)
 
+        if X_val_s is None:
+            raise ValueError(
+                "The validation period is empty after purging; increase the training "
+                "window or decrease --cv_embargo_hours. A validation period is required "
+                "to choose operational alert thresholds without test-fold leakage."
+            )
+        proba_val = model.predict_proba(X_val_s)[:, 1]
+        val_frame = df.iloc[train_idx].iloc[-len(X_val_s):].copy()
+        # split_train_val_tail removes an embargo immediately before X_val.  The
+        # tail rows are nevertheless exactly the validation rows retained above.
+        val_frame = val_frame.iloc[-len(proba_val):].copy()
+
+        primary_test_metrics = None
+        primary_bootstrap_ci = {}
+        primary_bootstrap_samples = {}
+        for budget in budgets:
+            alert_threshold, validation_metrics = choose_threshold_by_utility(
+                val_frame,
+                proba_val,
+                false_alert_budget_per_month=budget,
+                threshold_grid_size=args.threshold_grid_size,
+                event_context_frame=df.iloc[train_idx].copy(),
+                **evaluation_kwargs,
+            )
+            test_metrics, bootstrap_inputs = evaluate_early_warning(
+                df.iloc[test_idx].copy(),
+                proba_test,
+                alert_threshold,
+                event_context_frame=df.iloc[: test_idx[-1] + 1].copy(),
+                **evaluation_kwargs,
+            )
+            budget_rows.append({
+                "fold": fold,
+                "model_name": model_name,
+                "alpha": args.alpha,
+                "false_alert_budget_per_month": budget,
+                "threshold_selected_on_validation": alert_threshold,
+                **{f"validation_{k}": v for k, v in validation_metrics.items()},
+                **{f"test_{k}": v for k, v in test_metrics.items()},
+            })
+            if np.isclose(budget, primary_budget):
+                primary_test_metrics = test_metrics
+                primary_bootstrap_ci, primary_bootstrap_samples = event_block_bootstrap_ci(
+                    bootstrap_inputs,
+                    false_alert_cost=args.false_alert_cost,
+                    block_hours=args.bootstrap_block_hours,
+                    n_bootstrap=args.n_bootstrap,
+                    random_state=args.random_state + fold,
+                )
+
+        if primary_test_metrics is None:
+            raise RuntimeError("Primary false-alert budget was not evaluated")
+
         row = {
             "fold": fold,
             "model_name": model_name,
@@ -561,12 +637,25 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             "test_neg": int((y_test == 0).sum()),
             "scale_pos_weight": w_pos,
             "train_end_timestamp": df.iloc[train_idx]["timestamp"].iloc[-1],
-            "embargo_hours": args.cv_embargo_hours,
+            "embargo_hours": args.effective_embargo_hours,
             "test_start": df.iloc[test_idx]["timestamp"].iloc[0],
             "test_end": df.iloc[test_idx]["timestamp"].iloc[-1],
             **fold_metrics,
+            **{f"fold_{k}": v for k, v in primary_test_metrics.items()},
+            **primary_bootstrap_ci,
         }
         fold_rows.append(row)
+        bootstrap_ci_rows.append({
+            "fold": fold,
+            "model_name": model_name,
+            "alpha": args.alpha,
+            "ci_method": "event_and_calendar_block_bootstrap",
+            "n_bootstrap": args.n_bootstrap,
+            "block_hours": args.bootstrap_block_hours,
+            **primary_bootstrap_ci,
+        })
+        if primary_bootstrap_samples:
+            bootstrap_samples_by_fold.append(primary_bootstrap_samples)
 
         logger.log_metric(f"fold_{fold}_auc", fold_metrics["fold_auc"])
         logger.log_metric(f"fold_{fold}_auprc", fold_metrics["fold_auprc"])
@@ -576,6 +665,9 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         logger.log_metric(f"fold_{fold}_best_threshold_youdenJ", fold_metrics["best_threshold_youdenJ"])
         logger.log_metric(f"fold_{fold}_tpr_at_best_threshold", fold_metrics["tpr_at_best_threshold"])
         logger.log_metric(f"fold_{fold}_fpr_at_best_threshold", fold_metrics["fpr_at_best_threshold"])
+        logger.log_metric(f"fold_{fold}_event_utility_score", primary_test_metrics["event_utility_score"])
+        logger.log_metric(f"fold_{fold}_timely_event_recall", primary_test_metrics["timely_event_recall"])
+        logger.log_metric(f"fold_{fold}_false_alerts_per_month", primary_test_metrics["false_alerts_per_month"])
 
         print(
             f"[{model_name}] fold={fold} "
@@ -584,7 +676,10 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             f"auprc={fold_metrics['fold_auprc']} "
             f"brier={fold_metrics['fold_brier_score']} "
             f"bss={fold_metrics['fold_brier_skill_score']} "
-            f"lift={fold_metrics['lift_at_best_threshold']}"
+            f"lift={fold_metrics['lift_at_best_threshold']} "
+            f"utility={primary_test_metrics['event_utility_score']} "
+            f"event_recall={primary_test_metrics['timely_event_recall']} "
+            f"false_alerts/month={primary_test_metrics['false_alerts_per_month']}"
         )
 
     fold_df = pd.DataFrame(fold_rows)
@@ -603,6 +698,24 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
     cv_best_threshold_mean, cv_best_threshold_std = col_mean_std(fold_df, "best_threshold_youdenJ")
     cv_tpr_best_mean, cv_tpr_best_std = col_mean_std(fold_df, "tpr_at_best_threshold")
     cv_fpr_best_mean, cv_fpr_best_std = col_mean_std(fold_df, "fpr_at_best_threshold")
+    cv_utility_mean, cv_utility_std = col_mean_std(fold_df, "fold_event_utility_score")
+    cv_event_recall_mean, cv_event_recall_std = col_mean_std(fold_df, "fold_timely_event_recall")
+    cv_false_alerts_mean, cv_false_alerts_std = col_mean_std(fold_df, "fold_false_alerts_per_month")
+    cv_median_lead_mean, cv_median_lead_std = col_mean_std(fold_df, "fold_median_lead_hours")
+
+    cv_bootstrap_ci = {}
+    if bootstrap_samples_by_fold:
+        for metric in ["event_utility_score", "timely_event_recall", "false_alerts_per_month", "median_lead_hours"]:
+            values = [sample[metric] for sample in bootstrap_samples_by_fold if metric in sample]
+            if values:
+                pooled_draws = np.nanmean(np.vstack(values), axis=0)
+                pooled_draws = pooled_draws[np.isfinite(pooled_draws)]
+                if len(pooled_draws):
+                    cv_bootstrap_ci[f"cv_{metric}_ci_lower"] = float(np.quantile(pooled_draws, 0.025))
+                    cv_bootstrap_ci[f"cv_{metric}_ci_upper"] = float(np.quantile(pooled_draws, 0.975))
+    for metric in ["event_utility_score", "timely_event_recall", "false_alerts_per_month", "median_lead_hours"]:
+        cv_bootstrap_ci.setdefault(f"cv_{metric}_ci_lower", None)
+        cv_bootstrap_ci.setdefault(f"cv_{metric}_ci_upper", None)
 
     logger.log_metric("cv_auc_mean", cv_auc_mean)
     logger.log_metric("cv_auc_std", cv_auc_std)
@@ -626,9 +739,21 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
     logger.log_metric("cv_fpr_at_best_threshold_mean", cv_fpr_best_mean)
     logger.log_metric("cv_fpr_at_best_threshold_std", cv_fpr_best_std)
+    logger.log_metric("cv_event_utility_score_mean", cv_utility_mean)
+    logger.log_metric("cv_event_utility_score_std", cv_utility_std)
+    logger.log_metric("cv_timely_event_recall_mean", cv_event_recall_mean)
+    logger.log_metric("cv_timely_event_recall_std", cv_event_recall_std)
+    logger.log_metric("cv_false_alerts_per_month_mean", cv_false_alerts_mean)
+    logger.log_metric("cv_false_alerts_per_month_std", cv_false_alerts_std)
 
     logger.save_dataframe(fold_df, "cv/fold_metrics.parquet")
     logger.save_dataframe(fold_df, "cv/fold_metrics.csv")
+    budget_df = pd.DataFrame(budget_rows)
+    logger.save_dataframe(budget_df, "cv/utility_by_false_alert_budget.parquet")
+    logger.save_dataframe(budget_df, "cv/utility_by_false_alert_budget.csv")
+    bootstrap_ci_df = pd.DataFrame(bootstrap_ci_rows)
+    logger.save_dataframe(bootstrap_ci_df, "cv/event_block_bootstrap_ci.parquet")
+    logger.save_dataframe(bootstrap_ci_df, "cv/event_block_bootstrap_ci.csv")
 
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.plot(fold_df["fold"], fold_df["fold_auc"], marker="o", color="royalblue")
@@ -642,6 +767,18 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
     ax.grid(alpha=0.3)
     fig.tight_layout()
     logger.save_figure(fig, "plots/cv/fold_auc.png", dpi=200)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(fold_df["fold"], fold_df["fold_event_utility_score"], marker="o", color="darkorange")
+    ax.axhline(0, color="gray", linewidth=1, linestyle="--")
+    ax.set_title(f"{model_name} – event-level utility by chronological fold")
+    ax.set_xlabel("Fold")
+    ax.set_ylabel("Utility")
+    ax.set_xticks(fold_df["fold"].tolist())
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    logger.save_figure(fig, "plots/cv/fold_event_utility.png", dpi=200)
     plt.close(fig)
 
     return {
@@ -673,6 +810,17 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
         "cv_fpr_at_best_threshold_mean": None if np.isnan(cv_fpr_best_mean) else cv_fpr_best_mean,
         "cv_fpr_at_best_threshold_std": None if np.isnan(cv_fpr_best_std) else cv_fpr_best_std,
+
+        "false_alert_budget_per_month": primary_budget,
+        "cv_event_utility_score_mean": None if np.isnan(cv_utility_mean) else cv_utility_mean,
+        "cv_event_utility_score_std": None if np.isnan(cv_utility_std) else cv_utility_std,
+        "cv_timely_event_recall_mean": None if np.isnan(cv_event_recall_mean) else cv_event_recall_mean,
+        "cv_timely_event_recall_std": None if np.isnan(cv_event_recall_std) else cv_event_recall_std,
+        "cv_false_alerts_per_month_mean": None if np.isnan(cv_false_alerts_mean) else cv_false_alerts_mean,
+        "cv_false_alerts_per_month_std": None if np.isnan(cv_false_alerts_std) else cv_false_alerts_std,
+        "cv_median_lead_hours_mean": None if np.isnan(cv_median_lead_mean) else cv_median_lead_mean,
+        "cv_median_lead_hours_std": None if np.isnan(cv_median_lead_std) else cv_median_lead_std,
+        **cv_bootstrap_ci,
 
         **{f"fold_{int(r['fold'])}_auc": r["fold_auc"] for _, r in fold_df.iterrows()},
         **{f"fold_{int(r['fold'])}_auprc": r["fold_auprc"] for _, r in fold_df.iterrows()},
@@ -753,11 +901,86 @@ if __name__ == "__main__":
         help="number of hourly periods to drop between train/val and train/test boundaries (leakage embargo)"
     )
     cv_args.add_argument(
-        "--auprc_tolerance",
+        "--false_alert_budget_per_month",
+        type=float,
+        default=2.0,
+        help="primary operational cap on false alert episodes per month",
+    )
+    cv_args.add_argument(
+        "--false_alert_budgets",
+        nargs="+",
+        type=float,
+        default=[0.5, 1.0, 2.0],
+        help="budgets to evaluate and expose to the selection-evolution plot",
+    )
+    cv_args.add_argument(
+        "--false_alert_cost",
+        type=float,
+        default=0.05,
+        help="utility penalty for one false alert episode per month",
+    )
+    cv_args.add_argument(
+        "--min_lead_hours",
+        type=float,
+        default=1.0,
+        help="minimum operationally useful warning lead time",
+    )
+    cv_args.add_argument(
+        "--max_lead_hours",
+        type=float,
+        default=None,
+        help=("maximum lead time that belongs to an event warning window; defaults "
+              "to --target_window so evaluation matches the forecast label"),
+    )
+    cv_args.add_argument(
+        "--utility_target_lead_hours",
+        type=float,
+        default=None,
+        help=("lead time at which event utility reaches one; defaults to the "
+              "effective maximum lead time"),
+    )
+    cv_args.add_argument(
+        "--min_lead_utility",
+        type=float,
+        default=0.10,
+        help="event utility awarded at exactly --min_lead_hours (must lie in [0, 1])",
+    )
+    cv_args.add_argument(
+        "--alert_cooldown_hours",
+        type=float,
+        default=24.0,
+        help="refractory period that collapses repeated alerts into one episode",
+    )
+    cv_args.add_argument(
+        "--threshold_grid_size",
+        type=int,
+        default=201,
+        help="maximum number of validation probability thresholds considered",
+    )
+    cv_args.add_argument(
+        "--n_bootstrap",
+        type=int,
+        default=1000,
+        help="number of event/calendar-block bootstrap draws per outer fold (zero disables CIs)",
+    )
+    cv_args.add_argument(
+        "--bootstrap_block_hours",
+        type=float,
+        default=24.0 * 7,
+        help="calendar block length for false-alert bootstrap resampling",
+    )
+    cv_args.add_argument(
+        "--random_state",
+        type=int,
+        default=1233,
+        help="random seed for event/block bootstrap confidence intervals",
+    )
+    cv_args.add_argument(
+        "--utility_tolerance",
         type=float,
         default=0.01,
-        help=("models within this absolute mean AUPRC of the leader are treated as similar; "
-              "Brier skill then selects among them")
+        help=("models within this absolute mean event utility of the leader are treated as comparable; "
+              "timely recall and lower false-alert burden break the tie"),
     )
 
     model_args = parser.add_argument_group("Model arguments")
@@ -771,6 +994,25 @@ if __name__ == "__main__":
     model_args.add_argument("--n_jobs", type=int, default=-1, help="parallel jobs")
 
     args = parser.parse_args()
+    # The binary label says whether a depeg happens within target_window hours.
+    # A warning earlier than that is outside the supervised forecasting task, so
+    # evaluation follows the label horizon unless the user explicitly overrides it.
+    if args.max_lead_hours is None:
+        args.max_lead_hours = float(args.target_window)
+    if args.utility_target_lead_hours is None:
+        args.utility_target_lead_hours = args.max_lead_hours
+    if args.min_lead_hours < 0 or args.max_lead_hours < args.min_lead_hours:
+        parser.error("Require 0 <= --min_lead_hours <= --max_lead_hours")
+    if args.utility_target_lead_hours < args.min_lead_hours:
+        parser.error("--utility_target_lead_hours must be at least --min_lead_hours")
+    if not 0.0 <= args.min_lead_utility <= 1.0:
+        parser.error("--min_lead_utility must lie in [0, 1]")
+    if args.false_alert_budget_per_month < 0 or any(budget < 0 for budget in args.false_alert_budgets):
+        parser.error("False-alert budgets must be non-negative")
+    # The target looks ahead ``target_window`` rows.  Purging no fewer rows at
+    # each boundary prevents labels in the training period from seeing into the
+    # validation/test period, even if the user asks for a shorter embargo.
+    args.effective_embargo_hours = max(args.cv_embargo_hours, args.target_window)
 
     # Build dataset using your existing pipeline
     dict_args = vars(args).copy()
@@ -807,12 +1049,19 @@ if __name__ == "__main__":
         "alpha": args.alpha,
         "n_splits": args.n_splits,
         "cv_val_frac": args.cv_val_frac,
-        "cv_embargo_hours": args.cv_embargo_hours,
+        "cv_embargo_hours_requested": args.cv_embargo_hours,
+        "effective_embargo_hours": args.effective_embargo_hours,
         "scaler": args.scaler,
         "models_compared": args.model_names,
         "n_rows": len(df),
         "n_features": len(feature_cols),
-        "auprc_tolerance": args.auprc_tolerance,
+        "false_alert_budget_per_month": args.false_alert_budget_per_month,
+        "false_alert_budgets": args.false_alert_budgets,
+        "false_alert_cost": args.false_alert_cost,
+        "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
+        "min_lead_utility": args.min_lead_utility,
+        "alert_cooldown_hours": args.alert_cooldown_hours,
+        "n_bootstrap": args.n_bootstrap,
     })
 
     print(f"Experiment logs will be saved under: {experiment_logger.exp_dir}")
@@ -834,7 +1083,8 @@ if __name__ == "__main__":
             "dataset_path": dataset_path,
             "n_splits": args.n_splits,
             "cv_val_frac": args.cv_val_frac,
-            "cv_embargo_hours": args.cv_embargo_hours,
+            "cv_embargo_hours_requested": args.cv_embargo_hours,
+            "effective_embargo_hours": args.effective_embargo_hours,
             "scaler": args.scaler,
             "learning_rate": args.learning_rate,
             "early_stopping_rounds": args.early_stopping_rounds,
@@ -848,6 +1098,13 @@ if __name__ == "__main__":
             "depeg_side": args.depeg_side,
             "dynamic_threshold": int(args.dynamic_threshold),
             "n_features": len(feature_cols),
+            "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "false_alert_budgets": args.false_alert_budgets,
+            "false_alert_cost": args.false_alert_cost,
+            "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
+            "min_lead_utility": args.min_lead_utility,
+            "alert_cooldown_hours": args.alert_cooldown_hours,
+            "n_bootstrap": args.n_bootstrap,
         })
 
         summary = run_expanding_window_cv(
@@ -865,36 +1122,44 @@ if __name__ == "__main__":
     if summary_df.empty:
         raise RuntimeError("No CV summaries were produced.")
 
-    # Selection policy: AUPRC is primary.  For models statistically/operationally
-    # close to the AUPRC leader, prefer calibrated probabilities (Brier skill),
-    # then lower fold-to-fold AUPRC variation.
-    best_auprc = summary_df["cv_auprc_mean"].max()
-    summary_df["within_auprc_tolerance"] = (
-        summary_df["cv_auprc_mean"] >= best_auprc - args.auprc_tolerance
+    # Primary selection is the deployment utility, not a row-level ranking
+    # metric.  Each outer test fold uses a threshold selected only on its prior
+    # validation period at the pre-specified false-alert budget.
+    best_utility = summary_df["cv_event_utility_score_mean"].max()
+    if pd.isna(best_utility):
+        raise RuntimeError(
+            "No outer fold contained a boundary-complete depeg event. Increase the "
+            "evaluation horizon or reduce --max_lead_hours before selecting a model."
+        )
+    summary_df["within_utility_tolerance"] = (
+        summary_df["cv_event_utility_score_mean"] >= best_utility - args.utility_tolerance
     )
-    candidates = summary_df[summary_df["within_auprc_tolerance"]].copy()
-    candidates["_bss_sort"] = candidates["cv_brier_skill_score_mean"].fillna(-np.inf)
-    candidates["_stability_sort"] = candidates["cv_auprc_std"].fillna(np.inf)
+    candidates = summary_df[summary_df["within_utility_tolerance"]].copy()
+    candidates["_recall_sort"] = candidates["cv_timely_event_recall_mean"].fillna(-np.inf)
+    candidates["_fa_sort"] = candidates["cv_false_alerts_per_month_mean"].fillna(np.inf)
+    candidates["_stability_sort"] = candidates["cv_event_utility_score_std"].fillna(np.inf)
     candidates = candidates.sort_values(
-        ["_bss_sort", "_stability_sort", "cv_auprc_mean"],
-        ascending=[False, True, False],
+        ["_recall_sort", "_fa_sort", "_stability_sort", "cv_event_utility_score_mean"],
+        ascending=[False, True, True, False],
     )
     selected_model = candidates.iloc[0]["model_name"]
     summary_df["selected_model"] = summary_df["model_name"] == selected_model
     summary_df["selection_rank"] = np.nan
     summary_df.loc[candidates.index, "selection_rank"] = np.arange(1, len(candidates) + 1)
     summary_df["selection_policy"] = (
-        "Primary: highest mean OOS AUPRC. Among models within "
-        f"{args.auprc_tolerance:.4f} AUPRC of the leader: higher Brier skill, "
-        "then lower AUPRC fold standard deviation."
+        "Primary: highest mean outer-fold event utility at a fixed false-alert "
+        f"budget of {args.false_alert_budget_per_month:.3f} episodes/month. Among models within "
+        f"{args.utility_tolerance:.4f} utility of the leader: higher timely event recall, "
+        "then lower false-alert burden and lower utility variation."
     )
     summary_df = summary_df.sort_values(
-        ["selected_model", "cv_auprc_mean"], ascending=[False, False]
+        ["selected_model", "cv_event_utility_score_mean"], ascending=[False, False]
     )
     experiment_logger.save_json(
         {
             "selected_model": selected_model,
-            "auprc_tolerance": args.auprc_tolerance,
+            "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "utility_tolerance": args.utility_tolerance,
             "selection_policy": summary_df["selection_policy"].iloc[0],
         },
         "comparison/selected_model.json",
@@ -909,21 +1174,20 @@ if __name__ == "__main__":
     # Overall comparison: selection metrics, not in-sample fit metrics.
     fig, ax = plt.subplots(1, 2, figsize=(12, 5))
     colors = ["darkorange" if selected else "steelblue" for selected in summary_df["selected_model"]]
-    ax[0].bar(summary_df["model_name"], summary_df["cv_auprc_mean"],
-              yerr=summary_df["cv_auprc_std"], color=colors, capsize=4)
-    ax[0].set_title("Mean OOS AUPRC (primary)")
+    ax[0].bar(summary_df["model_name"], summary_df["cv_event_utility_score_mean"],
+              yerr=summary_df["cv_event_utility_score_std"], color=colors, capsize=4)
+    ax[0].set_title("Mean OOS event utility (primary)")
     ax[0].set_xlabel("Model")
-    ax[0].set_ylabel("AUPRC")
+    ax[0].set_ylabel("Utility")
     ax[0].grid(axis="y", alpha=0.3)
-    ax[1].bar(summary_df["model_name"], summary_df["cv_brier_skill_score_mean"],
-              yerr=summary_df["cv_brier_skill_score_std"], color=colors, capsize=4)
-    ax[1].axhline(0, color="gray", linestyle="--", linewidth=1)
-    ax[1].set_title("Mean Brier skill score (secondary)")
+    ax[1].bar(summary_df["model_name"], summary_df["cv_timely_event_recall_mean"],
+              yerr=summary_df["cv_timely_event_recall_std"], color=colors, capsize=4)
+    ax[1].set_title("Mean timely event recall (secondary)")
     ax[1].set_xlabel("Model")
-    ax[1].set_ylabel("Brier skill vs. prevalence")
+    ax[1].set_ylabel("Recall")
     ax[1].grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    experiment_logger.save_figure(fig, "plots/model_comparison_auprc_brier_skill.png", dpi=200)
+    experiment_logger.save_figure(fig, "plots/model_comparison_event_utility.png", dpi=200)
     plt.close(fig)
 
     # Retain the legacy AUC comparison artifact for existing downstream reports.
@@ -940,4 +1204,8 @@ if __name__ == "__main__":
     print("\nDone.")
     print(f"Summary saved to: {experiment_logger.run_dir}")
     print(f"Selected model: {selected_model}")
-    print(summary_df[["model_name", "selected_model", "cv_auprc_mean", "cv_auprc_std", "cv_brier_skill_score_mean"]])
+    print(summary_df[[
+        "model_name", "selected_model", "cv_event_utility_score_mean",
+        "cv_timely_event_recall_mean", "cv_false_alerts_per_month_mean",
+        "cv_event_utility_score_ci_lower", "cv_event_utility_score_ci_upper",
+    ]])
