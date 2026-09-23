@@ -14,6 +14,13 @@ python run_full_training.py \
     --run_name $model\_alpha_$alpha\_fullfeatures \
     --eval_metric auc \
     --scaler robust \
+    --false_alert_budget_per_month 2.0 \
+    --false_alert_cost 0.05 \
+    --min_lead_hours 1 \
+    --min_lead_utility 0.10 \
+    --max_lead_hours 24 \
+    --utility_target_lead_hours 24 \
+    --alert_cooldown_hours 24
 
 done
 done

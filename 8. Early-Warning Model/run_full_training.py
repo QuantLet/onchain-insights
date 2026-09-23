@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 import shap
 from sklearn.preprocessing import StandardScaler, RobustScaler
 from utils.build_dataset import build_dataset, add_dataset_args
+from early_warning_evaluation import choose_threshold_by_utility, evaluate_early_warning
 import argparse
 
 import json
@@ -124,20 +125,53 @@ def compute_earliest_future_depeg_hour(df, args, max_horizon):
     return earliest_hour
 
 
-def compute_event_level_metrics(df, proba_test, test_start_idx, threshold, args, max_horizon):
+def operating_alert_episode_mask(timestamps, probabilities, threshold, cooldown_hours):
+    """Return one boolean per deployed alert episode, using the policy cooldown.
+
+    This mirrors ``early_warning_evaluation.alert_episode_times`` while
+    retaining row positions for the diagnostic plots in this script.  An
+    above-threshold score during the refractory period is not a second alert.
+    """
+    ts = pd.to_datetime(pd.Series(timestamps), utc=True)
+    scores = np.asarray(probabilities, dtype=float)
+    mask = np.zeros(len(scores), dtype=bool)
+    next_allowed = None
+    cooldown = pd.Timedelta(hours=float(cooldown_hours))
+    for i, (time, score) in enumerate(zip(ts, scores)):
+        if score >= threshold and (next_allowed is None or time >= next_allowed):
+            mask[i] = True
+            next_allowed = time + cooldown
+    return mask
+
+
+def compute_event_level_metrics(
+    df,
+    proba_test,
+    test_start_idx,
+    threshold,
+    args,
+    max_horizon,
+    min_lead_hours=1.0,
+    cooldown_hours=24.0,
+):
     """Evaluate warnings against contiguous depeg episodes, rather than rows.
 
     An event is a contiguous run of current depeg observations. An event is
-    caught when at least one alert occurs in the preceding ``max_horizon``
-    hours. Lead time is the time from the earliest such alert to event onset.
-    Alerts outside every event's warning window are counted as false alarms;
-    contiguous false-alert rows are also collapsed into false-alarm episodes.
+    caught when at least one alert *episode* occurs in the policy window
+    ``[min_lead_hours, max_horizon]`` before onset. Lead time is measured from
+    the earliest such episode. Alerts outside every event's warning window are
+    counted as false alarm episodes.
     """
     event_now = infer_depeg_event_now(df, args).to_numpy(dtype=bool)
     proba_test = np.asarray(proba_test, dtype=float)
     test_end_idx = test_start_idx + len(proba_test)
     alert_global = np.zeros(len(df), dtype=bool)
-    alert_global[test_start_idx:test_end_idx] = proba_test >= threshold
+    alert_global[test_start_idx:test_end_idx] = operating_alert_episode_mask(
+        df.iloc[test_start_idx:test_end_idx]["timestamp"],
+        proba_test,
+        threshold,
+        cooldown_hours,
+    )
 
     event_starts = np.flatnonzero(event_now & ~np.r_[False, event_now[:-1]])
     event_ends = np.flatnonzero(event_now & ~np.r_[event_now[1:], False])
@@ -145,11 +179,19 @@ def compute_event_level_metrics(df, proba_test, test_start_idx, threshold, args,
     warning_window = np.zeros(len(df), dtype=bool)
 
     for event_id, (start, end) in enumerate(zip(event_starts, event_ends), start=1):
-        # Only score events whose onset belongs to the held-out test period.
-        if start < test_start_idx or start >= test_end_idx:
+        # Match the canonical evaluator: require the complete warning window
+        # to be observable in the held-out interval.
+        if (
+            start < test_start_idx
+            or start >= test_end_idx
+            or start - int(np.ceil(max_horizon)) < test_start_idx
+            or start > test_end_idx - 1 - int(np.ceil(min_lead_hours))
+        ):
             continue
-        warning_start = max(test_start_idx, start - max_horizon)
-        warning_end = start  # event onset is excluded: this is advance warning.
+        warning_start = max(test_start_idx, start - int(np.ceil(max_horizon)))
+        # The event itself and alerts too near to it are not valid advance
+        # warnings.  The slice endpoint is exclusive.
+        warning_end = min(test_end_idx, start - int(np.ceil(min_lead_hours)) + 1)
         candidate_alerts = np.flatnonzero(alert_global[warning_start:warning_end]) + warning_start
         caught = len(candidate_alerts) > 0
         first_alert = int(candidate_alerts[0]) if caught else None
@@ -169,8 +211,8 @@ def compute_event_level_metrics(df, proba_test, test_start_idx, threshold, args,
     event_df = pd.DataFrame(rows)
     test_alert_mask = alert_global[test_start_idx:test_end_idx]
     false_alert_mask = test_alert_mask & ~warning_window[test_start_idx:test_end_idx]
-    # Contiguous alert runs are one operational alarm episode.
-    false_alarm_episodes = int(np.sum(false_alert_mask & ~np.r_[False, false_alert_mask[:-1]]))
+    # ``alert_global`` already has one row per cooldown-delimited episode.
+    false_alarm_episodes = int(false_alert_mask.sum())
     n_events = len(event_df)
     n_caught = int(event_df["caught"].sum()) if n_events else 0
     summary = {
@@ -179,8 +221,7 @@ def compute_event_level_metrics(df, proba_test, test_start_idx, threshold, args,
         "event_recall": n_caught / n_events if n_events else np.nan,
         "mean_warning_lead_time_hours": event_df.loc[event_df["caught"], "lead_time_hours"].mean() if n_caught else np.nan,
         "median_warning_lead_time_hours": event_df.loc[event_df["caught"], "lead_time_hours"].median() if n_caught else np.nan,
-        "n_alert_rows": int(test_alert_mask.sum()),
-        "n_false_alarm_rows": int(false_alert_mask.sum()),
+        "n_alert_episodes": int(test_alert_mask.sum()),
         "n_false_alarm_episodes": false_alarm_episodes,
     }
     return event_df, summary
@@ -285,6 +326,7 @@ def compute_time_to_depeg_bin_metrics(
     args,
     max_horizon=None,
     bins=None,
+    cooldown_hours=24.0,
 ):
     """
     Compute precision, recall, F1, base rate, alert-conditioned event rate,
@@ -296,7 +338,7 @@ def compute_time_to_depeg_bin_metrics(
             earliest future depeg happens inside that bin.
 
         alert:
-            proba_test >= threshold
+            a cooldown-delimited above-threshold alert episode
 
         recall_bin:
             P(alert | event_bin)
@@ -343,7 +385,12 @@ def compute_time_to_depeg_bin_metrics(
     absolute_test_indices = np.arange(test_start_idx, test_start_idx + len(proba_test))
     valid_full_horizon = absolute_test_indices + max_horizon < len(df)
 
-    alert_mask = proba_test >= threshold
+    alert_mask = operating_alert_episode_mask(
+        df.iloc[test_start_idx:test_start_idx + len(proba_test)]["timestamp"],
+        proba_test,
+        threshold,
+        cooldown_hours,
+    )
 
     valid_mask = valid_full_horizon
     n_valid = int(valid_mask.sum())
@@ -1297,6 +1344,31 @@ if __name__ == "__main__":
         choices=["xgboost", "lightgbm", "catboost", "random_forest"],
     )
 
+    operational_args = parser.add_argument_group("Operational alert-threshold arguments")
+    operational_args.add_argument(
+        "--false_alert_budget_per_month", type=float, default=2.0,
+        help="maximum validation false-alert episodes per month when choosing the operating threshold",
+    )
+    operational_args.add_argument(
+        "--false_alert_cost", type=float, default=0.05,
+        help="utility penalty for one false alert episode per month",
+    )
+    operational_args.add_argument("--min_lead_hours", type=float, default=1.0)
+    operational_args.add_argument(
+        "--max_lead_hours", type=float, default=None,
+        help="defaults to --target_window so the alert window matches the forecast horizon",
+    )
+    operational_args.add_argument(
+        "--utility_target_lead_hours", type=float, default=None,
+        help="defaults to the maximum warning lead time",
+    )
+    operational_args.add_argument(
+        "--min_lead_utility", type=float, default=0.10,
+        help="utility assigned to an alert at exactly the minimum lead time",
+    )
+    operational_args.add_argument("--alert_cooldown_hours", type=float, default=24.0)
+    operational_args.add_argument("--threshold_grid_size", type=int, default=201)
+
     model_args = parser.add_argument_group("Model arguments")
     model_args.add_argument("--learning_rate", type=float, default=0.01)
     model_args.add_argument("--early_stopping_rounds", type=int, default=200)
@@ -1309,6 +1381,18 @@ if __name__ == "__main__":
     model_args.add_argument("--n_jobs", type=int, default=-1)
 
     args = parser.parse_args()
+    if args.max_lead_hours is None:
+        args.max_lead_hours = float(args.target_window)
+    if args.utility_target_lead_hours is None:
+        args.utility_target_lead_hours = args.max_lead_hours
+    if args.min_lead_hours < 0 or args.max_lead_hours < args.min_lead_hours:
+        parser.error("Require 0 <= --min_lead_hours <= --max_lead_hours")
+    if args.utility_target_lead_hours < args.min_lead_hours:
+        parser.error("--utility_target_lead_hours must be at least --min_lead_hours")
+    if not 0.0 <= args.min_lead_utility <= 1.0:
+        parser.error("--min_lead_utility must lie in [0, 1]")
+    if args.false_alert_budget_per_month < 0:
+        parser.error("--false_alert_budget_per_month must be non-negative")
 
     dict_args = vars(args).copy()
     dict_args["target"] = True
@@ -1423,6 +1507,12 @@ if __name__ == "__main__":
         "alpha": getattr(args, "alpha", None),
         "scale_pos_weight_used": float(w_pos),
         "n_features": len(FEATURES),
+        "false_alert_budget_per_month": args.false_alert_budget_per_month,
+        "false_alert_cost": args.false_alert_cost,
+        "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
+        "utility_target_lead_hours": args.utility_target_lead_hours,
+        "min_lead_utility": args.min_lead_utility,
+        "alert_cooldown_hours": args.alert_cooldown_hours,
     }
 
     logger.log_params(params_to_log)
@@ -1455,17 +1545,83 @@ if __name__ == "__main__":
     logger.log_metric("test_positive_rows", int(y_test.sum()))
     logger.log_metric("test_prevalence", test_prevalence)
 
-    # Threshold by Youden J
+    # Retain Youden's J strictly as a row-level diagnostic. It must not set the
+    # threshold for any deployment-facing plot or report.
     fpr, tpr, thresholds = roc_curve(y_test, proba_test)
     j = tpr - fpr
     best_idx = int(np.argmax(j))
-    thresh = float(thresholds[best_idx])
+    youden_threshold = float(thresholds[best_idx])
 
-    logger.log_metric("best_threshold_youdenJ", thresh)
+    logger.log_metric("best_threshold_youdenJ", youden_threshold)
     logger.log_metric("tpr_at_best_threshold", float(tpr[best_idx]))
     logger.log_metric("fpr_at_best_threshold", float(fpr[best_idx]))
 
+    # Select the real operating threshold on the immediately preceding
+    # validation period, at the same event-utility / false-alert policy used in
+    # chronological CV. The held-out test period is never used to tune it.
+    proba_val = model.predict_proba(X_val)[:, 1]
+    operational_kwargs = {
+        "timestamp_col": "timestamp",
+        "depeg_col": "depeg_bps",
+        "threshold_bps": args.target_threshold,
+        "depeg_side": args.depeg_side,
+        "dynamic_threshold": args.dynamic_threshold,
+        "min_lead_hours": args.min_lead_hours,
+        "max_lead_hours": args.max_lead_hours,
+        "target_lead_hours": args.utility_target_lead_hours,
+        "min_lead_utility": args.min_lead_utility,
+        "cooldown_hours": args.alert_cooldown_hours,
+        "false_alert_cost": args.false_alert_cost,
+    }
+    operating_threshold, validation_operating_metrics = choose_threshold_by_utility(
+        df.iloc[train_end2:val_end].copy(),
+        proba_val,
+        false_alert_budget_per_month=args.false_alert_budget_per_month,
+        threshold_grid_size=args.threshold_grid_size,
+        event_context_frame=df.iloc[:val_end].copy(),
+        **operational_kwargs,
+    )
+    test_operating_metrics, _ = evaluate_early_warning(
+        df.iloc[val_end:].copy(),
+        proba_test,
+        operating_threshold,
+        event_context_frame=df.copy(),
+        **operational_kwargs,
+    )
+    logger.log_metric("operating_threshold", operating_threshold)
+    logger.log_metrics({f"validation_operating_{k}": v for k, v in validation_operating_metrics.items()})
+    logger.log_metrics({f"test_operating_{k}": v for k, v in test_operating_metrics.items()})
+    logger.save_json(
+        {
+            "selection_data": "validation_period_only",
+            "selection_objective": "event_utility_under_false_alert_budget",
+            "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "operating_threshold": operating_threshold,
+            "youden_j_threshold_diagnostic_only": youden_threshold,
+            "validation_metrics": validation_operating_metrics,
+            "test_metrics": test_operating_metrics,
+        },
+        "reports/operating_threshold.json",
+    )
+    # All threshold-dependent plots below use this validation-selected decision
+    # boundary.  ``youden_threshold`` remains logged only for comparison.
+    thresh = float(operating_threshold)
     yhat = (proba_test >= thresh).astype(int)
+    test_alert_episode_mask = operating_alert_episode_mask(
+        df.iloc[val_end:]["timestamp"],
+        proba_test,
+        thresh,
+        args.alert_cooldown_hours,
+    )
+
+    y_true_array = y_test.to_numpy(dtype=int)
+    true_positive = int(((yhat == 1) & (y_true_array == 1)).sum())
+    false_positive = int(((yhat == 1) & (y_true_array == 0)).sum())
+    false_negative = int(((yhat == 0) & (y_true_array == 1)).sum())
+    true_negative = int(((yhat == 0) & (y_true_array == 0)).sum())
+    operating_tpr = true_positive / (true_positive + false_negative) if true_positive + false_negative else np.nan
+    operating_fpr = false_positive / (false_positive + true_negative) if false_positive + true_negative else np.nan
+    operating_precision = true_positive / (true_positive + false_positive) if true_positive + false_positive else np.nan
 
     # Calibration is assessed on the final held-out test period.
     plot_calibration(y_test, proba_test, logger)
@@ -1478,6 +1634,13 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, 2, figsize=(12, 4))
 
     ax[0].plot(fpr, tpr, label=f"AUC={auc:.3f}")
+    ax[0].scatter(
+        operating_fpr,
+        operating_tpr,
+        color="crimson",
+        zorder=3,
+        label=f"Operating threshold={thresh:.3f}",
+    )
     ax[0].plot([0, 1], [0, 1], "--", color="gray")
     ax[0].set_title("ROC Curve")
     ax[0].set_xlabel("False Positive Rate")
@@ -1485,6 +1648,13 @@ if __name__ == "__main__":
     ax[0].legend()
 
     ax[1].plot(rec, prec, label=f"AUPRC={auprc:.3f}")
+    ax[1].scatter(
+        operating_tpr,
+        operating_precision,
+        color="crimson",
+        zorder=3,
+        label=f"Operating threshold={thresh:.3f}",
+    )
     ax[1].set_title("Precision-Recall Curve")
     ax[1].set_xlabel("Recall")
     ax[1].set_ylabel("Precision")
@@ -1501,7 +1671,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(figsize=(4, 4))
     im = ax.imshow(cm, cmap="Blues", interpolation="nearest")
 
-    ax.set_title("Confusion Matrix")
+    ax.set_title(f"Confusion Matrix (operating threshold = {thresh:.3f})")
     ax.set_xlabel("Predicted")
     ax.set_ylabel("True")
     ax.set_xticks([0, 1])
@@ -1522,11 +1692,20 @@ if __name__ == "__main__":
 
     clf_report = classification_report(y_test, yhat, output_dict=True)
     logger.save_json(clf_report, "reports/classification_report.json")
+    logger.save_json(
+        {
+            "threshold_selection": "validation event utility under false-alert budget",
+            "operating_threshold": thresh,
+            "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "classification_report": clf_report,
+        },
+        "reports/classification_report_at_operating_threshold.json",
+    )
 
     # ---------------------------
     # Event-level operational performance
     # ---------------------------
-    max_horizon = int(getattr(args, "target_window", 24) or 24)
+    max_horizon = int(args.max_lead_hours)
     event_metrics, event_summary = compute_event_level_metrics(
         df=df,
         proba_test=proba_test,
@@ -1534,6 +1713,8 @@ if __name__ == "__main__":
         threshold=thresh,
         args=args,
         max_horizon=max_horizon,
+        min_lead_hours=args.min_lead_hours,
+        cooldown_hours=args.alert_cooldown_hours,
     )
     logger.save_dataframe(event_metrics, "reports/event_level_metrics.csv")
     logger.save_json(event_summary, "reports/event_level_summary.json")
@@ -1551,6 +1732,7 @@ if __name__ == "__main__":
         threshold=thresh,
         args=args,
         max_horizon=max_horizon,
+        cooldown_hours=args.alert_cooldown_hours,
     )
 
     logger.save_dataframe(
@@ -1700,7 +1882,9 @@ if __name__ == "__main__":
     )
 
     # Beeswarm above threshold
-    warn_mask = proba_test >= thresh
+    # Explain alerts that would actually be emitted, rather than every
+    # above-threshold hourly score suppressed by the cooldown.
+    warn_mask = test_alert_episode_mask
     sv_warn = shap_values[warn_mask]
 
     if sv_warn.values.shape[0] > 0:
@@ -1792,13 +1976,24 @@ if __name__ == "__main__":
         linestyle="--",
         linewidth=1,
         alpha=0.7,
-        label=f"Threshold={thresh:.3f}",
+        label=f"Operating threshold={thresh:.3f}",
     )
+    if test_alert_episode_mask.any():
+        ax.scatter(
+            test_dates[test_alert_episode_mask],
+            proba_test[test_alert_episode_mask],
+            color="darkorange",
+            marker="v",
+            s=32,
+            zorder=3,
+            label="Emitted alert episode",
+        )
 
     ax.set_ylabel(
-        f"Probability of depeg in next {max_horizon} hours",
+        f"Probability of depeg in next {args.target_window} hours",
         color="royalblue",
     )
+    ax.set_title("Out-of-sample scores at the validation-selected operating threshold")
 
     axi.set_ylabel("Depeg BPS", color="crimson")
 
@@ -1872,7 +2067,9 @@ if __name__ == "__main__":
         "timestamp": df["timestamp"].iloc[val_end:].reset_index(drop=True),
         "y_true": y_test.reset_index(drop=True).astype(int),
         "proba_depeg": proba_test.astype(float),
-        "y_pred_at_best_threshold": yhat.astype(int),
+        "y_pred_at_operating_threshold": yhat.astype(int),
+        "is_alert_episode": test_alert_episode_mask.astype(int),
+        "operating_threshold": float(thresh),
         "earliest_depeg_hour_ahead": earliest_test_depeg_hour,
     })
 

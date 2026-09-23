@@ -47,18 +47,21 @@ def load_cv_summaries(base_dir: Path, experiment_name: str) -> pd.DataFrame:
 
     all_df = pd.concat(dfs, ignore_index=True)
 
-    # Normalize alpha
+    # Normalize threshold and alpha before deduplicating reruns.
     if "alpha" not in all_df.columns:
         raise ValueError("Expected column 'alpha' not found in summary CSVs.")
     if "model_name" not in all_df.columns:
         raise ValueError("Expected column 'model_name' not found in summary CSVs.")
 
     all_df["alpha"] = pd.to_numeric(all_df["alpha"], errors="coerce")
+    if "target_threshold" not in all_df.columns:
+        raise ValueError("Expected column 'target_threshold' not found in summary CSVs.")
+    all_df["target_threshold"] = pd.to_numeric(all_df["target_threshold"], errors="coerce")
 
-    # If you have reruns, keep the latest result per (alpha, model_name)
+    # If you have reruns, keep the latest result per event definition/model/alpha.
     all_df = (
         all_df.sort_values("source_mtime")
-              .drop_duplicates(subset=["alpha", "model_name"], keep="last")
+              .drop_duplicates(subset=["target_threshold", "alpha", "model_name"], keep="last")
               .reset_index(drop=True)
     )
 
@@ -130,15 +133,15 @@ def plot_single_heatmap(pivot_df: pd.DataFrame, title: str, cbar_label: str, out
 def plot_three_heatmaps(
     pivot_auc: pd.DataFrame,
     pivot_auprc: pd.DataFrame,
-    pivot_lift: pd.DataFrame,
+    pivot_utility: pd.DataFrame,
     output_path: Path
 ):
     fig, axes = plt.subplots(1, 3, figsize=(22, 8), constrained_layout=True)
 
     heatmaps = [
         (pivot_auc, "Mean CV AUC", "AUC"),
-        (pivot_auprc, "Mean CV AUPRC", "AUPRC"),
-        (pivot_lift, "Mean CV Lift @ Best Threshold", "Lift"),
+        (pivot_auprc, "Mean CV AP", "Average precision"),
+        (pivot_utility, "Mean OOS event utility", "Utility"),
     ]
 
     for ax, (pivot_df, title, cbar_label) in zip(axes, heatmaps):
@@ -175,95 +178,50 @@ def plot_three_heatmaps(
     plt.close(fig)
 
 
+def render_threshold_heatmaps(summary_df: pd.DataFrame, output_dir: Path, threshold: float) -> None:
+    """Render one alpha/model grid per realised-depeg definition.
+
+    Combining different target thresholds in a single heatmap would average
+    different classification tasks and is therefore intentionally avoided.
+    """
+    model_order = (
+        summary_df.groupby("model_name")["cv_event_utility_score_mean"]
+        .mean().sort_values(ascending=False).index.tolist()
+    )
+    pivot_auc = build_pivot(summary_df, "cv_auc_mean", model_order=model_order)
+    pivot_auprc = build_pivot(summary_df, "cv_auprc_mean", model_order=model_order)
+    pivot_utility = build_pivot(summary_df, "cv_event_utility_score_mean", model_order=model_order)
+    label = f"{threshold:g} bps"
+    plot_single_heatmap(pivot_auc, f"Mean CV AUC by model and alpha ({label})", "AUC", output_dir / "heatmap_cv_auc.png")
+    plot_single_heatmap(pivot_auprc, f"Mean CV AP by model and alpha ({label})", "Average precision", output_dir / "heatmap_cv_auprc.png")
+    plot_single_heatmap(pivot_utility, f"Mean OOS event utility by model and alpha ({label})", "Utility", output_dir / "heatmap_cv_event_utility.png")
+    plot_three_heatmaps(
+        pivot_auc, pivot_auprc, pivot_utility, output_dir / "heatmap_cv_metrics_combined.png"
+    )
+    pivot_auc.to_csv(output_dir / "pivot_cv_auc.csv")
+    pivot_auprc.to_csv(output_dir / "pivot_cv_auprc.csv")
+    pivot_utility.to_csv(output_dir / "pivot_cv_event_utility.csv")
+
+
 # ------------------------------------------------------------
 # Main
 # ------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot CV metrics heatmaps for model comparison")
-    parser.add_argument(
-        "--experiment_name",
-        type=str,
-        default="cv_model_comparison",
-        help="Name of the experiment to load CV summaries from")
+    parser.add_argument("--experiment_name", default="cv_model_comparison")
     args = parser.parse_args()
-    EXPERIMENT_NAME = args.experiment_name
-    OUTPUT_DIR = BASE_DIR / EXPERIMENT_NAME / "plots_summary"
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    
-    summary_df = load_cv_summaries(BASE_DIR, EXPERIMENT_NAME)
-
-    required_cols = [
-        "model_name",
-        "alpha",
-        "cv_auc_mean",
-        "cv_auprc_mean",
-        "cv_lift_at_best_threshold_mean",
-    ]
-    missing = [c for c in required_cols if c not in summary_df.columns]
+    output_dir = BASE_DIR / args.experiment_name / "plots_summary"
+    summary_df = load_cv_summaries(BASE_DIR, args.experiment_name)
+    required_cols = {
+        "model_name", "alpha", "target_threshold", "cv_auc_mean", "cv_auprc_mean",
+        "cv_event_utility_score_mean",
+    }
+    missing = required_cols - set(summary_df.columns)
     if missing:
-        raise ValueError(
-            f"Missing expected columns in summary data: {missing}\n"
-            f"Available columns: {list(summary_df.columns)}"
-        )
+        raise ValueError(f"Missing expected columns in summary data: {sorted(missing)}")
 
-    # Sort models by overall mean CV AUC for consistent ordering across all heatmaps
-    model_order = (
-        summary_df.groupby("model_name")["cv_auc_mean"]
-        .mean()
-        .sort_values(ascending=False)
-        .index
-        .tolist()
-    )
-
-    pivot_auc = build_pivot(summary_df, "cv_auc_mean", model_order=model_order)
-    pivot_auprc = build_pivot(summary_df, "cv_auprc_mean", model_order=model_order)
-    pivot_lift = build_pivot(summary_df, "cv_lift_at_best_threshold_mean", model_order=model_order)
-
-    # Save individual heatmaps
-    plot_single_heatmap(
-        pivot_auc,
-        title="Mean 5-Fold CV AUC by Model and Alpha",
-        cbar_label="AUC",
-        output_path=OUTPUT_DIR / "heatmap_cv_auc.png"
-    )
-
-    plot_single_heatmap(
-        pivot_auprc,
-        title="Mean 5-Fold CV AUPRC by Model and Alpha",
-        cbar_label="AUPRC",
-        output_path=OUTPUT_DIR / "heatmap_cv_auprc.png"
-    )
-
-    plot_single_heatmap(
-        pivot_lift,
-        title="Mean 5-Fold CV Lift @ Best Threshold by Model and Alpha",
-        cbar_label="Lift",
-        output_path=OUTPUT_DIR / "heatmap_cv_lift_at_best_threshold.png"
-    )
-
-    # Save combined figure
-    plot_three_heatmaps(
-        pivot_auc,
-        pivot_auprc,
-        pivot_lift,
-        output_path=OUTPUT_DIR / "heatmap_cv_metrics_combined.png"
-    )
-
-    # Save pivot tables too
-    pivot_auc.to_csv(OUTPUT_DIR / "pivot_cv_auc.csv")
-    pivot_auprc.to_csv(OUTPUT_DIR / "pivot_cv_auprc.csv")
-    pivot_lift.to_csv(OUTPUT_DIR / "pivot_cv_lift_at_best_threshold.csv")
-
-    print("\nPivot Table: Mean CV AUC by Model and Alpha")
-    print("=" * 80)
-    print(pivot_auc.to_string())
-
-    print("\nPivot Table: Mean CV AUPRC by Model and Alpha")
-    print("=" * 80)
-    print(pivot_auprc.to_string())
-
-    print("\nPivot Table: Mean CV Lift @ Best Threshold by Model and Alpha")
-    print("=" * 80)
-    print(pivot_lift.to_string())
-
-    print(f"\nSaved plots and pivot tables to: {OUTPUT_DIR}")
+    for threshold, threshold_df in summary_df.groupby("target_threshold", sort=True):
+        threshold_dir = output_dir / f"threshold_{float(threshold):g}bps"
+        threshold_dir.mkdir(parents=True, exist_ok=True)
+        render_threshold_heatmaps(threshold_df, threshold_dir, float(threshold))
+    print(f"Saved threshold-specific plots and pivot tables to: {output_dir}")

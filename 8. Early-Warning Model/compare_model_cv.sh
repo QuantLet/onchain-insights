@@ -4,6 +4,7 @@ set -euo pipefail
 CV_SCRIPT="cv_model_comparison.py"
 PLOT_SCRIPT="plot_cv_metrics_heatmap.py"
 SELECTION_PLOT_SCRIPT="plot_model_selection_by_budget.py"
+PAPER_REPORT_SCRIPT="make_paper_ready_reports.py"
 FULL_TRAIN_SCRIPT="run_full_training.py"
 
 LOG_DIR="lightning_logs"
@@ -14,7 +15,8 @@ ALPHAS=(0.1 0.3 0.5 1.0 1.5 2.0)
 MODELS=(xgboost lightgbm catboost random_forest)
 
 TARGET_WINDOW=24
-TARGET_THRESHOLD=15
+# Sensitivity analysis of the realised-depeg definition (basis points).
+DEPEG_THRESHOLDS=(10 15 25)
 MAX_DEPTH=6
 N_ESTIMATORS=800
 EARLY_STOPPING_ROUNDS=200
@@ -39,36 +41,38 @@ echo "===================================================="
 echo "Running CV comparison experiment: ${EXPERIMENT_NAME}"
 echo "===================================================="
 
-for ALPHA in "${ALPHAS[@]}"; do
-  echo "========================================"
-  echo "Running CV comparison for alpha=${ALPHA}"
-  echo "========================================"
+for TARGET_THRESHOLD in "${DEPEG_THRESHOLDS[@]}"; do
+  for ALPHA in "${ALPHAS[@]}"; do
+    echo "========================================"
+    echo "Running CV comparison for threshold=${TARGET_THRESHOLD}bps, alpha=${ALPHA}"
+    echo "========================================"
 
-  python "${CV_SCRIPT}" \
-    --experiment_name "${EXPERIMENT_NAME}" \
-    --run_name "alpha_${ALPHA}" \
-    --alpha "${ALPHA}" \
-    --train_pct 0.68 \
-    --target \
-    --target_window "${TARGET_WINDOW}" \
-    --target_threshold "${TARGET_THRESHOLD}" \
-    --max_depth "${MAX_DEPTH}" \
-    --n_estimators "${N_ESTIMATORS}" \
-    --early_stopping_rounds "${EARLY_STOPPING_ROUNDS}" \
-    --depeg_side "${DEPEG_SIDE}" \
-    --model_names "${MODELS[@]}" \
-    --scaler "${SCALER}" \
-    --cv_embargo_hours 48 \
-    --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
-    --false_alert_budgets "${FALSE_ALERT_BUDGETS[@]}" \
-    --false_alert_cost "${FALSE_ALERT_COST}" \
-    --min_lead_hours "${MIN_LEAD_HOURS}" \
-    --min_lead_utility "${MIN_LEAD_UTILITY}" \
-    --max_lead_hours "${MAX_LEAD_HOURS}" \
-    --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
-    --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}" \
-    --n_bootstrap "${N_BOOTSTRAP}" \
-    --utility_tolerance "${UTILITY_TOLERANCE}"
+    python "${CV_SCRIPT}" \
+      --experiment_name "${EXPERIMENT_NAME}" \
+      --run_name "threshold_${TARGET_THRESHOLD}_alpha_${ALPHA}" \
+      --alpha "${ALPHA}" \
+      --train_pct 0.68 \
+      --target \
+      --target_window "${TARGET_WINDOW}" \
+      --target_threshold "${TARGET_THRESHOLD}" \
+      --max_depth "${MAX_DEPTH}" \
+      --n_estimators "${N_ESTIMATORS}" \
+      --early_stopping_rounds "${EARLY_STOPPING_ROUNDS}" \
+      --depeg_side "${DEPEG_SIDE}" \
+      --model_names "${MODELS[@]}" \
+      --scaler "${SCALER}" \
+      --cv_embargo_hours 48 \
+      --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
+      --false_alert_budgets "${FALSE_ALERT_BUDGETS[@]}" \
+      --false_alert_cost "${FALSE_ALERT_COST}" \
+      --min_lead_hours "${MIN_LEAD_HOURS}" \
+      --min_lead_utility "${MIN_LEAD_UTILITY}" \
+      --max_lead_hours "${MAX_LEAD_HOURS}" \
+      --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
+      --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}" \
+      --n_bootstrap "${N_BOOTSTRAP}" \
+      --utility_tolerance "${UTILITY_TOLERANCE}"
+  done
 done
 
 echo "All CV runs completed."
@@ -76,6 +80,10 @@ echo "All CV runs completed."
 python "${PLOT_SCRIPT}" --experiment_name "${EXPERIMENT_NAME}"
 python "${SELECTION_PLOT_SCRIPT}" \
   --experiment_name "${EXPERIMENT_NAME}" \
+  --utility_tolerance "${UTILITY_TOLERANCE}"
+python "${PAPER_REPORT_SCRIPT}" \
+  --experiment_name "${EXPERIMENT_NAME}" \
+  --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
   --utility_tolerance "${UTILITY_TOLERANCE}"
 
 echo "===================================================="
@@ -125,6 +133,7 @@ all_df = pd.concat(dfs, ignore_index=True)
 required_cols = [
     "model_name",
     "alpha",
+    "target_threshold",
     "cv_event_utility_score_mean",
     "cv_event_utility_score_std",
     "cv_timely_event_recall_mean",
@@ -136,6 +145,7 @@ if missing:
     raise SystemExit(f"Missing expected columns in summary data: {missing}")
 
 all_df["alpha"] = pd.to_numeric(all_df["alpha"], errors="coerce")
+all_df["target_threshold"] = pd.to_numeric(all_df["target_threshold"], errors="coerce")
 all_df["cv_event_utility_score_mean"] = pd.to_numeric(all_df["cv_event_utility_score_mean"], errors="coerce")
 all_df["cv_event_utility_score_std"] = pd.to_numeric(all_df["cv_event_utility_score_std"], errors="coerce")
 all_df["cv_timely_event_recall_mean"] = pd.to_numeric(all_df["cv_timely_event_recall_mean"], errors="coerce")
@@ -145,35 +155,41 @@ all_df["selected_model"] = all_df["selected_model"].astype(str).str.lower().eq("
 # Keep the latest row for each (alpha, model_name) in case of reruns
 all_df = (
     all_df.sort_values("source_mtime")
-          .drop_duplicates(subset=["alpha", "model_name"], keep="last")
+          .drop_duplicates(subset=["target_threshold", "alpha", "model_name"], keep="last")
           .reset_index(drop=True)
 )
 
-# Each CV summary has already selected its model for that alpha. Select one
-# full-retraining candidate across alphas with the same operational hierarchy.
-candidates = all_df[all_df["selected_model"]].dropna(subset=["cv_event_utility_score_mean"]).copy()
+# Each CV summary has already selected a model for one (threshold, alpha)
+# combination. Select one full-retraining candidate *within each threshold*.
+candidates = all_df[all_df["selected_model"]].dropna(
+    subset=["target_threshold", "cv_event_utility_score_mean"]
+).copy()
 if candidates.empty:
     raise SystemExit("No CV-selected candidates found for full retraining.")
 
-best_utility = candidates["cv_event_utility_score_mean"].max()
-comparable = candidates[
-    candidates["cv_event_utility_score_mean"] >= best_utility - utility_tolerance
-].copy()
-comparable["_recall_sort"] = comparable["cv_timely_event_recall_mean"].fillna(float("-inf"))
-comparable["_fa_sort"] = comparable["cv_false_alerts_per_month_mean"].fillna(float("inf"))
-comparable["_stability_sort"] = comparable["cv_event_utility_score_std"].fillna(float("inf"))
-selected = (
-    comparable.sort_values(
+selected_rows = []
+for threshold, group in candidates.groupby("target_threshold", sort=True):
+    best_utility = group["cv_event_utility_score_mean"].max()
+    comparable = group[
+        group["cv_event_utility_score_mean"] >= best_utility - utility_tolerance
+    ].copy()
+    comparable["_recall_sort"] = comparable["cv_timely_event_recall_mean"].fillna(float("-inf"))
+    comparable["_fa_sort"] = comparable["cv_false_alerts_per_month_mean"].fillna(float("inf"))
+    comparable["_stability_sort"] = comparable["cv_event_utility_score_std"].fillna(float("inf"))
+    winner = comparable.sort_values(
         ["_recall_sort", "_fa_sort", "_stability_sort", "cv_event_utility_score_mean"],
         ascending=[False, True, True, False],
+    ).head(1).copy()
+    winner["selection_reason"] = (
+        "threshold_specific_event_utility_then_timely_recall_then_false_alert_burden"
     )
-    .head(1)
-    [["alpha", "model_name", "cv_event_utility_score_mean", "cv_event_utility_score_std", "cv_timely_event_recall_mean", "cv_false_alerts_per_month_mean"]]
-    .copy()
-)
-selected["selection_reason"] = (
-    "cv_selected; global_event_utility_then_timely_recall_then_false_alert_burden"
-)
+    selected_rows.append(winner)
+
+selected = pd.concat(selected_rows, ignore_index=True)[[
+    "target_threshold", "alpha", "model_name", "cv_event_utility_score_mean",
+    "cv_event_utility_score_std", "cv_timely_event_recall_mean",
+    "cv_false_alerts_per_month_mean", "selection_reason",
+]]
 
 selected_tsv.parent.mkdir(parents=True, exist_ok=True)
 selected.to_csv(selected_tsv, sep="\t", index=False)
@@ -187,15 +203,15 @@ echo "===================================================="
 echo "Running full retraining for selected candidates"
 echo "===================================================="
 
-tail -n +2 "${SELECTED_TSV}" | while IFS=$'\t' read -r ALPHA MODEL CV_UTILITY CV_UTILITY_STD EVENT_RECALL FALSE_ALERTS REASON; do
+tail -n +2 "${SELECTED_TSV}" | while IFS=$'\t' read -r TARGET_THRESHOLD ALPHA MODEL CV_UTILITY CV_UTILITY_STD EVENT_RECALL FALSE_ALERTS REASON; do
   echo "----------------------------------------"
-  echo "Full retraining: model=${MODEL}, alpha=${ALPHA}, reason=${REASON}"
+  echo "Full retraining: threshold=${TARGET_THRESHOLD}bps, model=${MODEL}, alpha=${ALPHA}, reason=${REASON}"
   echo "CV utility=${CV_UTILITY}, utility std=${CV_UTILITY_STD}, event recall=${EVENT_RECALL}, false alerts/month=${FALSE_ALERTS}"
   echo "----------------------------------------"
 
   python "${FULL_TRAIN_SCRIPT}" \
     --experiment_name "${FULL_EXPERIMENT_NAME}" \
-    --run_name "${MODEL}_alpha_${ALPHA}_fullfeatures_${REASON}" \
+    --run_name "${MODEL}_threshold_${TARGET_THRESHOLD}_alpha_${ALPHA}_fullfeatures_${REASON}" \
     --alpha "${ALPHA}" \
     --model_name "${MODEL}" \
     --target_window "${TARGET_WINDOW}" \
@@ -205,7 +221,14 @@ tail -n +2 "${SELECTED_TSV}" | while IFS=$'\t' read -r ALPHA MODEL CV_UTILITY CV
     --early_stopping_rounds "${EARLY_STOPPING_ROUNDS}" \
     --depeg_side "${DEPEG_SIDE}" \
     --eval_metric "${EVAL_METRIC}" \
-    --scaler "${SCALER}"
+    --scaler "${SCALER}" \
+    --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
+    --false_alert_cost "${FALSE_ALERT_COST}" \
+    --min_lead_hours "${MIN_LEAD_HOURS}" \
+    --min_lead_utility "${MIN_LEAD_UTILITY}" \
+    --max_lead_hours "${MAX_LEAD_HOURS}" \
+    --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
+    --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}"
 done
 
 echo "===================================================="

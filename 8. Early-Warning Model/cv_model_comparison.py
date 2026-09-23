@@ -510,6 +510,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
     bootstrap_samples_by_fold = []
     primary_budget = float(args.false_alert_budget_per_month)
     budgets = sorted({float(x) for x in args.false_alert_budgets} | {primary_budget})
+    budget_bootstrap_samples = {budget: [] for budget in budgets}
     evaluation_kwargs = {
         "timestamp_col": "timestamp",
         "depeg_col": "depeg_bps",
@@ -601,24 +602,32 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
                 event_context_frame=df.iloc[: test_idx[-1] + 1].copy(),
                 **evaluation_kwargs,
             )
+            budget_bootstrap_ci, budget_bootstrap_samples_fold = event_block_bootstrap_ci(
+                bootstrap_inputs,
+                false_alert_cost=args.false_alert_cost,
+                block_hours=args.bootstrap_block_hours,
+                n_bootstrap=args.n_bootstrap,
+                random_state=args.random_state + fold + int(round(budget * 10_000)),
+            )
             budget_rows.append({
                 "fold": fold,
                 "model_name": model_name,
                 "alpha": args.alpha,
+                "target_threshold": args.target_threshold,
+                "target_window": args.target_window,
+                "depeg_side": args.depeg_side,
                 "false_alert_budget_per_month": budget,
                 "threshold_selected_on_validation": alert_threshold,
                 **{f"validation_{k}": v for k, v in validation_metrics.items()},
                 **{f"test_{k}": v for k, v in test_metrics.items()},
+                **{f"test_{k}": v for k, v in budget_bootstrap_ci.items()},
             })
+            if budget_bootstrap_samples_fold:
+                budget_bootstrap_samples[budget].append(budget_bootstrap_samples_fold)
             if np.isclose(budget, primary_budget):
                 primary_test_metrics = test_metrics
-                primary_bootstrap_ci, primary_bootstrap_samples = event_block_bootstrap_ci(
-                    bootstrap_inputs,
-                    false_alert_cost=args.false_alert_cost,
-                    block_hours=args.bootstrap_block_hours,
-                    n_bootstrap=args.n_bootstrap,
-                    random_state=args.random_state + fold,
-                )
+                primary_bootstrap_ci = budget_bootstrap_ci
+                primary_bootstrap_samples = budget_bootstrap_samples_fold
 
         if primary_test_metrics is None:
             raise RuntimeError("Primary false-alert budget was not evaluated")
@@ -627,6 +636,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             "fold": fold,
             "model_name": model_name,
             "alpha": args.alpha,
+            "target_threshold": args.target_threshold,
             "train_size_full": len(X_train_full),
             "train_size_fit": len(X_train),
             "val_size": 0 if X_val is None else len(X_val),
@@ -649,6 +659,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             "fold": fold,
             "model_name": model_name,
             "alpha": args.alpha,
+            "target_threshold": args.target_threshold,
             "ci_method": "event_and_calendar_block_bootstrap",
             "n_bootstrap": args.n_bootstrap,
             "block_hours": args.bootstrap_block_hours,
@@ -708,7 +719,12 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         for metric in ["event_utility_score", "timely_event_recall", "false_alerts_per_month", "median_lead_hours"]:
             values = [sample[metric] for sample in bootstrap_samples_by_fold if metric in sample]
             if values:
-                pooled_draws = np.nanmean(np.vstack(values), axis=0)
+                stacked_draws = np.vstack(values)
+                pooled_draws = (
+                    np.nanmean(stacked_draws, axis=0)
+                    if np.isfinite(stacked_draws).any()
+                    else np.asarray([])
+                )
                 pooled_draws = pooled_draws[np.isfinite(pooled_draws)]
                 if len(pooled_draws):
                     cv_bootstrap_ci[f"cv_{metric}_ci_lower"] = float(np.quantile(pooled_draws, 0.025))
@@ -751,6 +767,56 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
     budget_df = pd.DataFrame(budget_rows)
     logger.save_dataframe(budget_df, "cv/utility_by_false_alert_budget.parquet")
     logger.save_dataframe(budget_df, "cv/utility_by_false_alert_budget.csv")
+    budget_summary_rows = []
+    for budget in budgets:
+        budget_fold_df = budget_df.loc[
+            np.isclose(budget_df["false_alert_budget_per_month"], budget)
+        ]
+        summary_row = {
+            "model_name": model_name,
+            "alpha": args.alpha,
+            "target_threshold": args.target_threshold,
+            "target_window": args.target_window,
+            "depeg_side": args.depeg_side,
+            "false_alert_budget_per_month": budget,
+            "n_outer_folds": int(len(budget_fold_df)),
+            "ci_method": "event_and_calendar_block_bootstrap",
+            "n_bootstrap": args.n_bootstrap,
+            "block_hours": args.bootstrap_block_hours,
+        }
+        metric_map = {
+            "event_utility_score": "test_event_utility_score",
+            "timely_event_recall": "test_timely_event_recall",
+            "false_alerts_per_month": "test_false_alerts_per_month",
+            "median_lead_hours": "test_median_lead_hours",
+        }
+        for metric, column in metric_map.items():
+            mean, std = col_mean_std(budget_fold_df, column)
+            summary_row[f"cv_{metric}_mean"] = None if np.isnan(mean) else mean
+            summary_row[f"cv_{metric}_std"] = None if np.isnan(std) else std
+            sample_sets = [
+                sample[metric] for sample in budget_bootstrap_samples[budget] if metric in sample
+            ]
+            if sample_sets:
+                stacked_draws = np.vstack(sample_sets)
+                draws = (
+                    np.nanmean(stacked_draws, axis=0)
+                    if np.isfinite(stacked_draws).any()
+                    else np.asarray([])
+                )
+                draws = draws[np.isfinite(draws)]
+            else:
+                draws = np.asarray([])
+            summary_row[f"cv_{metric}_ci_lower"] = (
+                float(np.quantile(draws, 0.025)) if len(draws) else None
+            )
+            summary_row[f"cv_{metric}_ci_upper"] = (
+                float(np.quantile(draws, 0.975)) if len(draws) else None
+            )
+        budget_summary_rows.append(summary_row)
+    budget_summary_df = pd.DataFrame(budget_summary_rows)
+    logger.save_dataframe(budget_summary_df, "cv/utility_by_false_alert_budget_summary.parquet")
+    logger.save_dataframe(budget_summary_df, "cv/utility_by_false_alert_budget_summary.csv")
     bootstrap_ci_df = pd.DataFrame(bootstrap_ci_rows)
     logger.save_dataframe(bootstrap_ci_df, "cv/event_block_bootstrap_ci.parquet")
     logger.save_dataframe(bootstrap_ci_df, "cv/event_block_bootstrap_ci.csv")
@@ -784,6 +850,9 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
     return {
         "model_name": model_name,
         "alpha": args.alpha,
+        "target_threshold": args.target_threshold,
+        "target_window": args.target_window,
+        "depeg_side": args.depeg_side,
         "n_splits": args.n_splits,
         "cv_test_frac": args.cv_test_frac,
         "cv_min_train_frac": args.cv_min_train_frac,

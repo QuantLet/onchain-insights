@@ -28,7 +28,7 @@ def load_budget_reports(base_dir: Path, experiment_name: str) -> pd.DataFrame:
     for report in reports:
         frame = pd.read_csv(report)
         required = {
-            "fold", "model_name", "alpha", "false_alert_budget_per_month",
+            "fold", "model_name", "alpha", "target_threshold", "false_alert_budget_per_month",
             "test_event_utility_score", "test_timely_event_recall",
             "test_false_alerts_per_month",
         }
@@ -44,7 +44,7 @@ def load_budget_reports(base_dir: Path, experiment_name: str) -> pd.DataFrame:
     return (
         reports_df.sort_values("source_mtime")
         .drop_duplicates(
-            subset=["model_name", "alpha", "fold", "false_alert_budget_per_month"],
+            subset=["model_name", "alpha", "target_threshold", "fold", "false_alert_budget_per_month"],
             keep="last",
         )
         .reset_index(drop=True)
@@ -53,7 +53,10 @@ def load_budget_reports(base_dir: Path, experiment_name: str) -> pd.DataFrame:
 
 def select_by_budget(reports: pd.DataFrame, utility_tolerance: float) -> pd.DataFrame:
     aggregate = (
-        reports.groupby(["false_alert_budget_per_month", "model_name", "alpha"], as_index=False)
+        reports.groupby(
+            ["target_threshold", "false_alert_budget_per_month", "model_name", "alpha"],
+            as_index=False,
+        )
         .agg(
             mean_outer_test_utility=("test_event_utility_score", "mean"),
             std_outer_test_utility=("test_event_utility_score", "std"),
@@ -63,7 +66,9 @@ def select_by_budget(reports: pd.DataFrame, utility_tolerance: float) -> pd.Data
         )
     )
     winners = []
-    for budget, candidates in aggregate.groupby("false_alert_budget_per_month", sort=True):
+    for (threshold, budget), candidates in aggregate.groupby(
+        ["target_threshold", "false_alert_budget_per_month"], sort=True
+    ):
         leader = candidates["mean_outer_test_utility"].max()
         comparable = candidates[
             candidates["mean_outer_test_utility"] >= leader - utility_tolerance
@@ -84,25 +89,33 @@ def select_by_budget(reports: pd.DataFrame, utility_tolerance: float) -> pd.Data
         )
         winner["utility_tolerance"] = utility_tolerance
         winners.append(winner)
-    return pd.DataFrame(winners).sort_values("false_alert_budget_per_month")
+    return pd.DataFrame(winners).sort_values(["target_threshold", "false_alert_budget_per_month"])
 
 
 def plot_selection(winners: pd.DataFrame, output_path: Path) -> None:
+    thresholds = sorted(winners["target_threshold"].unique())
     fig, ax = plt.subplots(figsize=(10, 5.5))
-    x = winners["false_alert_budget_per_month"].to_numpy()
-    y = winners["mean_outer_test_utility"].to_numpy()
-    err = winners["std_outer_test_utility"].fillna(0.0).to_numpy()
-    ax.errorbar(x, y, yerr=err, marker="o", linewidth=2, capsize=4, color="darkorange")
-    ax.axhline(0, color="gray", linewidth=1, linestyle="--")
-    for _, row in winners.iterrows():
-        ax.annotate(
-            f"{row['model_name']}\nα={row['alpha']:g}",
-            (row["false_alert_budget_per_month"], row["mean_outer_test_utility"]),
-            xytext=(0, 10), textcoords="offset points", ha="center", fontsize=9,
+    for threshold in thresholds:
+        subset = winners.loc[winners["target_threshold"] == threshold].sort_values(
+            "false_alert_budget_per_month"
         )
+        ax.errorbar(
+            subset["false_alert_budget_per_month"],
+            subset["mean_outer_test_utility"],
+            yerr=subset["std_outer_test_utility"].fillna(0.0),
+            marker="o", linewidth=2, capsize=4,
+            label=f"{threshold:g} bps depeg threshold",
+        )
+        for _, row in subset.iterrows():
+            ax.annotate(
+                f"{row['model_name']}\nα={row['alpha']:g}",
+                (row["false_alert_budget_per_month"], row["mean_outer_test_utility"]),
+                xytext=(0, 8), textcoords="offset points", ha="center", fontsize=8,
+            )
+    ax.legend(title="Event definition", frameon=False)
     ax.set_xlabel("False-alert budget (episodes/month)")
     ax.set_ylabel("Mean outer-fold event utility")
-    ax.set_title("Selected model evolves with the operational false-alert budget")
+    ax.set_title("Selected model by false-alert budget and depeg threshold")
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(output_path, dpi=220, bbox_inches="tight", transparent=True)
