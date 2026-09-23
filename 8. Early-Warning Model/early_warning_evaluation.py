@@ -98,14 +98,22 @@ def lead_time_utility(
     min_lead_hours: float,
     target_lead_hours: float,
     min_lead_utility: float,
+    utility_power: float = 1.0,
 ) -> float:
-    """Zero before the valid window; rise linearly to one at the target lead."""
+    """Zero before the valid window; rise to one at the target lead.
+
+    ``utility_power=1`` is the existing linear curve. Values below one are
+    concave (more value for short-but-valid lead times); values above one are
+    convex (most value reserved for long lead times).
+    """
+    if utility_power <= 0:
+        raise ValueError("utility_power must be positive")
     if lead_hours < min_lead_hours:
         return 0.0
     if target_lead_hours <= min_lead_hours:
         return 1.0
     progress = min(1.0, (lead_hours - min_lead_hours) / (target_lead_hours - min_lead_hours))
-    return float(min_lead_utility + (1.0 - min_lead_utility) * progress)
+    return float(min_lead_utility + (1.0 - min_lead_utility) * progress ** utility_power)
 
 
 def evaluate_early_warning(
@@ -124,6 +132,7 @@ def evaluate_early_warning(
     min_lead_utility: float,
     cooldown_hours: float,
     false_alert_cost: float,
+    utility_power: float = 1.0,
     event_context_frame: pd.DataFrame | None = None,
 ) -> Tuple[Dict[str, float], Dict[str, np.ndarray]]:
     """Evaluate one fixed threshold without using labels to choose it.
@@ -135,6 +144,8 @@ def evaluate_early_warning(
     """
     if max_lead_hours < min_lead_hours:
         raise ValueError("max_lead_hours must be >= min_lead_hours")
+    if utility_power <= 0:
+        raise ValueError("utility_power must be positive")
     if frame.empty:
         return _empty_metrics(threshold), _empty_bootstrap_inputs()
 
@@ -185,7 +196,13 @@ def evaluate_early_warning(
             lead_hours.append(lead)
             detected.append(1.0)
             event_utilities.append(
-                lead_time_utility(lead, min_lead_hours, target_lead_hours, min_lead_utility)
+                lead_time_utility(
+                    lead,
+                    min_lead_hours,
+                    target_lead_hours,
+                    min_lead_utility,
+                    utility_power,
+                )
             )
         else:
             detected.append(0.0)

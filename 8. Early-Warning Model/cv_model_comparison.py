@@ -507,6 +507,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
     fold_rows = []
     budget_rows = []
     bootstrap_ci_rows = []
+    operational_score_frames = []
     bootstrap_samples_by_fold = []
     primary_budget = float(args.false_alert_budget_per_month)
     budgets = sorted({float(x) for x in args.false_alert_budgets} | {primary_budget})
@@ -521,6 +522,7 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         "max_lead_hours": args.max_lead_hours,
         "target_lead_hours": args.utility_target_lead_hours,
         "min_lead_utility": args.min_lead_utility,
+        "utility_power": args.utility_power,
         "cooldown_hours": args.alert_cooldown_hours,
         "false_alert_cost": args.false_alert_cost,
     }
@@ -582,6 +584,20 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
         # split_train_val_tail removes an embargo immediately before X_val.  The
         # tail rows are nevertheless exactly the validation rows retained above.
         val_frame = val_frame.iloc[-len(proba_val):].copy()
+        for split_name, frame, probabilities in [
+            ("validation", val_frame, proba_val),
+            ("test", df.iloc[test_idx].copy(), proba_test),
+        ]:
+            operational_score_frames.append(pd.DataFrame({
+                "fold": fold,
+                "split": split_name,
+                "model_name": model_name,
+                "alpha": args.alpha,
+                "target_threshold": args.target_threshold,
+                "timestamp": frame["timestamp"].to_numpy(),
+                "depeg_bps": frame["depeg_bps"].to_numpy(),
+                "probability": np.asarray(probabilities, dtype=float),
+            }))
 
         primary_test_metrics = None
         primary_bootstrap_ci = {}
@@ -764,6 +780,17 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
 
     logger.save_dataframe(fold_df, "cv/fold_metrics.parquet")
     logger.save_dataframe(fold_df, "cv/fold_metrics.csv")
+    # These score paths make post-hoc, leakage-free utility-policy sensitivity
+    # analysis possible: the notebook can re-select a threshold on each saved
+    # validation fold before scoring the corresponding test fold.
+    logger.save_dataframe(
+        pd.concat(operational_score_frames, ignore_index=True),
+        "cv/operational_scores.parquet",
+    )
+    logger.save_dataframe(
+        df[["timestamp", "depeg_bps"]].copy(),
+        "cv/realised_depeg_context.parquet",
+    )
     budget_df = pd.DataFrame(budget_rows)
     logger.save_dataframe(budget_df, "cv/utility_by_false_alert_budget.parquet")
     logger.save_dataframe(budget_df, "cv/utility_by_false_alert_budget.csv")
@@ -1015,6 +1042,13 @@ if __name__ == "__main__":
         help="event utility awarded at exactly --min_lead_hours (must lie in [0, 1])",
     )
     cv_args.add_argument(
+        "--utility_power",
+        type=float,
+        default=1.0,
+        help=("shape exponent for lead-time utility: 1 is linear, below 1 is "
+              "concave, and above 1 is convex"),
+    )
+    cv_args.add_argument(
         "--alert_cooldown_hours",
         type=float,
         default=24.0,
@@ -1076,6 +1110,8 @@ if __name__ == "__main__":
         parser.error("--utility_target_lead_hours must be at least --min_lead_hours")
     if not 0.0 <= args.min_lead_utility <= 1.0:
         parser.error("--min_lead_utility must lie in [0, 1]")
+    if args.utility_power <= 0:
+        parser.error("--utility_power must be positive")
     if args.false_alert_budget_per_month < 0 or any(budget < 0 for budget in args.false_alert_budgets):
         parser.error("False-alert budgets must be non-negative")
     # The target looks ahead ``target_window`` rows.  Purging no fewer rows at
@@ -1129,6 +1165,7 @@ if __name__ == "__main__":
         "false_alert_cost": args.false_alert_cost,
         "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
         "min_lead_utility": args.min_lead_utility,
+        "utility_power": args.utility_power,
         "alert_cooldown_hours": args.alert_cooldown_hours,
         "n_bootstrap": args.n_bootstrap,
     })

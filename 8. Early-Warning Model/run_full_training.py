@@ -1366,6 +1366,10 @@ if __name__ == "__main__":
         "--min_lead_utility", type=float, default=0.10,
         help="utility assigned to an alert at exactly the minimum lead time",
     )
+    operational_args.add_argument(
+        "--utility_power", type=float, default=1.0,
+        help="lead-time utility shape: 1 is linear, below 1 concave, above 1 convex",
+    )
     operational_args.add_argument("--alert_cooldown_hours", type=float, default=24.0)
     operational_args.add_argument("--threshold_grid_size", type=int, default=201)
 
@@ -1391,6 +1395,8 @@ if __name__ == "__main__":
         parser.error("--utility_target_lead_hours must be at least --min_lead_hours")
     if not 0.0 <= args.min_lead_utility <= 1.0:
         parser.error("--min_lead_utility must lie in [0, 1]")
+    if args.utility_power <= 0:
+        parser.error("--utility_power must be positive")
     if args.false_alert_budget_per_month < 0:
         parser.error("--false_alert_budget_per_month must be non-negative")
 
@@ -1512,6 +1518,7 @@ if __name__ == "__main__":
         "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
         "utility_target_lead_hours": args.utility_target_lead_hours,
         "min_lead_utility": args.min_lead_utility,
+        "utility_power": args.utility_power,
         "alert_cooldown_hours": args.alert_cooldown_hours,
     }
 
@@ -1570,6 +1577,7 @@ if __name__ == "__main__":
         "max_lead_hours": args.max_lead_hours,
         "target_lead_hours": args.utility_target_lead_hours,
         "min_lead_utility": args.min_lead_utility,
+        "utility_power": args.utility_power,
         "cooldown_hours": args.alert_cooldown_hours,
         "false_alert_cost": args.false_alert_cost,
     }

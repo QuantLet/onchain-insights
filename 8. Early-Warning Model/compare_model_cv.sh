@@ -8,15 +8,19 @@ PAPER_REPORT_SCRIPT="make_paper_ready_reports.py"
 FULL_TRAIN_SCRIPT="run_full_training.py"
 
 LOG_DIR="lightning_logs"
-EXPERIMENT_NAME="cv_model_comparison_$(date +%Y-%m-%d)"
+EXPERIMENT_NAME="cv_model_comparison_$(date +%Y-%m-%d)${EXPERIMENT_SUFFIX:+_${EXPERIMENT_SUFFIX}}"
 FULL_EXPERIMENT_NAME="${EXPERIMENT_NAME}_full_retraining"
 
 ALPHAS=(0.1 0.3 0.5 1.0 1.5 2.0)
 MODELS=(xgboost lightgbm catboost random_forest)
 
 TARGET_WINDOW=24
-# Sensitivity analysis of the realised-depeg definition (basis points).
+# Sensitivity analysis of the realised-depeg definition (basis points). Set
+# DEPEG_THRESHOLDS_OVERRIDE="15" to run just one definition.
 DEPEG_THRESHOLDS=(10 15 25)
+if [[ -n "${DEPEG_THRESHOLDS_OVERRIDE:-}" ]]; then
+  read -r -a DEPEG_THRESHOLDS <<< "${DEPEG_THRESHOLDS_OVERRIDE}"
+fi
 MAX_DEPTH=6
 N_ESTIMATORS=800
 EARLY_STOPPING_ROUNDS=200
@@ -31,6 +35,7 @@ UTILITY_TOLERANCE=0.01
 FALSE_ALERT_COST=0.05
 MIN_LEAD_HOURS=1
 MIN_LEAD_UTILITY=0.10
+UTILITY_POWER=1.0
 # Keep operational scoring aligned with "depeg within TARGET_WINDOW hours".
 MAX_LEAD_HOURS="${TARGET_WINDOW}"
 UTILITY_TARGET_LEAD_HOURS="${TARGET_WINDOW}"
@@ -67,6 +72,7 @@ for TARGET_THRESHOLD in "${DEPEG_THRESHOLDS[@]}"; do
       --false_alert_cost "${FALSE_ALERT_COST}" \
       --min_lead_hours "${MIN_LEAD_HOURS}" \
       --min_lead_utility "${MIN_LEAD_UTILITY}" \
+      --utility_power "${UTILITY_POWER}" \
       --max_lead_hours "${MAX_LEAD_HOURS}" \
       --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
       --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}" \
@@ -226,6 +232,7 @@ tail -n +2 "${SELECTED_TSV}" | while IFS=$'\t' read -r TARGET_THRESHOLD ALPHA MO
     --false_alert_cost "${FALSE_ALERT_COST}" \
     --min_lead_hours "${MIN_LEAD_HOURS}" \
     --min_lead_utility "${MIN_LEAD_UTILITY}" \
+    --utility_power "${UTILITY_POWER}" \
     --max_lead_hours "${MAX_LEAD_HOURS}" \
     --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
     --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}"

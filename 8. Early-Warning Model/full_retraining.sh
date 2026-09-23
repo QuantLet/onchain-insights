@@ -18,6 +18,7 @@ python run_full_training.py \
     --false_alert_cost 0.05 \
     --min_lead_hours 1 \
     --min_lead_utility 0.10 \
+    --utility_power 1.0 \
     --max_lead_hours 24 \
     --utility_target_lead_hours 24 \
     --alert_cooldown_hours 24
