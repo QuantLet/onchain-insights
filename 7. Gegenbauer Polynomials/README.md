@@ -36,3 +36,7 @@ Datafile: hourly_liquidity_full.parquet
 <div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_curve_reconstruction.png" alt="Image" />
 </div>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/symmetric_vs_asymmetric_liquidity.png" alt="Image" />
+</div>
