@@ -20,6 +20,7 @@ Submitted: 25.01.2026
 Datafile: hourly_liquidity_full.parquet
 
 ```
+
 <div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_roots_weights.png" alt="Image" />
 </div>
@@ -33,18 +34,5 @@ Datafile: hourly_liquidity_full.parquet
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_shocks_alpha0.3.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_curve_reconstruction.png" alt="Image" />
 </div>
-
-<div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_shocks_alpha0.5.png" alt="Image" />
-</div>
-
-<div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_shocks_alpha1.0.png" alt="Image" />
-</div>
-
-<div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/7.%20Gegenbauer%20Polynomials/gegenbauer_shocks_alpha3.png" alt="Image" />
-</div>
-
