@@ -66,7 +66,7 @@ bash full_retraining.sh
 
 <div align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-09-23/plots_summary/threshold_15bps/heatmap_cv_event_utility.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8. Early-Warning Classifier Cross Validation/lightning_logs/cv_model_comparison_2026-09-23_15bp/plots_summary/threshold_15bps/heatmap_cv_event_utility.png"
     alt="Operational Utility Heatmap"
   />
 </div>
