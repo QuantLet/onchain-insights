@@ -1,0 +1,6 @@
+fold,model_name,alpha,target_threshold,ci_method,n_bootstrap,block_hours,event_utility_score_ci_lower,event_utility_score_ci_upper,timely_event_recall_ci_lower,timely_event_recall_ci_upper,false_alerts_per_month_ci_lower,false_alerts_per_month_ci_upper,median_lead_hours_ci_lower,median_lead_hours_ci_upper
+1,lightgbm,0.5,15,event_and_calendar_block_bootstrap,1000,168.0,-0.4598787172395194,-0.21581055117121348,0.0,0.2692307692307692,5.2552460030048005,9.858926274127828,2.0,11.0
+2,lightgbm,0.5,15,event_and_calendar_block_bootstrap,1000,168.0,-0.3392910349662607,-0.10870535714285715,0.0,0.13636363636363635,2.5562455285111154,6.84983787573394,6.0,6.0
+3,lightgbm,0.5,15,event_and_calendar_block_bootstrap,1000,168.0,-0.06721803522916485,-0.01281803825232497,0.0,0.0,0.2563607650464994,1.3443607045832968,,
+4,lightgbm,0.5,15,event_and_calendar_block_bootstrap,1000,168.0,-0.022380514705882357,0.0,0.0,0.0,0.0,0.4476102941176471,,
+5,lightgbm,0.5,15,event_and_calendar_block_bootstrap,1000,168.0,-0.022380514705882357,0.0,0.0,0.0,0.0,0.4476102941176471,,

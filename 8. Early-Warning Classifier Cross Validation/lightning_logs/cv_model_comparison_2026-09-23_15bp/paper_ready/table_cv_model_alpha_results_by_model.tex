@@ -1,0 +1,35 @@
+% Requires \usepackage{xcolor} and \usepackage{booktabs}.
+\begin{table}[!htbp]
+\caption{Operational out-of-sample comparison at the 15-basis-point depeg threshold. Probability thresholds are selected on the preceding validation fold subject to an estimated budget of at most 2 false-alert episodes per month; reported false-alert rates are held-out outcomes and may exceed that validation constraint. Event utility is the primary selection metric; brackets report event/calendar-block bootstrap 95\% confidence intervals. AUC and AUPRC are secondary row-level ranking metrics. Rows are ordered by model and increasing $lpha$. Best values in each metric are shown in bold red and second-best distinct values in underlined blue; lower is better for false alerts.}
+\label{tab:cv_model_alpha_results_ordered}
+\begin{tabular}{llrrrrrr}
+\toprule
+Model & $\alpha$ & Event utility & Timely event recall & False alerts/month & Median lead (h) & AUC & AUPRC \\
+\midrule
+CatBoost & 0.1 & 0.208 [0.142, 0.279] & 0.568 [0.484, 0.646] & 2.30 [1.83, 2.83] & 14.0 [10.6, 16.4] & 0.855 & 0.239 \\
+CatBoost & 0.3 & \textcolor{red}{\textbf{0.303 [0.229, 0.381]}} & \textcolor{blue}{\underline{0.723 [0.631, 0.819]}} & 2.50 [1.98, 3.01] & 14.4 [11.5, 16.5] & 0.862 & \textcolor{red}{\textbf{0.241}} \\
+CatBoost & 0.5 & 0.149 [0.084, 0.206] & 0.517 [0.432, 0.599] & 2.33 [1.87, 2.87] & 9.6 [7.6, 11.2] & 0.814 & 0.172 \\
+CatBoost & 1 & \textcolor{blue}{\underline{0.281 [0.204, 0.363]}} & \textcolor{red}{\textbf{0.746 [0.651, 0.841]}} & 3.07 [2.52, 3.62] & 14.5 [11.7, 16.3] & 0.853 & 0.217 \\
+CatBoost & 1.5 & 0.183 [0.110, 0.261] & 0.589 [0.499, 0.688] & 3.10 [2.55, 3.67] & 13.5 [10.6, 16.2] & 0.842 & 0.173 \\
+CatBoost & 2 & 0.226 [0.157, 0.298] & 0.685 [0.598, 0.768] & 2.70 [2.19, 3.23] & 13.0 [9.5, 14.7] & 0.862 & 0.202 \\
+LightGBM & 0.1 & -0.071 [-0.096, -0.047] & 0.030 [0.000, 0.066] & 1.60 [1.17, 2.07] & 6.0 [3.5, 8.5] & 0.545 & 0.036 \\
+LightGBM & 0.3 & -0.037 [-0.064, -0.010] & 0.054 [0.023, 0.085] & 1.19 [0.83, 1.64] & 4.0 [1.0, 20.0] & 0.579 & 0.044 \\
+LightGBM & 0.5 & -0.124 [-0.158, -0.090] & 0.032 [0.008, 0.064] & 2.69 [2.06, 3.35] & 6.5 [4.0, 8.5] & 0.543 & 0.031 \\
+LightGBM & 1 & -0.096 [-0.143, -0.041] & 0.105 [0.048, 0.170] & 3.05 [2.42, 3.66] & 11.8 [6.0, 15.2] & 0.602 & 0.043 \\
+LightGBM & 1.5 & 0.010 [-0.035, 0.060] & 0.118 [0.052, 0.190] & 1.34 [1.05, 1.66] & 14.8 [12.8, 17.0] & 0.512 & 0.044 \\
+LightGBM & 2 & -0.093 [-0.136, -0.045] & 0.095 [0.050, 0.147] & 2.96 [2.32, 3.63] & 12.3 [8.7, 14.3] & 0.565 & 0.032 \\
+Random forest & 0.1 & 0.180 [0.118, 0.243] & 0.410 [0.307, 0.504] & \textcolor{blue}{\underline{0.97 [0.70, 1.27]}} & 12.0 [9.9, 14.9] & \textcolor{red}{\textbf{0.901}} & \textcolor{blue}{\underline{0.239}} \\
+Random forest & 0.3 & 0.071 [0.018, 0.127] & 0.160 [0.088, 0.230] & \textcolor{red}{\textbf{0.76 [0.51, 1.02]}} & \textcolor{blue}{\underline{15.8 [11.8, 19.2]}} & \textcolor{blue}{\underline{0.891}} & 0.172 \\
+Random forest & 0.5 & 0.233 [0.150, 0.308] & 0.489 [0.383, 0.593] & 1.45 [1.11, 1.82] & 14.3 [12.0, 16.5] & 0.890 & 0.204 \\
+Random forest & 1 & 0.222 [0.152, 0.291] & 0.515 [0.418, 0.612] & 1.79 [1.41, 2.24] & 14.6 [10.7, 16.7] & 0.887 & 0.213 \\
+Random forest & 1.5 & 0.111 [0.049, 0.178] & 0.305 [0.217, 0.407] & 1.49 [1.13, 1.86] & \textcolor{red}{\textbf{17.0 [13.3, 18.4]}} & 0.879 & 0.217 \\
+Random forest & 2 & 0.170 [0.100, 0.241] & 0.437 [0.352, 0.530] & 1.93 [1.45, 2.42] & 15.0 [9.6, 17.8] & 0.870 & 0.180 \\
+XGBoost & 0.1 & -0.049 [-0.069, -0.033] & 0.000 [0.000, 0.000] & 0.99 [0.65, 1.39] & NA & 0.670 & 0.048 \\
+XGBoost & 0.3 & 0.002 [-0.035, 0.037] & 0.186 [0.157, 0.200] & 1.59 [1.17, 2.05] & 9.0 [4.0, 16.0] & 0.700 & 0.083 \\
+XGBoost & 0.5 & 0.076 [0.012, 0.133] & 0.516 [0.459, 0.568] & 3.46 [2.75, 4.20] & 11.7 [6.7, 13.7] & 0.753 & 0.113 \\
+XGBoost & 1 & 0.101 [0.029, 0.182] & 0.544 [0.458, 0.625] & 3.73 [3.03, 4.44] & 13.5 [7.2, 16.2] & 0.812 & 0.133 \\
+XGBoost & 1.5 & -0.040 [-0.091, 0.014] & 0.206 [0.145, 0.266] & 3.28 [2.77, 3.79] & 15.2 [11.8, 17.2] & 0.703 & 0.078 \\
+XGBoost & 2 & -0.055 [-0.090, -0.020] & 0.055 [0.018, 0.100] & 1.75 [1.32, 2.22] & 14.5 [7.0, 19.5] & 0.648 & 0.045 \\
+\bottomrule
+\end{tabular}
+\end{table}

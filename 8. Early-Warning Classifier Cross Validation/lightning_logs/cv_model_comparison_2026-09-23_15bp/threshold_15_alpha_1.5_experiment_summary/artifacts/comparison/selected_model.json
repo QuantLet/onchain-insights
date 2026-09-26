@@ -1,0 +1,6 @@
+{
+  "selected_model": "catboost",
+  "false_alert_budget_per_month": 2.0,
+  "utility_tolerance": 0.01,
+  "selection_policy": "Primary: highest mean outer-fold event utility at a fixed false-alert budget of 2.000 episodes/month. Among models within 0.0100 utility of the leader: higher timely event recall, then lower false-alert burden and lower utility variation."
+}

@@ -1,0 +1,2 @@
+target_threshold,false_alert_budget_per_month,selected_specification,event_utility_95ci,timely_recall_95ci,false_alerts_per_month_95ci,median_lead_hours_95ci
+15,2.0,catboost (α=0.3),"0.303 [0.229, 0.381]","0.723 [0.631, 0.819]","2.50 [1.98, 3.01]","14.4 [11.5, 16.5]"

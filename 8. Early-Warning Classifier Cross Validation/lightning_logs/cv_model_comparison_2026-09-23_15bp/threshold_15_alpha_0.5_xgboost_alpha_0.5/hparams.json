@@ -1,0 +1,36 @@
+{
+  "model_name": "xgboost",
+  "alpha": 0.5,
+  "dataset_path": "./preprocessed_datasets/dataset_alpha_0.5_full_binarytarget_win-24_thresh-15_both_dynamic-False.parquet",
+  "n_splits": 5,
+  "cv_val_frac": 0.3,
+  "cv_embargo_hours_requested": 48,
+  "effective_embargo_hours": 48,
+  "scaler": "robust",
+  "learning_rate": 0.01,
+  "early_stopping_rounds": 200,
+  "eval_metric": "auc",
+  "n_estimators": 800,
+  "max_depth": 6,
+  "num_leaves": 31,
+  "rf_max_features": "sqrt",
+  "target_window": 24,
+  "target_threshold": 15,
+  "depeg_side": "both",
+  "dynamic_threshold": 0,
+  "n_features": 105,
+  "false_alert_budget_per_month": 2.0,
+  "false_alert_budgets": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "false_alert_cost": 0.05,
+  "warning_window_hours": [
+    1.0,
+    24.0
+  ],
+  "min_lead_utility": 0.1,
+  "alert_cooldown_hours": 24.0,
+  "n_bootstrap": 1000
+}

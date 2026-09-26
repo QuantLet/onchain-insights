@@ -1,0 +1,4 @@
+target_threshold,false_alert_budget_per_month,model_name,alpha,mean_outer_test_utility,std_outer_test_utility,mean_timely_event_recall,mean_false_alerts_per_month,outer_folds,selection_policy,utility_tolerance
+15,0.5,catboost,1.0,0.08715874507389561,0.12020859773865958,0.21538461538461537,0.34569275260713345,5,"mean outer-fold event utility; within utility tolerance: timely recall, false-alert burden, then utility stability",0.01
+15,1.0,catboost,0.3,0.3513128000125672,0.0443496961049859,0.6409590409590409,1.2035229164840942,5,"mean outer-fold event utility; within utility tolerance: timely recall, false-alert burden, then utility stability",0.01
+15,2.0,catboost,0.3,0.30345343646382306,0.048770380258078894,0.7229770229770229,2.4966698799404083,5,"mean outer-fold event utility; within utility tolerance: timely recall, false-alert burden, then utility stability",0.01

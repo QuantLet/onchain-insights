@@ -1,0 +1,6 @@
+fold,model_name,alpha,target_threshold,ci_method,n_bootstrap,block_hours,event_utility_score_ci_lower,event_utility_score_ci_upper,timely_event_recall_ci_lower,timely_event_recall_ci_upper,false_alerts_per_month_ci_lower,false_alerts_per_month_ci_upper,median_lead_hours_ci_lower,median_lead_hours_ci_upper
+1,random_forest,2.0,15,event_and_calendar_block_bootstrap,1000,168.0,-0.08013875314064658,0.10278420235135366,0.0,0.23076923076923078,0.6416154331909003,2.1805411270875683,3.0,21.0
+2,random_forest,2.0,15,event_and_calendar_block_bootstrap,1000,168.0,-0.028840586067731183,0.0,0.0,0.0,0.0,0.5768117213546237,,
+3,random_forest,2.0,15,event_and_calendar_block_bootstrap,1000,168.0,0.09735223956267806,0.4876969894615455,0.35714285714285715,0.8589285714285697,1.4067752100840336,3.8410305845237054,11.0,20.0
+4,random_forest,2.0,15,event_and_calendar_block_bootstrap,1000,168.0,0.02883138010738339,0.41563965956299204,0.5,0.9285714285714286,1.9807849491184877,4.866765602769128,4.0,19.0
+5,random_forest,2.0,15,event_and_calendar_block_bootstrap,1000,168.0,0.16717789493514804,0.535493794350703,0.42857142857142855,0.9285714285714286,1.1523091753571115,3.3340989312080755,10.0,20.0

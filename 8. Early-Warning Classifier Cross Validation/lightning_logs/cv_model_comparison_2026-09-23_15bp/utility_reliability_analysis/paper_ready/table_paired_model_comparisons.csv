@@ -1,0 +1,24 @@
+Depeg threshold (bps),Preferred specification,Comparator,Utility difference (95% CI),Bootstrap P(preferred > comparator),Interval excludes zero,Paired outer folds
+15.0,catboost (α=0.3),catboost (α=1),"0.023 [-0.042, 0.084]",0.7635,No,5
+15.0,catboost (α=0.3),random_forest (α=0.5),"0.070 [-0.036, 0.177]",0.894,No,5
+15.0,catboost (α=0.3),catboost (α=2),"0.078 [-0.009, 0.159]",0.96,No,5
+15.0,catboost (α=0.3),random_forest (α=1),"0.081 [-0.026, 0.184]",0.939,No,5
+15.0,catboost (α=0.3),catboost (α=0.1),"0.095 [0.007, 0.178]",0.983,Yes,5
+15.0,catboost (α=0.3),catboost (α=1.5),"0.121 [0.009, 0.229]",0.9865,Yes,5
+15.0,catboost (α=0.3),random_forest (α=0.1),"0.123 [0.021, 0.230]",0.992,Yes,5
+15.0,catboost (α=0.3),random_forest (α=2),"0.134 [0.053, 0.214]",0.9995,Yes,5
+15.0,catboost (α=0.3),catboost (α=0.5),"0.155 [0.076, 0.235]",1.0,Yes,5
+15.0,catboost (α=0.3),random_forest (α=1.5),"0.193 [0.086, 0.299]",1.0,Yes,5
+15.0,catboost (α=0.3),xgboost (α=1),"0.202 [0.108, 0.299]",1.0,Yes,5
+15.0,catboost (α=0.3),xgboost (α=0.5),"0.227 [0.128, 0.329]",1.0,Yes,5
+15.0,catboost (α=0.3),random_forest (α=0.3),"0.232 [0.136, 0.329]",1.0,Yes,5
+15.0,catboost (α=0.3),lightgbm (α=1.5),"0.294 [0.203, 0.389]",1.0,Yes,5
+15.0,catboost (α=0.3),xgboost (α=0.3),"0.302 [0.214, 0.388]",1.0,Yes,5
+15.0,catboost (α=0.3),lightgbm (α=0.3),"0.341 [0.260, 0.426]",1.0,Yes,5
+15.0,catboost (α=0.3),xgboost (α=1.5),"0.343 [0.261, 0.424]",1.0,Yes,5
+15.0,catboost (α=0.3),xgboost (α=0.1),"0.353 [0.272, 0.434]",1.0,Yes,5
+15.0,catboost (α=0.3),xgboost (α=2),"0.359 [0.274, 0.443]",1.0,Yes,5
+15.0,catboost (α=0.3),lightgbm (α=0.1),"0.375 [0.290, 0.460]",1.0,Yes,5
+15.0,catboost (α=0.3),lightgbm (α=2),"0.396 [0.307, 0.486]",1.0,Yes,5
+15.0,catboost (α=0.3),lightgbm (α=1),"0.400 [0.307, 0.493]",1.0,Yes,5
+15.0,catboost (α=0.3),lightgbm (α=0.5),"0.428 [0.343, 0.512]",1.0,Yes,5

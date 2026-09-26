@@ -1,0 +1,32 @@
+{
+  "dataset_path": "./preprocessed_datasets/dataset_alpha_0.5_full_binarytarget_win-24_thresh-15_both_dynamic-False.parquet",
+  "alpha": 0.5,
+  "n_splits": 5,
+  "cv_val_frac": 0.3,
+  "cv_embargo_hours_requested": 48,
+  "effective_embargo_hours": 48,
+  "scaler": "robust",
+  "models_compared": [
+    "xgboost",
+    "lightgbm",
+    "catboost",
+    "random_forest"
+  ],
+  "n_rows": 38038,
+  "n_features": 105,
+  "false_alert_budget_per_month": 2.0,
+  "false_alert_budgets": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "false_alert_cost": 0.05,
+  "warning_window_hours": [
+    1.0,
+    24.0
+  ],
+  "min_lead_utility": 0.1,
+  "utility_power": 1.0,
+  "alert_cooldown_hours": 24.0,
+  "n_bootstrap": 1000
+}

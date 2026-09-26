@@ -1,0 +1,2 @@
+target_threshold	alpha	model_name	cv_event_utility_score_mean	cv_event_utility_score_std	cv_timely_event_recall_mean	cv_false_alerts_per_month_mean	selection_reason
+15	0.3	catboost	0.303453436463823	0.0436215542182312	0.722977022977023	2.496669879940409	threshold_specific_event_utility_then_timely_recall_then_false_alert_burden
