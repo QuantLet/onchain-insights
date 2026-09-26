@@ -1,0 +1,12 @@
+
+Name of Quantlet: Onchain Insights - SHAP explanations of Early Warning Model
+
+Published in: Onchain Insights - SHAP explanations of Early Warning Model
+
+Description: The best performing Early Warning model is selected from the previous quantlet. SHAP explanations are produced to explain its outputs, including global summaries and local waterfalls. SHAP importance of Economic groups is highlighted.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  25.09.2026
