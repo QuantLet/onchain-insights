@@ -1,0 +1,17 @@
+
+Name of Quantlet: Onchain Insights - Parametric quantile function characterisation
+
+Published in: Onchain Insights - Parametric quantile function characterisation
+
+Description: We evaluate the distribution of stablecoin depeg basis points. ARIMA/GARCH residuals show poor fit against Gaussian/Student's t innovations. In order to circumvent this issu we train a Neural Network to regress the quantile function in a non-distributional manner.
+We show the use of both Chebyshev and I-spline bases for quantile function regression, and their advantages/drawbacks. We also introduce the threshold weighted CRPS used to favor rare extreme events in the diustributional calibration. 
+Lastly we showscase the addition of spliced GPD tails for modeling extreme events/ closed form VaR+ES estimation.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk, quantile regression, Full distribution probabilistic forecasting, Extreme event forecast 
+
+Author: Owen Chaffard
+
+Submitted:  29.04.2026
+
+Datafile: USDC_USDT_hourly_metrics.parquet
+

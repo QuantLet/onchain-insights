@@ -1,0 +1,13 @@
+Name of Quantlet: Onchain Insights - Forecasting architecture
+
+Published in: Onchain Insights - Forecasting architecture
+
+Description: This Quantlet presents our custom Forecasting architecture and highlights some of its integral components, including the NHITS stack decomposition-based encoder and the L0 regularisation to enforece sparse covariate attention.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  06.05.2026
+
+Datafile:

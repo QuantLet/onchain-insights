@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Clickable Neural Architecture Diagram</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1280px;
+            margin: auto;
+        }
+        #detail_diagram {
+            margin-top: 10px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>                <div id="main_architecture" class="plotly-graph-div" style="height:620px; width:1250px;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("main_architecture")) {                    Plotly.newPlot(                        "main_architecture",                        [{"customdata":["tcn","grn","fusion"],"hovertemplate":"%{hovertext}\u003cextra\u003e\u003c\u002fextra\u003e","hovertext":["Click to show dilated TCN diagram","Click to show Selection GRN diagram","Click to show Cross-Attention Fusion diagram"],"marker":{"color":"rgba(0,0,0,0.01)","line":{"color":"rgba(0,0,0,0)","width":0},"size":[95,95,105],"symbol":"square"},"mode":"markers","showlegend":false,"x":[4.25,6.2,8.0],"y":[6.0,2.8,4.4],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"shapes":[{"fillcolor":"rgba(59, 130, 246, 0.07)","layer":"below","line":{"color":"rgba(59, 130, 246, 0.25)","width":1},"type":"rect","x0":0.4,"x1":10.8,"y0":5.15,"y1":6.85},{"fillcolor":"rgba(249, 115, 22, 0.07)","layer":"below","line":{"color":"rgba(249, 115, 22, 0.25)","width":1},"type":"rect","x0":0.4,"x1":10.8,"y0":1.95,"y1":3.65},{"fillcolor":"rgba(139, 92, 246, 0.07)","layer":"below","line":{"color":"rgba(139, 92, 246, 0.25)","width":1},"type":"rect","x0":6.9,"x1":10.8,"y0":3.75,"y1":5.05},{"fillcolor":"#f9fafb","layer":"below","line":{"color":"#374151","width":1.8},"type":"rect","x0":0.5000000000000001,"x1":1.7000000000000002,"y0":4.025,"y1":4.775},{"fillcolor":"#dbeafe","layer":"below","line":{"color":"#2563eb","width":1.8},"type":"rect","x0":1.775,"x1":3.225,"y0":5.625,"y1":6.375},{"fillcolor":"#bfdbfe","layer":"below","line":{"color":"#1d4ed8","width":3},"type":"rect","x0":3.35,"x1":5.15,"y0":5.575,"y1":6.425},{"fillcolor":"#dbeafe","layer":"below","line":{"color":"#2563eb","width":1.8},"type":"rect","x0":5.425,"x1":6.9750000000000005,"y0":5.625,"y1":6.375},{"fillcolor":"#ffedd5","layer":"below","line":{"color":"#ea580c","width":1.8},"type":"rect","x0":1.775,"x1":3.225,"y0":2.425,"y1":3.175},{"fillcolor":"#ffedd5","layer":"below","line":{"color":"#ea580c","width":1.8},"type":"rect","x0":3.425,"x1":5.075,"y0":2.425,"y1":3.175},{"fillcolor":"#fed7aa","layer":"below","line":{"color":"#c2410c","width":3},"type":"rect","x0":5.375,"x1":7.025,"y0":2.375,"y1":3.2249999999999996},{"fillcolor":"#ffedd5","layer":"below","line":{"color":"#ea580c","width":1.8},"type":"rect","x0":7.225,"x1":8.775,"y0":2.425,"y1":3.175},{"fillcolor":"#ede9fe","layer":"below","line":{"color":"#7c3aed","width":3},"type":"rect","x0":7.075,"x1":8.925,"y0":3.95,"y1":4.8500000000000005},{"fillcolor":"#f3e8ff","layer":"below","line":{"color":"#7c3aed","width":1.8},"type":"rect","x0":9.275,"x1":10.725,"y0":4.025,"y1":4.775},{"fillcolor":"#f5f3ff","layer":"below","line":{"color":"#6d28d9","width":1.8},"type":"rect","x0":10.875,"x1":12.225000000000001,"y0":4.025,"y1":4.775}],"annotations":[{"font":{"color":"#1d4ed8","size":14},"showarrow":false,"text":"\u003cb\u003eTarget branch\u003c\u002fb\u003e","x":0.75,"xanchor":"left","y":6.7},{"font":{"color":"#c2410c","size":14},"showarrow":false,"text":"\u003cb\u003eCovariate branch\u003c\u002fb\u003e","x":0.75,"xanchor":"left","y":3.5},{"font":{"color":"#6d28d9","size":14},"showarrow":false,"text":"\u003cb\u003eFusion\u003c\u002fb\u003e","x":7.1,"xanchor":"left","y":4.9},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Input\u003cbr\u003ewindow","x":1.1,"y":4.4},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Target\u003cbr\u003ehistory","x":2.5,"y":6.0},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"\u003cb\u003eTemporal causal\u003cbr\u003econv encoder\u003c\u002fb\u003e\u003cbr\u003e\u003cspan style='font-size:10px'\u003e(click)\u003c\u002fspan\u003e","x":4.25,"y":6.0},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Target horizon\u003cbr\u003etokens","x":6.2,"y":6.0},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Historical\u003cbr\u003ecovariates","x":2.5,"y":2.8},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Variate token\u003cbr\u003eencoder","x":4.25,"y":2.8},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"\u003cb\u003eSelection\u003cbr\u003eGRN\u003c\u002fb\u003e\u003cbr\u003e\u003cspan style='font-size:10px'\u003e(click)\u003c\u002fspan\u003e","x":6.2,"y":2.8},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Selected\u003cbr\u003evariate tokens","x":8.0,"y":2.8},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"\u003cb\u003eCross-attention\u003cbr\u003efusion layer\u003c\u002fb\u003e\u003cbr\u003e\u003cspan style='font-size:10px'\u003e(click)\u003c\u002fspan\u003e","x":8.0,"y":4.4},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Forecast\u003cbr\u003ehead","x":10.0,"y":4.4},{"align":"center","font":{"color":"#111827","size":13},"showarrow":false,"text":"Distributional\u003cbr\u003eforecast","x":11.55,"y":4.4},{"arrowcolor":"#2563eb","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":1.7,"axref":"x","ay":4.55,"ayref":"y","showarrow":true,"x":1.95,"xref":"x","y":5.8,"yref":"y"},{"arrowcolor":"#ea580c","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":1.7,"axref":"x","ay":4.25,"ayref":"y","showarrow":true,"x":1.95,"xref":"x","y":3.0,"yref":"y"},{"arrowcolor":"#2563eb","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":3.22,"axref":"x","ay":6.0,"ayref":"y","showarrow":true,"x":3.35,"xref":"x","y":6.0,"yref":"y"},{"arrowcolor":"#2563eb","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":5.15,"axref":"x","ay":6.0,"ayref":"y","showarrow":true,"x":5.42,"xref":"x","y":6.0,"yref":"y"},{"arrowcolor":"#ea580c","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":3.22,"axref":"x","ay":2.8,"ayref":"y","showarrow":true,"x":3.42,"xref":"x","y":2.8,"yref":"y"},{"arrowcolor":"#ea580c","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":5.07,"axref":"x","ay":2.8,"ayref":"y","showarrow":true,"x":5.38,"xref":"x","y":2.8,"yref":"y"},{"arrowcolor":"#ea580c","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":7.02,"axref":"x","ay":2.8,"ayref":"y","showarrow":true,"x":7.22,"xref":"x","y":2.8,"yref":"y"},{"arrowcolor":"#7c3aed","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":6.85,"axref":"x","ay":5.8,"ayref":"y","showarrow":true,"x":7.25,"xref":"x","y":4.75,"yref":"y"},{"arrowcolor":"#7c3aed","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":8.0,"axref":"x","ay":3.18,"ayref":"y","showarrow":true,"x":8.0,"xref":"x","y":3.9,"yref":"y"},{"arrowcolor":"#7c3aed","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":8.92,"axref":"x","ay":4.4,"ayref":"y","showarrow":true,"x":9.28,"xref":"x","y":4.4,"yref":"y"},{"arrowcolor":"#7c3aed","arrowhead":3,"arrowsize":1.2,"arrowwidth":2,"ax":10.72,"axref":"x","ay":4.4,"ayref":"y","showarrow":true,"x":10.88,"xref":"x","y":4.4,"yref":"y"},{"align":"center","font":{"color":"#6d28d9","size":10},"showarrow":false,"text":"target tokens query\u003cbr\u003eselected variates","x":7.05,"y":5.35},{"font":{"color":"#6b7280","size":12},"showarrow":false,"text":"Click the highlighted blocks to inspect the internal module.","x":6.15,"y":1.55}],"title":{"font":{"size":20},"text":"\u003cb\u003eNeural Forecasting Architecture\u003c\u002fb\u003e","x":0.5},"margin":{"l":30,"r":30,"t":70,"b":30},"width":1250,"height":620,"paper_bgcolor":"white","plot_bgcolor":"white","showlegend":false,"xaxis":{"range":[0,12.3],"visible":false,"fixedrange":true},"yaxis":{"range":[1.4,7.1],"visible":false,"fixedrange":true}},                        {"displayModeBar": false, "responsive": true}                    )                };                            </script>        </div>
+        <div id="detail_diagram"></div>
+    </div>
+    
+<script>
+function rect(x, y, w, h, fill, line, width=2) {
+    return {
+        type: "rect",
+        x0: x - w/2,
+        x1: x + w/2,
+        y0: y - h/2,
+        y1: y + h/2,
+        fillcolor: fill,
+        line: {color: line, width: width},
+        layer: "below"
+    };
+}
+
+function label(x, y, text, size=13, color="#111827") {
+    return {
+        x: x,
+        y: y,
+        text: text,
+        showarrow: false,
+        font: {size: size, color: color},
+        align: "center"
+    };
+}
+
+function arrow(x0, y0, x1, y1, color="#374151") {
+    return {
+        x: x1,
+        y: y1,
+        ax: x0,
+        ay: y0,
+        xref: "x",
+        yref: "y",
+        axref: "x",
+        ayref: "y",
+        showarrow: true,
+        arrowhead: 3,
+        arrowsize: 1.1,
+        arrowwidth: 2,
+        arrowcolor: color
+    };
+}
+
+function baseLayout(title) {
+    return {
+        title: {
+            text: "<b>" + title + "</b>",
+            x: 0.5,
+            font: {size: 17}
+        },
+        width: 950,
+        height: 360,
+        paper_bgcolor: "white",
+        plot_bgcolor: "white",
+        margin: {l: 30, r: 30, t: 55, b: 25},
+        xaxis: {range: [0, 10], visible: false, fixedrange: true},
+        yaxis: {range: [0, 4], visible: false, fixedrange: true},
+        shapes: [],
+        annotations: []
+    };
+}
+
+function drawTCN() {
+    let layout = baseLayout("Dilated Temporal Causal Convolution Encoder");
+
+    layout.shapes = [
+        rect(1.0, 2.0, 1.2, 0.75, "#dbeafe", "#2563eb"),
+        rect(2.7, 2.0, 1.25, 0.75, "#bfdbfe", "#1d4ed8"),
+        rect(4.3, 2.0, 1.25, 0.75, "#bfdbfe", "#1d4ed8"),
+        rect(5.9, 2.0, 1.25, 0.75, "#bfdbfe", "#1d4ed8"),
+        rect(7.5, 2.0, 1.25, 0.75, "#dbeafe", "#2563eb"),
+        rect(9.0, 2.0, 1.25, 0.75, "#dbeafe", "#2563eb")
+    ];
+
+    layout.annotations = [
+        label(1.0, 2.0, "target<br>history"),
+        label(2.7, 2.0, "causal conv<br>dilation 1"),
+        label(4.3, 2.0, "causal conv<br>dilation 2"),
+        label(5.9, 2.0, "causal conv<br>dilation 4"),
+        label(7.5, 2.0, "multi-scale<br>summary"),
+        label(9.0, 2.0, "horizon<br>tokens"),
+
+        arrow(1.6, 2.0, 2.05, 2.0, "#2563eb"),
+        arrow(3.32, 2.0, 3.68, 2.0, "#2563eb"),
+        arrow(4.92, 2.0, 5.28, 2.0, "#2563eb"),
+        arrow(6.52, 2.0, 6.88, 2.0, "#2563eb"),
+        arrow(8.12, 2.0, 8.38, 2.0, "#2563eb"),
+
+        label(
+            5.0, 0.95,
+            "Dilations expand the receptive field while preserving causal order.",
+            12,
+            "#4b5563"
+        )
+    ];
+
+    Plotly.react("detail_diagram", [], layout, {displayModeBar: false});
+}
+
+function drawGRN() {
+    let layout = baseLayout("Context-Conditioned Selection GRN");
+
+    layout.shapes = [
+        rect(1.0, 2.6, 1.2, 0.7, "#dbeafe", "#2563eb"),
+        rect(1.0, 1.4, 1.2, 0.7, "#ffedd5", "#ea580c"),
+        rect(3.0, 2.0, 1.35, 0.85, "#fed7aa", "#c2410c"),
+        rect(4.8, 2.0, 1.2, 0.7, "#ffedd5", "#ea580c"),
+        rect(6.35, 2.0, 1.3, 0.7, "#ffedd5", "#ea580c"),
+        rect(8.05, 2.0, 1.5, 0.75, "#ffedd5", "#ea580c")
+    ];
+
+    layout.annotations = [
+        label(1.0, 2.6, "target<br>context"),
+        label(1.0, 1.4, "variate<br>tokens"),
+        label(3.0, 2.0, "GRN<br>scorer"),
+        label(4.8, 2.0, "relevance<br>logits"),
+        label(6.35, 2.0, "sparsemax<br>/ entmax"),
+        label(8.05, 2.0, "selected<br>variates"),
+
+        arrow(1.6, 2.5, 2.3, 2.25, "#7c3aed"),
+        arrow(1.6, 1.5, 2.3, 1.75, "#ea580c"),
+        arrow(3.67, 2.0, 4.2, 2.0, "#ea580c"),
+        arrow(5.4, 2.0, 5.7, 2.0, "#ea580c"),
+        arrow(7.0, 2.0, 7.3, 2.0, "#ea580c"),
+
+        label(
+            5.0, 0.85,
+            "The GRN scores each covariate conditioned on the target context; sparse mapping gives interpretable weights π.",
+            12,
+            "#4b5563"
+        )
+    ];
+
+    Plotly.react("detail_diagram", [], layout, {displayModeBar: false});
+}
+
+function drawFusion() {
+    let layout = baseLayout("Target-to-Covariate Cross-Attention Fusion");
+
+    layout.shapes = [
+        rect(1.0, 2.8, 1.3, 0.7, "#dbeafe", "#2563eb"),
+        rect(1.0, 1.2, 1.3, 0.7, "#ffedd5", "#ea580c"),
+        rect(3.0, 2.8, 1.3, 0.7, "#ede9fe", "#7c3aed"),
+        rect(4.9, 2.0, 1.55, 0.85, "#ddd6fe", "#7c3aed"),
+        rect(6.9, 2.0, 1.2, 0.7, "#ede9fe", "#7c3aed"),
+        rect(8.5, 2.0, 1.3, 0.7, "#f3e8ff", "#6d28d9")
+    ];
+
+    layout.annotations = [
+        label(1.0, 2.8, "target<br>tokens"),
+        label(1.0, 1.2, "selected<br>variates"),
+        label(3.0, 2.8, "target<br>self-attn"),
+        label(4.9, 2.0, "cross-attn<br>Q = target<br>K,V = variates"),
+        label(6.9, 2.0, "FFN +<br>residual"),
+        label(8.5, 2.0, "fused<br>tokens"),
+
+        arrow(1.65, 2.8, 2.35, 2.8, "#2563eb"),
+        arrow(3.65, 2.7, 4.15, 2.3, "#7c3aed"),
+        arrow(1.65, 1.2, 4.1, 1.75, "#ea580c"),
+        arrow(5.68, 2.0, 6.3, 2.0, "#7c3aed"),
+        arrow(7.5, 2.0, 7.85, 2.0, "#7c3aed"),
+
+        label(
+            5.0, 0.75,
+            "The attention map Aₕᵥ shows which selected covariates influence each forecast horizon.",
+            12,
+            "#4b5563"
+        )
+    ];
+
+    Plotly.react("detail_diagram", [], layout, {displayModeBar: false});
+}
+
+function drawPlaceholder() {
+    let layout = baseLayout("Module details");
+    layout.annotations = [
+        label(
+            5.0, 2.2,
+            "Click a highlighted block in the main diagram<br>to show its internal module.",
+            15,
+            "#4b5563"
+        )
+    ];
+    Plotly.react("detail_diagram", [], layout, {displayModeBar: false});
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    drawPlaceholder();
+
+    const mainPlot = document.getElementById("main_architecture");
+
+    mainPlot.on("plotly_click", function(data) {
+        if (!data.points || data.points.length === 0) {
+            return;
+        }
+
+        const block = data.points[0].customdata;
+
+        if (block === "tcn") {
+            drawTCN();
+        } else if (block === "grn") {
+            drawGRN();
+        } else if (block === "fusion") {
+            drawFusion();
+        }
+    });
+});
+</script>
+
+</body>
+</html>
