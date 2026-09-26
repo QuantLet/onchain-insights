@@ -32,9 +32,10 @@ Submitted: 25.01.2026
 | [Quantlet 5: Functional PCA analysis of the liquidity curve](#quantlet-5-functional-pca-analysis-of-the-liquidity-curve) | [View Quantlet](./5.%20Functional%20PCA%20analysis%20of%20the%20liquidity%20curve/README.md) |
 | [Quantlet 6: Legendre basis Decomposition](#quantlet-6-legendre-basis-decomposition) | [View Quantlet](./6.%20Legendre%20basis%20decomposition/README.md) |
 | [Quantlet 7: Gegenbauer Polynomials](#quantlet-7-gegenbauer-polynomials) | [View Quantlet](./7.%20Gegenbauer%20Polynomials/README.md) |
-| [Quantlet 8: Early-Warning Model](#quantlet-8-early-warning-model) | [View Quantlet](./8.%20Early-Warning%20Model/README.md) |
-| [Quantlet 9: Parametric Quantile Function Characterisation](#quantlet-9-parametric-quantile-function-characterisation) | [View Quantlet](./9.%20Parametric%20quantile%20function%20characterisation/README.md) |
-| [Quantlet 10: Forecasting architecture](#quantlet-10-forecasting-architecture) | [View Quantlet](./10.%20Forecasting%20architecture/README.md) |
+| [Quantlet 8: Early-Warning Classifier Cross Validation](#quantlet-8-early-warning-classifier-cross-validation) | [View Quantlet](./8.%20Early-Warning%20Classifier%20Cross%20Validation/README.md) |
+| [Quantlet 9: SHAP explanations of Early Warning Model](#quantlet-9-shap-explanations-of-early-warning-model) | [View Quantlet](./9.%20Early-Warning%20Classifier%20Cross%20Validation/README.md) |
+| [Quantlet 10: Parametric Quantile Function Characterisation](#quantlet-10-parametric-quantile-function-characterisation) | [View Quantlet](./10.%20Parametric%20quantile%20function%20characterisation/README.md) |
+| [Quantlet 11: Forecasting architecture](#quantlet-11-forecasting-architecture) | [View Quantlet](./11.%20Forecasting%20architecture/README.md) |
 
 # Repo Instructions
 
@@ -289,7 +290,7 @@ Run the notebook:
 7. Gegenbauer Polynomials/code.ipynb
 ```
 
-## Quantlet 8: Early-Warning Model
+## Quantlet 8: Early-Warning Classifier Cross Validation
 
 ### Description and Output
 
@@ -331,8 +332,50 @@ View the detailed instructions in the README:
 ```bash
 8. Early-Warning Model/README.md
 ```
+## Quantlet 9: SHAP explanations of Early Warning Model
 
-## Quantlet 9: Parametric Quantile Function Characterisation
+### Description and Output
+
+The best performing Early Warning model is selected from the previous quantlet. SHAP explanations are produced to explain its outputs, including global summaries and local waterfalls. SHAP importance of Economic groups is highlighted.
+
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/roc_pr.png"
+    alt="Final retraining ROC and PR curves"
+    width="100%"
+  />
+</p>
+
+<p align="center">
+  <b>Final retraining AUC/AUPRC</b>
+</p>
+
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_curve_entropy.png"
+    alt="SHAP scatter plot curve entropy"
+    width="49%"
+  />
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tangent_up.png"
+    alt="SHAP scatter plot tangent up"
+    width="49%"
+  />
+</p>
+
+<p align="center">
+  <b>SHAP correlation scatter plots</b>
+</p>
+
+### Recreate the plot
+
+View the detailed instructions in the README:
+
+```bash
+8. Early-Warning Model/README.md
+```
+
+## Quantlet 10: Parametric Quantile Function Characterisation
 
 ### Description and Output
 
@@ -381,7 +424,7 @@ Run the notebook:
 9. Parametric quantile function characterisation/code.ipynb
 ```
 
-## Quantlet 10: Forecasting architecture
+## Quantlet 11: Forecasting architecture
 
 ### Description and Output
 
