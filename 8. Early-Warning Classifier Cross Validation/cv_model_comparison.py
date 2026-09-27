@@ -495,7 +495,7 @@ def safe_auc(y_true, proba):
 
 def run_expanding_window_cv(
     df, feature_cols, target_col, model_name, args, logger,
-    model_factory=None, fit_callback=None,
+    model_factory=None, fit_callback=None, progress_callback=None,
 ):
     """Run the shared chronological CV/evaluation with an optional estimator adapter."""
     if model_factory is None:
@@ -537,6 +537,8 @@ def run_expanding_window_cv(
     }
 
     for fold, (train_idx, test_idx) in enumerate(splits, start=1):
+        if progress_callback is not None:
+            progress_callback(f"fold {fold}/{len(splits)}: preparing train/validation/test splits")
         X_train_full = X.iloc[train_idx].copy()
         y_train_full = y.iloc[train_idx].copy()
         X_test = X.iloc[test_idx].copy()
@@ -562,13 +564,22 @@ def run_expanding_window_cv(
             pd.Series(y_val).nunique() > 1
         )
 
+        if progress_callback is not None:
+            progress_callback(f"fold {fold}/{len(splits)}: constructing/loading {model_name}")
         model = model_factory(
             model_name=model_name,
             args=args,
             pos_weight=w_pos,
             use_early_stopping=use_early_stopping
         )
+        if hasattr(model, "set_progress_context"):
+            model.set_progress_context(progress_callback, fold, len(splits))
 
+        if progress_callback is not None:
+            progress_callback(
+                f"fold {fold}/{len(splits)}: fitting {model_name} "
+                f"({len(X_train_s):,} fit, {len(X_val_s) if X_val_s is not None else 0:,} validation rows)"
+            )
         fit_callback(
             model=model,
             model_name=model_name,
@@ -578,9 +589,15 @@ def run_expanding_window_cv(
             X_val=X_val_s if use_early_stopping else None,
             y_val=y_val if use_early_stopping else None
         )
+        if progress_callback is not None:
+            progress_callback(f"fold {fold}/{len(splits)}: fit complete; predicting {len(X_test_s):,} test rows")
 
+        if hasattr(model, "set_prediction_stage"):
+            model.set_prediction_stage("test")
         proba_test = model.predict_proba(X_test_s)[:, 1]
         fold_metrics = compute_fold_metrics(y_test, proba_test)
+        if progress_callback is not None:
+            progress_callback(f"fold {fold}/{len(splits)}: test predictions complete; predicting validation rows")
 
         if X_val_s is None:
             raise ValueError(
@@ -588,7 +605,11 @@ def run_expanding_window_cv(
                 "window or decrease --cv_embargo_hours. A validation period is required "
                 "to choose operational alert thresholds without test-fold leakage."
             )
+        if hasattr(model, "set_prediction_stage"):
+            model.set_prediction_stage("validation")
         proba_val = model.predict_proba(X_val_s)[:, 1]
+        if progress_callback is not None:
+            progress_callback(f"fold {fold}/{len(splits)}: validation predictions complete; scoring budgets")
         val_frame = df.iloc[train_idx].iloc[-len(X_val_s):].copy()
         # split_train_val_tail removes an embargo immediately before X_val.  The
         # tail rows are nevertheless exactly the validation rows retained above.
@@ -612,6 +633,8 @@ def run_expanding_window_cv(
         primary_bootstrap_ci = {}
         primary_bootstrap_samples = {}
         for budget in budgets:
+            if progress_callback is not None:
+                progress_callback(f"fold {fold}/{len(splits)}: selecting threshold for budget {budget:g}/month")
             alert_threshold, validation_metrics = choose_threshold_by_utility(
                 val_frame,
                 proba_val,
@@ -620,6 +643,11 @@ def run_expanding_window_cv(
                 event_context_frame=df.iloc[train_idx].copy(),
                 **evaluation_kwargs,
             )
+            if progress_callback is not None:
+                progress_callback(
+                    f"fold {fold}/{len(splits)}: threshold {alert_threshold:.6g} selected "
+                    f"for budget {budget:g}/month; scoring test events"
+                )
             test_metrics, bootstrap_inputs = evaluate_early_warning(
                 df.iloc[test_idx].copy(),
                 proba_test,
@@ -627,6 +655,11 @@ def run_expanding_window_cv(
                 event_context_frame=df.iloc[: test_idx[-1] + 1].copy(),
                 **evaluation_kwargs,
             )
+            if progress_callback is not None:
+                progress_callback(
+                    f"fold {fold}/{len(splits)}: test events scored for budget {budget:g}/month; "
+                    f"running {args.n_bootstrap:,} bootstrap draws"
+                )
             budget_bootstrap_ci, budget_bootstrap_samples_fold = event_block_bootstrap_ci(
                 bootstrap_inputs,
                 false_alert_cost=args.false_alert_cost,
@@ -634,6 +667,8 @@ def run_expanding_window_cv(
                 n_bootstrap=args.n_bootstrap,
                 random_state=args.random_state + fold + int(round(budget * 10_000)),
             )
+            if progress_callback is not None:
+                progress_callback(f"fold {fold}/{len(splits)}: bootstrap complete for budget {budget:g}/month")
             budget_rows.append({
                 "fold": fold,
                 "model_name": model_name,
@@ -717,11 +752,15 @@ def run_expanding_window_cv(
             f"event_recall={primary_test_metrics['timely_event_recall']} "
             f"false_alerts/month={primary_test_metrics['false_alerts_per_month']}"
         )
+        if progress_callback is not None:
+            progress_callback(f"fold {fold}/{len(splits)}: complete")
         # Foundation estimators can retain substantial fit/inference state.
         # Release the previous fold before constructing the next one.
         del model
         gc.collect()
 
+    if progress_callback is not None:
+        progress_callback("all folds complete; aggregating metrics and writing artifacts")
     fold_df = pd.DataFrame(fold_rows)
 
     def col_mean_std(df, col):
@@ -887,6 +926,8 @@ def run_expanding_window_cv(
     logger.save_figure(fig, "plots/cv/fold_event_utility.png", dpi=200)
     plt.close(fig)
 
+    if progress_callback is not None:
+        progress_callback("CV metrics and artifacts saved")
     return {
         "model_name": model_name,
         "alpha": args.alpha,

@@ -10,9 +10,12 @@ from __future__ import annotations
 import argparse
 import gc
 import importlib.metadata
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
+from threading import Event, Lock, Thread
+from time import monotonic
 
 import numpy as np
 import pandas as pd
@@ -29,12 +32,72 @@ if not (SCRIPT_DIR / "utils").is_dir() and (SHAP_DIR / "utils").is_dir():
 from cv_model_comparison import LocalLightningLogger, run_expanding_window_cv  # noqa: E402
 
 
+class ProgressReporter:
+    """Timestamped stage updates plus heartbeats during long blocking calls."""
+
+    def __init__(self, label: str, log_path: Path, interval_seconds: float):
+        self.label = label
+        self.log_path = log_path
+        self.interval_seconds = interval_seconds
+        self.started = monotonic()
+        self.stage_started = self.started
+        self.stage = "starting"
+        self.stop_event = Event()
+        self.lock = Lock()
+        self.thread = Thread(target=self._heartbeat, daemon=True)
+
+    def _write_locked(self, message: str) -> None:
+        elapsed = monotonic() - self.started
+        timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        line = f"[{timestamp}] [{self.label}] +{elapsed:,.0f}s {message}"
+        print(line, flush=True)
+        with self.log_path.open("a", encoding="utf-8") as handle:
+            handle.write(line + "\n")
+
+    def update(self, stage: str) -> None:
+        with self.lock:
+            self.stage = stage
+            self.stage_started = monotonic()
+            self._write_locked(stage)
+
+    def _heartbeat(self) -> None:
+        while not self.stop_event.wait(self.interval_seconds):
+            with self.lock:
+                stage_elapsed = monotonic() - self.stage_started
+                self._write_locked(f"still running: {self.stage} ({stage_elapsed:,.0f}s in stage)")
+
+    def __enter__(self):
+        self.log_path.parent.mkdir(parents=True, exist_ok=True)
+        self.update("run started")
+        self.thread.start()
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        self.stop_event.set()
+        self.thread.join(timeout=2)
+        self.update("run complete" if exc_type is None else f"run failed: {exc_type.__name__}: {exc}")
+        return False
+
+
 class BatchedClassifier:
     """Limit prediction-batch memory without changing fit rows or predictions."""
 
-    def __init__(self, estimator, batch_size: int):
+    def __init__(self, estimator, batch_size: int, progress_every_batches: int = 1):
         self.estimator = estimator
         self.batch_size = batch_size
+        self.progress_every_batches = progress_every_batches
+        self.progress_callback = None
+        self.fold = None
+        self.n_folds = None
+        self.prediction_stage = "prediction"
+
+    def set_progress_context(self, callback, fold: int, n_folds: int) -> None:
+        self.progress_callback = callback
+        self.fold = fold
+        self.n_folds = n_folds
+
+    def set_prediction_stage(self, stage: str) -> None:
+        self.prediction_stage = stage
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
         self.estimator.fit(X, y)
@@ -45,7 +108,9 @@ class BatchedClassifier:
 
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         chunks = []
-        for start in range(0, len(X), self.batch_size):
+        started = monotonic()
+        n_batches = (len(X) + self.batch_size - 1) // self.batch_size
+        for batch_number, start in enumerate(range(0, len(X), self.batch_size), start=1):
             batch = np.asarray(
                 self.estimator.predict_proba(X.iloc[start:start + self.batch_size]),
                 dtype=float,
@@ -55,6 +120,17 @@ class BatchedClassifier:
             if not np.isfinite(batch).all():
                 raise ValueError("Foundation model returned non-finite probabilities")
             chunks.append(batch)
+            if self.progress_callback is not None and (
+                batch_number % self.progress_every_batches == 0 or batch_number == n_batches
+            ):
+                processed = min(start + self.batch_size, len(X))
+                elapsed = monotonic() - started
+                eta = elapsed * (len(X) - processed) / max(processed, 1)
+                self.progress_callback(
+                    f"fold {self.fold}/{self.n_folds}: {self.prediction_stage} prediction "
+                    f"batch {batch_number}/{n_batches}, {processed:,}/{len(X):,} rows "
+                    f"({elapsed:,.0f}s elapsed, ~{eta:,.0f}s remaining)"
+                )
         return np.concatenate(chunks, axis=0)
 
 
@@ -80,7 +156,7 @@ def build_foundation_model(model_name, args, pos_weight, use_early_stopping):
         )
     else:
         raise ValueError(f"Unsupported foundation model: {model_name}")
-    return BatchedClassifier(estimator, args.predict_batch_size)
+    return BatchedClassifier(estimator, args.predict_batch_size, args.progress_every_batches)
 
 
 def fit_foundation_model(*, model, model_name, args, X_train, y_train, X_val, y_val):
@@ -93,6 +169,35 @@ def package_version(name: str) -> str:
         return importlib.metadata.version(name)
     except importlib.metadata.PackageNotFoundError:
         return "not installed"
+
+
+def require_cuda_device(device_name: str) -> dict[str, str | int]:
+    """Fail before CV if the requested CUDA device is absent or unusable."""
+    if not re.fullmatch(r"cuda(?::\d+)?", device_name):
+        raise ValueError(
+            f"GPU-only benchmark requires a CUDA device such as cuda:0, got {device_name!r}"
+        )
+    try:
+        import torch
+    except ImportError as exc:
+        raise RuntimeError("PyTorch is required for the GPU-only benchmark") from exc
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA is unavailable to PyTorch; refusing to run on CPU")
+    index = int(device_name.split(":", 1)[1]) if ":" in device_name else 0
+    if index >= torch.cuda.device_count():
+        raise RuntimeError(
+            f"Requested {device_name}, but PyTorch sees only {torch.cuda.device_count()} CUDA device(s)"
+        )
+    # An allocation and synchronization catch driver/runtime errors before any
+    # expensive model fit. Explicit estimator device settings then prevent a
+    # model's default 'auto' selection from silently falling back to CPU.
+    try:
+        probe = torch.ones(1, device=f"cuda:{index}")
+        torch.cuda.synchronize(index)
+        del probe
+    except Exception as exc:
+        raise RuntimeError(f"Cannot allocate on {device_name}: {exc}") from exc
+    return {"device": f"cuda:{index}", "gpu_name": torch.cuda.get_device_name(index), "visible_index": index}
 
 
 def load_cv_frame(path: Path) -> tuple[pd.DataFrame, list[str]]:
@@ -172,10 +277,14 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bootstrap_block_hours", type=float, default=168.0)
     parser.add_argument("--random_state", type=int, default=1233)
     parser.add_argument("--utility_tolerance", type=float, default=0.01)
-    parser.add_argument("--tabpfn_device", default="auto")
-    parser.add_argument("--causilo_device", default="auto")
+    parser.add_argument("--tabpfn_device", default="cuda:0", help="CUDA device for TabPFN 3.5; CPU/auto are rejected")
+    parser.add_argument("--causilo_device", default="cuda:0", help="CUDA device for Causilo; CPU/auto are rejected")
     parser.add_argument("--causilo_n_estimators", type=int, default=8)
     parser.add_argument("--predict_batch_size", type=int, default=512)
+    parser.add_argument("--progress_interval_seconds", type=float, default=60.0,
+                        help="heartbeat interval during long fit/scoring stages")
+    parser.add_argument("--progress_every_batches", type=int, default=1,
+                        help="report every N completed prediction batches")
     return parser
 
 
@@ -186,6 +295,8 @@ def main() -> None:
         parser.error("target_window and target_threshold must be positive")
     if args.predict_batch_size < 1 or args.causilo_n_estimators < 1:
         parser.error("predict_batch_size and causilo_n_estimators must be positive")
+    if args.progress_interval_seconds <= 0 or args.progress_every_batches < 1:
+        parser.error("progress_interval_seconds and progress_every_batches must be positive")
     if args.n_bootstrap < 0 or args.threshold_grid_size < 2:
         parser.error("n_bootstrap must be non-negative and threshold_grid_size >= 2")
     if args.max_lead_hours is None:
@@ -207,7 +318,16 @@ def main() -> None:
         if versions[package] == "not installed":
             parser.error(f"{package} is not installed in this Python environment")
 
-    print(f"Foundation model package versions: {versions}")
+    gpu_info = {}
+    for model_name in args.model_names:
+        device_name = args.tabpfn_device if model_name == "tabpfn_3_5" else args.causilo_device
+        try:
+            gpu_info[model_name] = require_cuda_device(device_name)
+        except (ValueError, RuntimeError) as exc:
+            parser.error(str(exc))
+
+    print(f"Foundation model package versions: {versions}", flush=True)
+    print(f"Verified CUDA devices: {gpu_info}", flush=True)
     for alpha in args.alphas:
         args.alpha = alpha
         dataset_name = (
@@ -216,11 +336,11 @@ def main() -> None:
         )
         dataset_path = args.dataset_dir / dataset_name
         df, feature_cols = load_cv_frame(dataset_path)
-        print(f"alpha={alpha:g}: {len(df)} rows, {len(feature_cols)} features from {dataset_path}")
+        print(f"alpha={alpha:g}: {len(df)} rows, {len(feature_cols)} features from {dataset_path}", flush=True)
         base_run_name = f"threshold_{args.target_threshold}_alpha_{alpha}"
         summaries = []
         for model_name in args.model_names:
-            print(f"Running {model_name}, alpha={alpha:g}, threshold={args.target_threshold} bp")
+            print(f"Running {model_name}, alpha={alpha:g}, threshold={args.target_threshold} bp", flush=True)
             logger = LocalLightningLogger(
                 base_dir=args.log_dir, experiment_name=args.experiment_name,
                 run_name=f"{base_run_name}_{model_name}_alpha_{alpha}",
@@ -230,15 +350,22 @@ def main() -> None:
                 "dataset_path": str(dataset_path), "model_name": model_name,
                 "n_rows": len(df), "n_features": len(feature_cols),
                 "package_versions": versions,
+                "gpu_info": gpu_info[model_name],
                 "tabpfn_version": "3.5" if model_name == "tabpfn_3_5" else None,
                 "validation_used_for_fit": False,
             })
-            summaries.append(run_expanding_window_cv(
-                df=df, feature_cols=feature_cols, target_col="target",
-                model_name=model_name, args=args, logger=logger,
-                model_factory=build_foundation_model,
-                fit_callback=fit_foundation_model,
-            ))
+            with ProgressReporter(
+                f"{model_name} alpha={alpha:g}",
+                logger.artifact_dir / "cv_progress.log",
+                args.progress_interval_seconds,
+            ) as progress:
+                summaries.append(run_expanding_window_cv(
+                    df=df, feature_cols=feature_cols, target_col="target",
+                    model_name=model_name, args=args, logger=logger,
+                    model_factory=build_foundation_model,
+                    fit_callback=fit_foundation_model,
+                    progress_callback=progress.update,
+                ))
             gc.collect()
 
         summary_df = select_within_alpha(pd.DataFrame(summaries), args.utility_tolerance)
@@ -252,6 +379,7 @@ def main() -> None:
             "false_alert_budget_per_month": args.false_alert_budget_per_month,
             "effective_embargo_hours": args.effective_embargo_hours,
             "package_versions": versions,
+            "gpu_info": gpu_info,
         })
         experiment_logger.save_dataframe(
             summary_df, "comparison/model_comparison_summary.csv",
