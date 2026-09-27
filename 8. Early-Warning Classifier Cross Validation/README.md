@@ -35,14 +35,11 @@ bash update_data.sh
 - Move terminal into this specific quantlet:
 
 ```bash
-cd 8.\ Early-Warning\ Model/
+cd '8. Early-Warning Classifier Cross Validation/'
 ```
 
-- Install requirements:
-
-```bash
-pip install -r requirements.txt
-```
+- Activate the VM environment containing the tree-model dependencies and, for
+  the foundation benchmark, `tabpfn` and `causilo`.
 
 - The first shell script runs full 5-fold cross-validation for all models and automatically updates the preprocessed datasets:
 
@@ -61,6 +58,65 @@ bash compare_model_cv.sh
 ```bash
 bash full_retraining.sh
 ```
+
+## Tabular foundation-model benchmark
+
+Run [TabPFN 3.5](https://github.com/PriorLabs/TabPFN) and
+[Causilo](https://github.com/nums-ai/causilo) on the same six 15-bp datasets and
+the same five-fold operational CV protocol as the tree models:
+
+```bash
+bash compare_foundation_model_cv_15bp.sh
+```
+
+Both models are pinned to `cuda:0` by default. The runner checks that PyTorch
+can allocate on the selected GPU and stops before CV if CUDA is unavailable;
+it never silently switches to CPU. Use `--tabpfn_device cuda:1` and
+`--causilo_device cuda:1` to select another visible GPU. The verified GPU name
+and device are recorded in each run's `hparams.json`.
+
+The default dataset directory is `../9. SHAP explanations of Early Warning Model/preprocessed_datasets`;
+override it with `--dataset_dir` if your VM stores those Parquet files elsewhere.
+The first fit may need access to each model's checkpoint. To try one alpha and
+one model first:
+
+```bash
+bash compare_foundation_model_cv_15bp.sh --alphas 0.3 --model_names tabpfn_3_5 --n_bootstrap 50
+```
+
+For reported results, run the full defaults (`n_bootstrap=1000`).
+TabPFN now uses `--tabpfn_train_chunk_size 4096` by default. Within each
+training fold, it forms disjoint, target-stratified row chunks from fit rows
+only and assigns them as TabPFN ensemble contexts. Every fit row is included,
+and chunks are repeated equally when needed to reach at least eight ensemble
+members (`--tabpfn_chunk_min_estimators`). The validation and test rows are
+never included. No single member sees the entire training history, so this
+is a **different model specification** from full-context TabPFN; report the
+chunk size and do not pool its results with an unchunked run. Use
+`--tabpfn_train_chunk_size 0` to disable this strategy. Causilo is unchanged.
+The realized chunk sizes and ensemble-member counts are recorded per fold in
+`cv/fold_metrics.csv` and announced in `artifacts/cv_progress.log`.
+
+`--predict_batch_size` starts at 64 rows by default. On a CUDA out-of-memory
+error, the runner retries the same rows at half the batch size, down to one
+row, and keeps the smaller size for subsequent predictions. This does not
+change fit rows or CV folds, and all prediction rows are retained in order.
+Record the realized batch sizes from `cv_progress.log` when reporting a run;
+as with other inference settings, check numerical reproducibility if batch
+size changes. If even one prediction row fails, the training context may be
+too large for the available GPU memory; try a smaller TabPFN training chunk,
+free memory held by other GPU processes, or use a larger GPU.
+
+The terminal now reports every prediction batch, CV phase, and an elapsed-time
+heartbeat every 60 seconds during slow fits or scoring. Each model run also
+writes `artifacts/cv_progress.log` under its `lightning_logs` directory. Use
+`--progress_every_batches 5` for fewer batch messages or
+`--progress_interval_seconds 30` for more frequent heartbeats.
+
+Open `foundation_vs_tree_cv.ipynb` after both experiments finish. It loads the
+saved summaries, verifies matching fold boundaries and evaluation settings,
+and exports a comparison table and figure. The notebook's within-model CIs
+are not paired confidence intervals for a foundation-versus-tree difference.
 
 # Generated plots
 

@@ -714,6 +714,8 @@ def run_expanding_window_cv(
             **{f"fold_{k}": v for k, v in primary_test_metrics.items()},
             **primary_bootstrap_ci,
         }
+        if hasattr(model, "training_context_metadata"):
+            row.update(model.training_context_metadata)
         fold_rows.append(row)
         bootstrap_ci_rows.append({
             "fold": fold,
