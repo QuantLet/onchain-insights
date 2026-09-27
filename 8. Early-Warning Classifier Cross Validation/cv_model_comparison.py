@@ -26,6 +26,7 @@ from early_warning_evaluation import (
 )
 
 import argparse
+import gc
 import json
 import shutil
 import joblib
@@ -492,7 +493,15 @@ def safe_auc(y_true, proba):
     return roc_auc_score(y_true, proba)
 
 
-def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logger):
+def run_expanding_window_cv(
+    df, feature_cols, target_col, model_name, args, logger,
+    model_factory=None, fit_callback=None,
+):
+    """Run the shared chronological CV/evaluation with an optional estimator adapter."""
+    if model_factory is None:
+        model_factory = build_model
+    if fit_callback is None:
+        fit_callback = fit_model
     X = df[feature_cols].copy()
     y = df[target_col].astype(int).copy()
 
@@ -553,14 +562,14 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             pd.Series(y_val).nunique() > 1
         )
 
-        model = build_model(
+        model = model_factory(
             model_name=model_name,
             args=args,
             pos_weight=w_pos,
             use_early_stopping=use_early_stopping
         )
 
-        fit_model(
+        fit_callback(
             model=model,
             model_name=model_name,
             args=args,
@@ -708,6 +717,10 @@ def run_expanding_window_cv(df, feature_cols, target_col, model_name, args, logg
             f"event_recall={primary_test_metrics['timely_event_recall']} "
             f"false_alerts/month={primary_test_metrics['false_alerts_per_month']}"
         )
+        # Foundation estimators can retain substantial fit/inference state.
+        # Release the previous fold before constructing the next one.
+        del model
+        gc.collect()
 
     fold_df = pd.DataFrame(fold_rows)
 
