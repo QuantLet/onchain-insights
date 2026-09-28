@@ -101,11 +101,10 @@ the same five-fold operational CV protocol as the tree models:
 bash compare_foundation_model_cv_15bp.sh
 ```
 
-Both models are pinned to `cuda:0` by default. The runner checks that PyTorch
-can allocate on the selected GPU and stops before CV if CUDA is unavailable;
-it never silently switches to CPU. Use `--tabpfn_device cuda:1` and
-`--causilo_device cuda:1` to select another visible GPU. The verified GPU name
-and device are recorded in each run's `hparams.json`.
+Both models run on CPU using their direct, unbatched estimator configuration.
+The runner neither requires CUDA nor splits prediction rows into batches, and
+TabPFN uses its full fit history rather than custom training-context chunks.
+The CPU execution setting is recorded in each run's `hparams.json`.
 
 The default dataset directory is `../9. SHAP explanations of Early Warning Model/preprocessed_datasets`;
 override it with `--dataset_dir` if your VM stores those Parquet files elsewhere.
@@ -116,34 +115,9 @@ one model first:
 bash compare_foundation_model_cv_15bp.sh --alphas 0.3 --model_names tabpfn_3_5 --n_bootstrap 50
 ```
 
-For reported results, run the full defaults (`n_bootstrap=1000`).
-TabPFN now uses `--tabpfn_train_chunk_size 4096` by default. Within each
-training fold, it forms disjoint, target-stratified row chunks from fit rows
-only and assigns them as TabPFN ensemble contexts. Every fit row is included,
-and chunks are repeated equally when needed to reach at least eight ensemble
-members (`--tabpfn_chunk_min_estimators`). The validation and test rows are
-never included. No single member sees the entire training history, so this
-is a **different model specification** from full-context TabPFN; report the
-chunk size and do not pool its results with an unchunked run. Use
-`--tabpfn_train_chunk_size 0` to disable this strategy. Causilo is unchanged.
-The realized chunk sizes and ensemble-member counts are recorded per fold in
-`cv/fold_metrics.csv` and announced in `artifacts/cv_progress.log`.
-
-`--predict_batch_size` starts at 64 rows by default. On a CUDA out-of-memory
-error, the runner retries the same rows at half the batch size, down to one
-row, and keeps the smaller size for subsequent predictions. This does not
-change fit rows or CV folds, and all prediction rows are retained in order.
-Record the realized batch sizes from `cv_progress.log` when reporting a run;
-as with other inference settings, check numerical reproducibility if batch
-size changes. If even one prediction row fails, the training context may be
-too large for the available GPU memory; try a smaller TabPFN training chunk,
-free memory held by other GPU processes, or use a larger GPU.
-
-The terminal now reports every prediction batch, CV phase, and an elapsed-time
-heartbeat every 60 seconds during slow fits or scoring. Each model run also
-writes `artifacts/cv_progress.log` under its `lightning_logs` directory. Use
-`--progress_every_batches 5` for fewer batch messages or
-`--progress_interval_seconds 30` for more frequent heartbeats.
+For reported results, run the full defaults (`n_bootstrap=1000`). The runner
+logs CV phases and a 60-second heartbeat to `artifacts/cv_progress.log`; use
+`--progress_interval_seconds 30` for a shorter heartbeat interval.
 
 Open `foundation_vs_tree_cv.ipynb` after both experiments finish. It loads the
 saved summaries, verifies matching fold boundaries and evaluation settings,

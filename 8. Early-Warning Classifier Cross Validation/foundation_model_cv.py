@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import gc
 import importlib.metadata
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -79,226 +78,6 @@ class ProgressReporter:
         return False
 
 
-class BatchedClassifier:
-    """Limit prediction-batch memory while retaining every fit and test row."""
-
-    def __init__(self, estimator, batch_size: int, progress_every_batches: int = 1):
-        self.estimator = estimator
-        self.batch_size = batch_size
-        self.progress_every_batches = progress_every_batches
-        self.progress_callback = None
-        self.fold = None
-        self.n_folds = None
-        self.prediction_stage = "model"
-
-    def set_progress_context(self, callback, fold: int, n_folds: int) -> None:
-        self.progress_callback = callback
-        self.fold = fold
-        self.n_folds = n_folds
-
-    def set_prediction_stage(self, stage: str) -> None:
-        self.prediction_stage = stage
-
-    def fit(self, X: pd.DataFrame, y: pd.Series):
-        self.estimator.fit(X, y)
-        classes = np.asarray(getattr(self.estimator, "classes_", np.unique(y)))
-        if not np.array_equal(classes, [0, 1]):
-            raise ValueError(f"Expected binary class order [0, 1], got {classes.tolist()}")
-        return self
-
-    @staticmethod
-    def _is_cuda_oom(exc: Exception) -> bool:
-        name = type(exc).__name__.lower()
-        message = str(exc).lower()
-        return (
-            ("outofmemory" in name and "cuda" in (name + message))
-            or "cuda out of memory" in message
-        )
-
-    def _report(self, message: str) -> None:
-        if self.progress_callback is not None:
-            self.progress_callback(message)
-        else:
-            print(message, flush=True)
-
-    def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
-        chunks = []
-        started = monotonic()
-        start = 0
-        batch_number = 0
-        while start < len(X):
-            batch_rows = min(self.batch_size, len(X) - start)
-            try:
-                batch = np.asarray(
-                    self.estimator.predict_proba(X.iloc[start:start + batch_rows]),
-                    dtype=float,
-                )
-            except Exception as exc:
-                if not self._is_cuda_oom(exc):
-                    raise
-                if batch_rows == 1:
-                    raise RuntimeError(
-                        "CUDA out of memory even for one prediction row. The fitted "
-                        "training context may not fit on this GPU. Free other GPU "
-                        "memory, use a larger GPU, or reduce "
-                        "--tabpfn_train_chunk_size for TabPFN. Training-row "
-                        "chunking changes the model definition."
-                    ) from exc
-                next_size = max(1, batch_rows // 2)
-                self._report(
-                    f"fold {self.fold}/{self.n_folds}: CUDA OOM during "
-                    f"{self.prediction_stage} prediction at {batch_rows} rows; "
-                    f"retrying the same rows with batch size {next_size}"
-                )
-                self.batch_size = next_size
-                retry = True
-            else:
-                retry = False
-            if retry:
-                # The exception traceback is released before clearing cached
-                # CUDA allocations; otherwise it may still own GPU tensors.
-                gc.collect()
-                import torch
-
-                torch.cuda.empty_cache()
-                continue
-            if batch.shape != (batch_rows, 2):
-                raise ValueError(f"Unexpected probability shape: {batch.shape}")
-            if not np.isfinite(batch).all():
-                raise ValueError("Foundation model returned non-finite probabilities")
-            chunks.append(batch)
-            start += batch_rows
-            batch_number += 1
-            if self.progress_callback is not None and (
-                batch_number % self.progress_every_batches == 0 or start == len(X)
-            ):
-                elapsed = monotonic() - started
-                eta = elapsed * (len(X) - start) / max(start, 1)
-                self.progress_callback(
-                    f"fold {self.fold}/{self.n_folds}: {self.prediction_stage} prediction "
-                    f"batch {batch_number}, {start:,}/{len(X):,} rows "
-                    f"(batch size {self.batch_size}; "
-                    f"{elapsed:,.0f}s elapsed, ~{eta:,.0f}s remaining)"
-                )
-        return np.concatenate(chunks, axis=0)
-
-
-def stratified_train_chunks(y: pd.Series, chunk_size: int, seed: int) -> list[np.ndarray]:
-    """Partition every fit row exactly once, with both classes in every chunk."""
-    labels = np.asarray(y, dtype=int)
-    if chunk_size < 2:
-        raise ValueError("Training chunk size must be at least two rows")
-    if not np.array_equal(np.unique(labels), [0, 1]):
-        raise ValueError("TabPFN training chunks require both binary classes")
-    n_chunks = (len(labels) + chunk_size - 1) // chunk_size
-    if n_chunks == 1:
-        return [np.arange(len(labels))]
-    counts = np.bincount(labels, minlength=2)
-    if counts.min() < n_chunks:
-        raise ValueError(
-            f"Cannot make {n_chunks} two-class training chunks: the rarer class "
-            f"has only {counts.min()} rows. Increase --tabpfn_train_chunk_size."
-        )
-
-    rng = np.random.default_rng(seed)
-    chunks: list[list[int]] = [[] for _ in range(n_chunks)]
-    for label in (0, 1):
-        indices = np.flatnonzero(labels == label)
-        rng.shuffle(indices)
-        for i, row in enumerate(indices):
-            chunks[i % n_chunks].append(int(row))
-
-    # Per-class round robin can put one extra row in a chunk; rebalance while
-    # leaving at least one example of each class in its original chunk.
-    sizes = [len(chunk) for chunk in chunks]
-    while max(sizes) > chunk_size:
-        source = int(np.argmax(sizes))
-        destination = min(
-            (i for i, size in enumerate(sizes) if size < chunk_size),
-            key=lambda i: (sizes[i], i),
-        )
-        source_labels = labels[chunks[source]]
-        label_to_move = int(np.argmax(np.bincount(source_labels, minlength=2)))
-        position = next(
-            i for i, row in enumerate(chunks[source]) if labels[row] == label_to_move
-        )
-        chunks[destination].append(chunks[source].pop(position))
-        sizes[source] -= 1
-        sizes[destination] += 1
-
-    result = [np.sort(np.asarray(chunk, dtype=int)) for chunk in chunks]
-    if not np.array_equal(np.sort(np.concatenate(result)), np.arange(len(labels))):
-        raise AssertionError("Training chunks did not cover every fit row exactly once")
-    if any(len(np.unique(labels[chunk])) != 2 for chunk in result):
-        raise AssertionError("A training chunk is missing a target class")
-    return result
-
-
-class TabPFNTrainChunkedClassifier(BatchedClassifier):
-    """Use disjoint fit-row contexts across TabPFN's ensemble members."""
-
-    def __init__(self, estimator, batch_size: int, progress_every_batches: int,
-                 train_chunk_size: int, min_estimators: int, random_state: int):
-        super().__init__(estimator, batch_size, progress_every_batches)
-        self.train_chunk_size = train_chunk_size
-        self.min_estimators = min_estimators
-        self.random_state = random_state
-        self.training_context_metadata = {}
-
-    def fit(self, X: pd.DataFrame, y: pd.Series):
-        self.training_context_metadata = {
-            "train_context_strategy": "full",
-            "train_context_chunk_size_limit": self.train_chunk_size,
-            "train_context_n_chunks": 1,
-            "train_context_n_estimators": None,
-            "train_context_chunk_repeats": None,
-            "train_context_min_chunk_rows": len(X),
-            "train_context_max_chunk_rows": len(X),
-        }
-        if self.train_chunk_size:
-            chunks = stratified_train_chunks(y, self.train_chunk_size, self.random_state)
-            if len(chunks) > 1:
-                repeats = max(1, (self.min_estimators + len(chunks) - 1) // len(chunks))
-                contexts = [chunk.tolist() for _ in range(repeats) for chunk in chunks]
-                self.estimator.set_params(
-                    n_estimators=len(contexts),
-                    inference_config={"SUBSAMPLE_SAMPLES": contexts},
-                )
-                self.training_context_metadata.update({
-                    "train_context_strategy": "stratified_disjoint_ensemble_chunks",
-                    "train_context_n_chunks": len(chunks),
-                    "train_context_n_estimators": len(contexts),
-                    "train_context_chunk_repeats": repeats,
-                    "train_context_min_chunk_rows": min(map(len, chunks)),
-                    "train_context_max_chunk_rows": max(map(len, chunks)),
-                })
-                positives = [int(np.count_nonzero(np.asarray(y)[chunk])) for chunk in chunks]
-                self._report(
-                    f"fold {self.fold}/{self.n_folds}: TabPFN training context "
-                    f"{len(X):,} rows -> {len(chunks)} stratified chunks "
-                    f"({min(map(len, chunks)):,}-{max(map(len, chunks)):,} rows, "
-                    f"{min(positives)}-{max(positives)} positives each); "
-                    f"{len(contexts)} ensemble members, every fit row used {repeats} time(s)"
-                )
-            else:
-                self._report(
-                    f"fold {self.fold}/{self.n_folds}: TabPFN training context "
-                    f"uses all {len(X):,} rows in each ensemble member"
-                )
-        super().fit(X, y)
-        actual_estimators = getattr(self.estimator, "n_estimators_", None)
-        if actual_estimators is not None:
-            actual_estimators = int(actual_estimators)
-            expected = self.training_context_metadata["train_context_n_estimators"]
-            if expected is not None and actual_estimators != expected:
-                raise RuntimeError(
-                    f"TabPFN used {actual_estimators} ensemble members, expected {expected}; "
-                    "training-row coverage cannot be guaranteed"
-                )
-            self.training_context_metadata["train_context_n_estimators"] = actual_estimators
-        return self
-
-
 def build_foundation_model(model_name, args, pos_weight, use_early_stopping):
     # No class-weight or early-stopping tuning: both are frozen pretrained
     # estimators. Validation remains entirely held out for threshold selection.
@@ -308,25 +87,17 @@ def build_foundation_model(model_name, args, pos_weight, use_early_stopping):
         from tabpfn.constants import ModelVersion
 
         estimator = TabPFNClassifier.create_default_for_version(
-            ModelVersion.V3_5, device=args.tabpfn_device,
+            ModelVersion.V3_5, device="cpu",
             random_state=args.random_state,
         )
-        return TabPFNTrainChunkedClassifier(
-            estimator, args.predict_batch_size, args.progress_every_batches,
-            args.tabpfn_train_chunk_size, args.tabpfn_chunk_min_estimators,
-            args.random_state,
-        )
+        return estimator
     elif model_name == "causilo":
         from causilo import CausiloClassifier
 
-        estimator = CausiloClassifier(
-            n_estimators=args.causilo_n_estimators,
-            random_state=args.random_state,
-            device=args.causilo_device,
-        )
+        estimator = CausiloClassifier(random_state=args.random_state, device="cpu")
     else:
         raise ValueError(f"Unsupported foundation model: {model_name}")
-    return BatchedClassifier(estimator, args.predict_batch_size, args.progress_every_batches)
+    return estimator
 
 
 def fit_foundation_model(*, model, model_name, args, X_train, y_train, X_val, y_val):
@@ -339,35 +110,6 @@ def package_version(name: str) -> str:
         return importlib.metadata.version(name)
     except importlib.metadata.PackageNotFoundError:
         return "not installed"
-
-
-def require_cuda_device(device_name: str) -> dict[str, str | int]:
-    """Fail before CV if the requested CUDA device is absent or unusable."""
-    if not re.fullmatch(r"cuda(?::\d+)?", device_name):
-        raise ValueError(
-            f"GPU-only benchmark requires a CUDA device such as cuda:0, got {device_name!r}"
-        )
-    try:
-        import torch
-    except ImportError as exc:
-        raise RuntimeError("PyTorch is required for the GPU-only benchmark") from exc
-    if not torch.cuda.is_available():
-        raise RuntimeError("CUDA is unavailable to PyTorch; refusing to run on CPU")
-    index = int(device_name.split(":", 1)[1]) if ":" in device_name else 0
-    if index >= torch.cuda.device_count():
-        raise RuntimeError(
-            f"Requested {device_name}, but PyTorch sees only {torch.cuda.device_count()} CUDA device(s)"
-        )
-    # An allocation and synchronization catch driver/runtime errors before any
-    # expensive model fit. Explicit estimator device settings then prevent a
-    # model's default 'auto' selection from silently falling back to CPU.
-    try:
-        probe = torch.ones(1, device=f"cuda:{index}")
-        torch.cuda.synchronize(index)
-        del probe
-    except Exception as exc:
-        raise RuntimeError(f"Cannot allocate on {device_name}: {exc}") from exc
-    return {"device": f"cuda:{index}", "gpu_name": torch.cuda.get_device_name(index), "visible_index": index}
 
 
 def load_cv_frame(path: Path) -> tuple[pd.DataFrame, list[str]]:
@@ -450,19 +192,8 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bootstrap_block_hours", type=float, default=168.0)
     parser.add_argument("--random_state", type=int, default=1233)
     parser.add_argument("--utility_tolerance", type=float, default=0.01)
-    parser.add_argument("--tabpfn_device", default="cuda:0", help="CUDA device for TabPFN 3.5; CPU/auto are rejected")
-    parser.add_argument("--causilo_device", default="cuda:0", help="CUDA device for Causilo; CPU/auto are rejected")
-    parser.add_argument("--causilo_n_estimators", type=int, default=8)
-    parser.add_argument("--tabpfn_train_chunk_size", type=int, default=4096,
-                        help="maximum fit rows per TabPFN ensemble member; 0 disables chunking")
-    parser.add_argument("--tabpfn_chunk_min_estimators", type=int, default=8,
-                        help="minimum TabPFN members when chunked; rounded up to equal chunk repeats")
-    parser.add_argument("--predict_batch_size", type=int, default=64,
-                        help="initial prediction batch size; halves on CUDA OOM down to one row")
     parser.add_argument("--progress_interval_seconds", type=float, default=60.0,
                         help="heartbeat interval during long fit/scoring stages")
-    parser.add_argument("--progress_every_batches", type=int, default=1,
-                        help="report every N completed prediction batches")
     return parser
 
 
@@ -471,14 +202,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.target_window < 1 or args.target_threshold <= 0:
         parser.error("target_window and target_threshold must be positive")
-    if args.predict_batch_size < 1 or args.causilo_n_estimators < 1:
-        parser.error("predict_batch_size and causilo_n_estimators must be positive")
-    if args.tabpfn_train_chunk_size < 0 or args.tabpfn_train_chunk_size == 1:
-        parser.error("tabpfn_train_chunk_size must be 0 (disabled) or at least 2")
-    if args.tabpfn_chunk_min_estimators < 1:
-        parser.error("tabpfn_chunk_min_estimators must be positive")
-    if args.progress_interval_seconds <= 0 or args.progress_every_batches < 1:
-        parser.error("progress_interval_seconds and progress_every_batches must be positive")
+    if args.progress_interval_seconds <= 0:
+        parser.error("progress_interval_seconds must be positive")
     if args.n_bootstrap < 0 or args.threshold_grid_size < 2:
         parser.error("n_bootstrap must be non-negative and threshold_grid_size >= 2")
     if args.max_lead_hours is None:
@@ -502,16 +227,8 @@ def main() -> None:
         if versions[package] == "not installed":
             parser.error(f"{package} is not installed in this Python environment")
 
-    gpu_info = {}
-    for model_name in args.model_names:
-        device_name = args.tabpfn_device if model_name == "tabpfn_3_5" else args.causilo_device
-        try:
-            gpu_info[model_name] = require_cuda_device(device_name)
-        except (ValueError, RuntimeError) as exc:
-            parser.error(str(exc))
-
     print(f"Foundation model package versions: {versions}", flush=True)
-    print(f"Verified CUDA devices: {gpu_info}", flush=True)
+    print("Foundation models use their unbatched CPU estimator configuration.", flush=True)
     for alpha in args.alphas:
         args.alpha = alpha
         dataset_name = (
@@ -534,7 +251,7 @@ def main() -> None:
                 "dataset_path": str(dataset_path), "model_name": model_name,
                 "n_rows": len(df), "n_features": len(feature_cols),
                 "package_versions": versions,
-                "gpu_info": gpu_info[model_name],
+                "execution_device": "cpu",
                 "tabpfn_version": "3.5" if model_name == "tabpfn_3_5" else None,
                 "validation_used_for_fit": False,
             })
@@ -563,7 +280,7 @@ def main() -> None:
             "false_alert_budget_per_month": args.false_alert_budget_per_month,
             "effective_embargo_hours": args.effective_embargo_hours,
             "package_versions": versions,
-            "gpu_info": gpu_info,
+            "execution_device": "cpu",
         })
         experiment_logger.save_dataframe(
             summary_df, "comparison/model_comparison_summary.csv",
