@@ -11,7 +11,7 @@ LOG_DIR="lightning_logs"
 EXPERIMENT_NAME="cv_model_comparison_$(date +%Y-%m-%d)${EXPERIMENT_SUFFIX:+_${EXPERIMENT_SUFFIX}}"
 FULL_EXPERIMENT_NAME="${EXPERIMENT_NAME}_full_retraining"
 
-ALPHAS=(0.1 0.3 0.5 1.0 1.5 2.0)
+ALPHAS=(0.1 0.3 0.5 1.0)
 MODELS=(xgboost lightgbm catboost random_forest)
 
 TARGET_WINDOW=24
@@ -21,18 +21,18 @@ DEPEG_THRESHOLDS=(10 15 25)
 if [[ -n "${DEPEG_THRESHOLDS_OVERRIDE:-}" ]]; then
   read -r -a DEPEG_THRESHOLDS <<< "${DEPEG_THRESHOLDS_OVERRIDE}"
 fi
-MAX_DEPTH=6
-N_ESTIMATORS=800
+MAX_DEPTH=7
+N_ESTIMATORS=1000
 EARLY_STOPPING_ROUNDS=200
 SCALER="robust"
 DEPEG_SIDE="both"
-EVAL_METRIC="auc"
+EVAL_METRIC="auprc"
 # Model selection is event-level utility at this operating point.  The full
 # list is also evaluated so the selection-frontier plot can show sensitivity.
 FALSE_ALERT_BUDGET=4.0
 FALSE_ALERT_BUDGETS=(0.5 1.0 2.0 3.0 4.0)
 UTILITY_TOLERANCE=0.01
-FALSE_ALERT_COST=0.25
+FALSE_ALERT_COST=0.05
 MIN_LEAD_HOURS=1
 MIN_LEAD_UTILITY=0.50
 UTILITY_POWER=1.0
@@ -73,7 +73,7 @@ for TARGET_THRESHOLD in "${DEPEG_THRESHOLDS[@]}"; do
       --cv_embargo_hours 48 \
       --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
       --false_alert_budgets "${FALSE_ALERT_BUDGETS[@]}" \
-      --no_hard_false_alert_budget \
+      --hard_false_alert_budget \
       --false_alert_cost "${FALSE_ALERT_COST}" \
       --min_lead_hours "${MIN_LEAD_HOURS}" \
       --min_lead_utility "${MIN_LEAD_UTILITY}" \

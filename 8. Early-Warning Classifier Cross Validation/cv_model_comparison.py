@@ -342,7 +342,7 @@ def build_model(model_name, args, pos_weight, use_early_stopping=True):
             reg_lambda=1.0,
             min_child_weight=1.0,
             objective="binary:logistic",
-            eval_metric="auc",
+            eval_metric="auprc",
             early_stopping_rounds=args.early_stopping_rounds if use_early_stopping else None,
             scale_pos_weight=pos_weight,
             random_state=1233,
@@ -372,8 +372,8 @@ def build_model(model_name, args, pos_weight, use_early_stopping=True):
             learning_rate=args.learning_rate,
             depth=args.max_depth,
             loss_function="Logloss",
-            eval_metric="AUC",
-            class_weights=[1.0, float(pos_weight)],
+            eval_metric="AUPRC",
+            scale_pos_weight=pos_weight,
             random_seed=1233,
             verbose=False,
         )
@@ -422,7 +422,7 @@ def fit_model(model, model_name, args, X_train, y_train, X_val=None, y_val=None)
                 X_train, y_train,
                 eval_set=(X_val, y_val),
                 use_best_model=True,
-                verbose=False
+                verbose=False,            
             )
         else:
             model.fit(X_train, y_train, verbose=False)
