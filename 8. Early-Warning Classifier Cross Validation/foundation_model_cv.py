@@ -150,7 +150,7 @@ def select_within_alpha(summary_df: pd.DataFrame, tolerance: float) -> pd.DataFr
     result["selection_rank"] = np.nan
     result.loc[candidates.index, "selection_rank"] = np.arange(1, len(candidates) + 1)
     result["selection_policy"] = (
-        "Mean outer-fold operational utility per calendar month; "
+        "Mean outer-fold operational utility per declustered depeg event; "
         "within utility tolerance: higher recall, lower false-alert burden, "
         "lower utility variation"
     )
@@ -178,7 +178,7 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--false_alert_budget_per_month", type=float, default=4.0)
     parser.add_argument("--false_alert_budgets", type=float, nargs="+", default=[0.5, 1.0, 2.0, 3.0, 4.0])
     parser.add_argument("--false_alert_cost", type=float, default=0.25)
-    parser.add_argument("--no_hard_false_alert_budget", dest="no_hard_false_alert_budget", action="store_true", default=True)
+    parser.add_argument("--no_hard_false_alert_budget", dest="no_hard_false_alert_budget", action="store_true", default=False)
     parser.add_argument("--hard_false_alert_budget", dest="no_hard_false_alert_budget", action="store_false")
     parser.add_argument("--min_lead_hours", type=float, default=1.0)
     parser.add_argument("--max_lead_hours", type=float, default=None)

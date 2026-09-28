@@ -32,7 +32,9 @@ EVAL_METRIC="auprc"
 FALSE_ALERT_BUDGET=4.0
 FALSE_ALERT_BUDGETS=(0.5 1.0 2.0 3.0 4.0)
 UTILITY_TOLERANCE=0.01
-FALSE_ALERT_COST=0.05
+# One false alert costs 0.25 utility units.  Because a one-hour warning earns
+# 0.50, two unnecessary alert episodes offset one such correct warning.
+FALSE_ALERT_COST=0.25
 MIN_LEAD_HOURS=1
 MIN_LEAD_UTILITY=0.50
 UTILITY_POWER=1.0

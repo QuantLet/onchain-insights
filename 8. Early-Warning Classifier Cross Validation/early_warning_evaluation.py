@@ -189,8 +189,10 @@ def evaluate_early_warning(
     full warning window inside the evaluated frame, and the final
     ``min_lead_hours`` cannot start a new scored alert episode.  This avoids
     crediting or penalising alerts whose outcome lies outside the fold.  The
-    primary utility is total operational value per calendar month: event value
-    and false-alert episode costs use the same calendar-time denominator.
+    primary utility is operational value per realised depeg event: event value
+    and false-alert episode costs use the same declustered-event denominator.
+    The separate false-alert budget remains an episodes-per-calendar-month
+    validation constraint.
     """
     if max_lead_hours < min_lead_hours:
         raise ValueError("max_lead_hours must be >= min_lead_hours")
@@ -275,10 +277,13 @@ def evaluate_early_warning(
     duration_hours = max((score_end - score_start).total_seconds() / 3600.0 + 1.0, 1.0)
     duration_months = duration_hours / HOURS_PER_MONTH
     fa_per_month = len(false_alert_times) / duration_months
-    event_value_per_month = float(np.sum(event_utilities) / duration_months)
-    false_alert_cost_per_month = float(false_alert_cost * len(false_alert_times) / duration_months)
-    utility = event_value_per_month - false_alert_cost_per_month
-    event_utility = float(np.mean(event_utilities)) if event_utilities else np.nan
+    n_events = len(event_utilities)
+    event_value_total = float(np.sum(event_utilities))
+    false_alert_cost_total = float(false_alert_cost * len(false_alert_times))
+    event_value_per_event = event_value_total / n_events if n_events else np.nan
+    false_alert_cost_per_event = false_alert_cost_total / n_events if n_events else np.nan
+    utility = event_value_per_event - false_alert_cost_per_event if n_events else np.nan
+    event_utility = event_value_per_event
     precision = len(matched_alerts) / len(alert_times) if len(alert_times) else np.nan
 
     metrics = {
@@ -296,14 +301,13 @@ def evaluate_early_warning(
         "false_alerts_per_month": float(fa_per_month),
         "alert_episode_precision": float(precision) if not np.isnan(precision) else np.nan,
         "event_utility": event_utility,
-        "event_value_total": float(np.sum(event_utilities)),
-        "event_value_per_month": event_value_per_month,
-        "false_alert_cost_total": float(false_alert_cost * len(false_alert_times)),
-        "false_alert_cost_per_month": false_alert_cost_per_month,
-        # Retained for downstream compatibility.  This is now explicitly a
-        # calendar-time utility, rather than a per-event average minus a rate.
+        "false_alerts_per_event": float(len(false_alert_times) / n_events) if n_events else np.nan,
+        "event_value_total": event_value_total,
+        "event_value_per_event": event_value_per_event,
+        "false_alert_cost_total": false_alert_cost_total,
+        "false_alert_cost_per_event": false_alert_cost_per_event,
         "event_utility_score": utility,
-        "operational_utility_per_month": utility,
+        "operational_utility_per_event": utility,
         "evaluation_hours": float(duration_hours),
         "evaluation_months": float(duration_months),
     }
@@ -383,10 +387,12 @@ def event_block_bootstrap_ci(
 ) -> Tuple[Dict[str, float], Dict[str, np.ndarray]]:
     """Paired event/block bootstrap confidence intervals.
 
-    Detected-event contributions are resampled at the event level, while false
-    alert episodes are resampled as contiguous calendar blocks.  Resampling rows
-    would understate uncertainty because hourly observations are serially
-    dependent.
+    Event contributions are resampled at the declustered-event level.  False
+    alert episodes are resampled as contiguous calendar blocks, then their
+    penalised count is divided by the resampled event count in the utility.
+    The episodes/month draw remains a separate diagnostic for the hard
+    validation constraint. Resampling rows would understate uncertainty because
+    hourly observations are serially dependent.
     """
     event_utilities = bootstrap_inputs["event_utilities"]
     detected = bootstrap_inputs["detected"]
@@ -430,8 +436,10 @@ def event_block_bootstrap_ci(
         )
         samples["false_alerts_per_month"][draw] = fa_rate
         samples["timely_event_recall"][draw] = detected[event_idx].mean()
-        event_value_per_month = event_utilities[event_idx].sum() / (block_duration[block_idx].sum() / HOURS_PER_MONTH)
-        samples["event_utility_score"][draw] = event_value_per_month - false_alert_cost * fa_rate
+        false_alert_count = false_by_block[block_idx].sum()
+        samples["event_utility_score"][draw] = (
+            event_utilities[event_idx].sum() - false_alert_cost * false_alert_count
+        ) / n_events
         detected_leads = lead_hours[rng.integers(0, len(lead_hours), size=len(lead_hours))] if len(lead_hours) else []
         if len(detected_leads):
             samples["median_lead_hours"][draw] = np.median(detected_leads)
@@ -453,10 +461,11 @@ def _empty_metrics(threshold: float) -> Dict[str, float]:
         "alert_episodes": 0, "boundary_censored_alert_episodes": 0,
         "matched_alert_episodes": 0, "false_alert_episodes": 0,
         "false_alerts_per_month": np.nan, "alert_episode_precision": np.nan,
-        "event_utility": np.nan, "event_value_total": 0.0,
-        "event_value_per_month": np.nan, "false_alert_cost_total": 0.0,
-        "false_alert_cost_per_month": np.nan, "event_utility_score": np.nan,
-        "operational_utility_per_month": np.nan, "evaluation_hours": 0.0,
+        "event_utility": np.nan, "false_alerts_per_event": np.nan,
+        "event_value_total": 0.0, "event_value_per_event": np.nan,
+        "false_alert_cost_total": 0.0, "false_alert_cost_per_event": np.nan,
+        "event_utility_score": np.nan, "operational_utility_per_event": np.nan,
+        "evaluation_hours": 0.0,
         "evaluation_months": 0.0,
     }
 

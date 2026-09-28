@@ -52,22 +52,27 @@ bash compare_model_cv_15bp.sh
 Model selection uses the full history through expanding chronological folds.
 Within each fold, the alert cutoff is selected on a chronological validation
 tail and then evaluated on the later outer-fold period. The default runner
-selects the cutoff by penalised utility without a hard false-alert cap; the
-0.5–4 episode/month caps remain available as sensitivity specifications.
+selects the cutoff subject to the configured hard validation budget of four
+false-alert episodes per month; the 0.5–4 episode/month caps are also reported
+as sensitivity specifications. `--no_hard_false_alert_budget` is available for
+a penalty-only sensitivity run, but is not the default policy.
 
-The primary score is operational utility per calendar month:
+The primary score is operational utility per declustered depeg event:
 
 \[
-U_{\mathrm{month}} = \frac{\sum_e v(\ell_e) - c_{\mathrm{FA}}N_{\mathrm{FA}}}{M}.
+U_{\mathrm{event}} =
+\frac{\sum_{e\in E} v(\ell_e) - c_{\mathrm{FA}}N_{\mathrm{FA}}}{|E|}.
 \]
 
 `c_FA` is therefore the cost of one unnecessary vault intervention relative to
-one perfectly timed warning. Both event value and false-alert episode cost use
-the same calendar-time denominator. The default lead-time curve rises from
-0.50 at one hour to one at five hours and then plateaus through the 24-hour
-forecast horizon; use `--utility_target_lead_hours` to run a sensitivity curve.
-The default false-alert cost is 0.25, so two unnecessary alert episodes offset
-the utility of one correctly timed one-hour warning (0.50).
+one perfectly timed warning. Both the correctly warned events and false-alert
+episodes use the same depeg-event denominator. The hard feasibility constraint
+remains independently expressed in false-alert episodes per calendar month.
+The default lead-time curve rises from 0.50 at one hour to one at five hours
+and then plateaus through the 24-hour forecast horizon; use
+`--utility_target_lead_hours` to run a sensitivity curve. The default
+false-alert cost is 0.25, so two unnecessary alert episodes offset the utility
+of one correctly timed one-hour warning (0.50).
 
 Realised depegs are declustered: a new event requires 24 threshold-free hours
 after the prior depeg (`--depeg_event_reset_hours`). Alerts are likewise counted

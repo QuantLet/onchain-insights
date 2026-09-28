@@ -817,8 +817,8 @@ def run_expanding_window_cv(
         logger.log_metric(f"fold_{fold}_fpr_at_best_threshold", fold_metrics["fpr_at_best_threshold"])
         logger.log_metric(f"fold_{fold}_event_utility_score", primary_test_metrics["event_utility_score"])
         logger.log_metric(
-            f"fold_{fold}_operational_utility_per_month",
-            primary_test_metrics["operational_utility_per_month"],
+            f"fold_{fold}_operational_utility_per_event",
+            primary_test_metrics["operational_utility_per_event"],
         )
         logger.log_metric(f"fold_{fold}_timely_event_recall", primary_test_metrics["timely_event_recall"])
         logger.log_metric(f"fold_{fold}_false_alerts_per_month", primary_test_metrics["false_alerts_per_month"])
@@ -908,8 +908,8 @@ def run_expanding_window_cv(
     logger.log_metric("cv_fpr_at_best_threshold_std", cv_fpr_best_std)
     logger.log_metric("cv_event_utility_score_mean", cv_utility_mean)
     logger.log_metric("cv_event_utility_score_std", cv_utility_std)
-    logger.log_metric("cv_operational_utility_per_month_mean", cv_utility_mean)
-    logger.log_metric("cv_operational_utility_per_month_std", cv_utility_std)
+    logger.log_metric("cv_operational_utility_per_event_mean", cv_utility_mean)
+    logger.log_metric("cv_operational_utility_per_event_std", cv_utility_std)
     logger.log_metric("cv_timely_event_recall_mean", cv_event_recall_mean)
     logger.log_metric("cv_timely_event_recall_std", cv_event_recall_std)
     logger.log_metric("cv_false_alerts_per_month_mean", cv_false_alerts_mean)
@@ -1004,7 +1004,7 @@ def run_expanding_window_cv(
     ax.axhline(0, color="gray", linewidth=1, linestyle="--")
     ax.set_title(f"{model_name} – operational utility by chronological fold")
     ax.set_xlabel("Fold")
-    ax.set_ylabel("Utility / month")
+    ax.set_ylabel("Utility / depeg event")
     ax.set_xticks(fold_df["fold"].tolist())
     ax.grid(alpha=0.3)
     fig.tight_layout()
@@ -1051,8 +1051,8 @@ def run_expanding_window_cv(
         "false_alert_budget_per_month": primary_budget,
         "cv_event_utility_score_mean": None if np.isnan(cv_utility_mean) else cv_utility_mean,
         "cv_event_utility_score_std": None if np.isnan(cv_utility_std) else cv_utility_std,
-        "cv_operational_utility_per_month_mean": None if np.isnan(cv_utility_mean) else cv_utility_mean,
-        "cv_operational_utility_per_month_std": None if np.isnan(cv_utility_std) else cv_utility_std,
+        "cv_operational_utility_per_event_mean": None if np.isnan(cv_utility_mean) else cv_utility_mean,
+        "cv_operational_utility_per_event_std": None if np.isnan(cv_utility_std) else cv_utility_std,
         "cv_timely_event_recall_mean": None if np.isnan(cv_event_recall_mean) else cv_event_recall_mean,
         "cv_timely_event_recall_std": None if np.isnan(cv_event_recall_std) else cv_event_recall_std,
         "cv_false_alerts_per_month_mean": None if np.isnan(cv_false_alerts_mean) else cv_false_alerts_mean,
@@ -1157,13 +1157,16 @@ if __name__ == "__main__":
         "--false_alert_cost",
         type=float,
         default=0.25,
-        help="cost of one unnecessary alert episode, in units of a perfectly timed warning; utility is reported per calendar month",
+        help=(
+            "cost of one unnecessary alert episode, in units of a perfectly "
+            "timed warning; utility is reported per declustered depeg event"
+        ),
     )
     cv_args.add_argument(
         "--no_hard_false_alert_budget",
         dest="no_hard_false_alert_budget",
         action="store_true",
-        default=True,
+        default=False,
         help="select the primary alert threshold by penalised utility only, without rejecting thresholds above the false-alert budget",
     )
     cv_args.add_argument(
@@ -1444,7 +1447,7 @@ if __name__ == "__main__":
         else f"at a fixed false-alert budget of {args.false_alert_budget_per_month:.3f} episodes/month"
     )
     summary_df["selection_policy"] = (
-        "Primary: highest mean outer-fold operational utility per calendar month "
+        "Primary: highest mean outer-fold operational utility per declustered depeg event "
         f"{hard_budget_description}. Among models within {args.utility_tolerance:.4f} utility "
         "of the leader: higher timely event recall, then lower false-alert burden and lower utility variation."
     )
@@ -1473,9 +1476,9 @@ if __name__ == "__main__":
     colors = ["darkorange" if selected else "steelblue" for selected in summary_df["selected_model"]]
     ax[0].bar(summary_df["model_name"], summary_df["cv_event_utility_score_mean"],
               yerr=summary_df["cv_event_utility_score_std"], color=colors, capsize=4)
-    ax[0].set_title("Mean OOS operational utility / month (primary)")
+    ax[0].set_title("Mean OOS operational utility / depeg event (primary)")
     ax[0].set_xlabel("Model")
-    ax[0].set_ylabel("Utility / month")
+    ax[0].set_ylabel("Utility / depeg event")
     ax[0].grid(axis="y", alpha=0.3)
     ax[1].bar(summary_df["model_name"], summary_df["cv_timely_event_recall_mean"],
               yerr=summary_df["cv_timely_event_recall_std"], color=colors, capsize=4)
