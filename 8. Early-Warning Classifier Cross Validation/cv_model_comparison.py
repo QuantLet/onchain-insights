@@ -367,7 +367,7 @@ def build_model(model_name, args, pos_weight, use_early_stopping=True):
         )
 
     elif model_name == "catboost":
-        return CatBoostClassifier(
+        params = dict(
             iterations=args.n_estimators,
             learning_rate=args.learning_rate,
             depth=args.max_depth,
@@ -377,6 +377,12 @@ def build_model(model_name, args, pos_weight, use_early_stopping=True):
             random_seed=1233,
             verbose=False,
         )
+        if use_early_stopping:
+            params.update(
+                od_type="Iter",
+                od_wait=args.early_stopping_rounds,
+            )
+        return CatBoostClassifier(**params)
 
     elif model_name == "random_forest":
         return RandomForestClassifier(
@@ -386,10 +392,55 @@ def build_model(model_name, args, pos_weight, use_early_stopping=True):
             random_state=1233,
             n_jobs=args.n_jobs,
             max_features=args.rf_max_features,
+            warm_start=use_early_stopping,
         )
 
     else:
         raise ValueError(f"Unsupported model_name: {model_name}")
+
+
+def _fit_random_forest_with_early_stopping(model, args, X_train, y_train, X_val, y_val):
+    """Grow a forest in batches and retain the validation-AUC-best prefix.
+
+    sklearn's RandomForestClassifier has no built-in early stopping. Warm-start
+    growth supplies equivalent overfitting detection without training on the
+    validation tail: every checkpoint adds trees, the chronological validation
+    AUC is monitored, and trees beyond the best checkpoint are discarded.
+    """
+    step = min(args.rf_early_stopping_step, args.n_estimators)
+    checkpoints = list(range(step, args.n_estimators + 1, step))
+    if checkpoints[-1] != args.n_estimators:
+        checkpoints.append(args.n_estimators)
+    patience_checkpoints = max(1, int(np.ceil(args.early_stopping_rounds / step)))
+    best_auc = -np.inf
+    best_trees = checkpoints[0]
+    stale_checkpoints = 0
+
+    model.set_params(warm_start=True)
+    for n_trees in checkpoints:
+        model.set_params(n_estimators=n_trees)
+        model.fit(X_train, y_train)
+        validation_auc = roc_auc_score(y_val, model.predict_proba(X_val)[:, 1])
+        if validation_auc > best_auc + 1e-12:
+            best_auc = float(validation_auc)
+            best_trees = n_trees
+            stale_checkpoints = 0
+        else:
+            stale_checkpoints += 1
+            if stale_checkpoints >= patience_checkpoints:
+                break
+
+    if len(model.estimators_) > best_trees:
+        model.estimators_ = model.estimators_[:best_trees]
+    model.set_params(n_estimators=best_trees, warm_start=False)
+    model.early_stopping_metadata = {
+        "early_stopping_method": "validation_auc_warm_start",
+        "early_stopping_best_iteration": int(best_trees),
+        "early_stopping_best_validation_auc": float(best_auc),
+        "early_stopping_patience_trees": int(args.early_stopping_rounds),
+        "early_stopping_stopped_early": bool(best_trees < args.n_estimators),
+    }
+    return model
 
 
 def fit_model(model, model_name, args, X_train, y_train, X_val=None, y_val=None):
@@ -422,16 +473,28 @@ def fit_model(model, model_name, args, X_train, y_train, X_val=None, y_val=None)
                 X_train, y_train,
                 eval_set=(X_val, y_val),
                 use_best_model=True,
-                verbose=False,            
+                verbose=False,
             )
+            model.early_stopping_metadata = {
+                "early_stopping_method": "catboost_iterative_overfitting_detector",
+                "early_stopping_best_iteration": int(model.get_best_iteration()) + 1,
+                "early_stopping_patience_trees": int(args.early_stopping_rounds),
+                "early_stopping_stopped_early": bool(model.tree_count_ < args.n_estimators),
+            }
         else:
             model.fit(X_train, y_train, verbose=False)
 
     elif model_name == "random_forest":
-        model.fit(X_train, y_train)
+        if use_val:
+            model = _fit_random_forest_with_early_stopping(
+                model, args, X_train, y_train, X_val, y_val
+            )
+        else:
+            model.fit(X_train, y_train)
 
     else:
         raise ValueError(f"Unsupported model_name: {model_name}")
+    return model
 
 
 # -------------------------------------------------------------------
@@ -584,7 +647,7 @@ def run_expanding_window_cv(
                 f"fold {fold}/{len(splits)}: fitting {model_name} "
                 f"({len(X_train_s):,} fit, {len(X_val_s) if X_val_s is not None else 0:,} validation rows)"
             )
-        fit_callback(
+        fitted_model = fit_callback(
             model=model,
             model_name=model_name,
             args=args,
@@ -593,6 +656,8 @@ def run_expanding_window_cv(
             X_val=X_val_s if use_early_stopping else None,
             y_val=y_val if use_early_stopping else None
         )
+        if fitted_model is not None:
+            model = fitted_model
         if progress_callback is not None:
             progress_callback(f"fold {fold}/{len(splits)}: fit complete; predicting {len(X_test_s):,} test rows")
 
@@ -726,6 +791,8 @@ def run_expanding_window_cv(
         }
         if hasattr(model, "training_context_metadata"):
             row.update(model.training_context_metadata)
+        if hasattr(model, "early_stopping_metadata"):
+            row.update(model.early_stopping_metadata)
         fold_rows.append(row)
         bootstrap_ci_rows.append({
             "fold": fold,
@@ -1190,6 +1257,12 @@ if __name__ == "__main__":
     model_args.add_argument("--max_depth", type=int, default=6, help="maximum tree depth")
     model_args.add_argument("--num_leaves", type=int, default=31, help="LightGBM only")
     model_args.add_argument("--rf_max_features", type=str, default="sqrt", help="RandomForest only")
+    model_args.add_argument(
+        "--rf_early_stopping_step",
+        type=int,
+        default=25,
+        help="trees added between RandomForest validation-AUC early-stopping checks",
+    )
     model_args.add_argument("--n_jobs", type=int, default=-1, help="parallel jobs")
 
     args = parser.parse_args()
@@ -1208,6 +1281,8 @@ if __name__ == "__main__":
         parser.error("--min_lead_utility must lie in [0, 1]")
     if args.utility_power <= 0:
         parser.error("--utility_power must be positive")
+    if args.rf_early_stopping_step < 1:
+        parser.error("--rf_early_stopping_step must be positive")
     if args.alert_cooldown_hours < 0 or args.depeg_event_reset_hours < 0:
         parser.error("Alert and depeg reset periods must be non-negative")
     if args.false_alert_budget_per_month < 0 or any(budget < 0 for budget in args.false_alert_budgets):
@@ -1270,6 +1345,7 @@ if __name__ == "__main__":
         "utility_target_lead_hours": args.utility_target_lead_hours,
         "alert_cooldown_hours": args.alert_cooldown_hours,
         "depeg_event_reset_hours": args.depeg_event_reset_hours,
+        "rf_early_stopping_step": args.rf_early_stopping_step,
         "n_bootstrap": args.n_bootstrap,
     })
 
@@ -1304,6 +1380,7 @@ if __name__ == "__main__":
             "max_depth": args.max_depth,
             "num_leaves": args.num_leaves,
             "rf_max_features": args.rf_max_features,
+            "rf_early_stopping_step": args.rf_early_stopping_step,
             "target_window": args.target_window,
             "target_threshold": args.target_threshold,
             "depeg_side": args.depeg_side,
