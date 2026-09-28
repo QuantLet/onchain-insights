@@ -213,43 +213,6 @@ def make_overlapping_expanding_window_splits(
 
     return splits
 
-
-def reserve_final_holdout(
-    df: pd.DataFrame,
-    *,
-    final_test_frac: float,
-    embargo_periods: int,
-) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
-    """Reserve the final chronological segment before any CV/model selection.
-
-    The embargo immediately before the holdout is removed from development
-    fitting/validation.  It remains available as realised-price context for
-    post-hoc event construction, but no fitted model can train on labels whose
-    look-ahead overlaps the held-out test period.
-    """
-    if not 0 < final_test_frac < 1:
-        raise ValueError("final_test_frac must be in (0, 1)")
-    n_rows = len(df)
-    test_size = int(np.ceil(n_rows * final_test_frac))
-    test_start = n_rows - test_size
-    development_end = test_start - embargo_periods
-    if development_end <= 1:
-        raise ValueError(
-            "The final holdout plus embargo leaves no development data; reduce "
-            "--final_test_frac or --cv_embargo_hours."
-        )
-    development = df.iloc[:development_end].copy().reset_index(drop=True)
-    final_test = df.iloc[test_start:].copy().reset_index(drop=True)
-    metadata = {
-        "development_rows": len(development),
-        "final_test_rows": len(final_test),
-        "holdout_embargo_rows": test_start - development_end,
-        "development_end_timestamp": development["timestamp"].iloc[-1],
-        "final_test_start_timestamp": final_test["timestamp"].iloc[0],
-        "final_test_end_timestamp": final_test["timestamp"].iloc[-1],
-    }
-    return development, final_test, metadata
-
 class LocalLightningLogger:
     def __init__(self, base_dir="lightning_logs", experiment_name="default", run_name: Optional[str] = None):
         self.base_dir = Path(base_dir)
@@ -555,9 +518,12 @@ def run_expanding_window_cv(
     bootstrap_ci_rows = []
     operational_score_frames = []
     bootstrap_samples_by_fold = []
-    primary_budget = float(args.false_alert_budget_per_month)
-    budgets = sorted({float(x) for x in args.false_alert_budgets} | {primary_budget})
-    budget_bootstrap_samples = {budget: [] for budget in budgets}
+    primary_budget = None if args.no_hard_false_alert_budget else float(args.false_alert_budget_per_month)
+    budgets = sorted({float(x) for x in args.false_alert_budgets} | (
+        {primary_budget} if primary_budget is not None else set()
+    ))
+    policy_budgets = budgets + ([None] if primary_budget is None else [])
+    budget_bootstrap_samples = {budget: [] for budget in policy_budgets}
     evaluation_kwargs = {
         "timestamp_col": "timestamp",
         "depeg_col": "depeg_bps",
@@ -670,9 +636,10 @@ def run_expanding_window_cv(
         primary_test_metrics = None
         primary_bootstrap_ci = {}
         primary_bootstrap_samples = {}
-        for budget in budgets:
+        for budget in policy_budgets:
+            budget_label = "no hard cap" if budget is None else f"{budget:g}/month"
             if progress_callback is not None:
-                progress_callback(f"fold {fold}/{len(splits)}: selecting threshold for budget {budget:g}/month")
+                progress_callback(f"fold {fold}/{len(splits)}: selecting threshold for {budget_label}")
             alert_threshold, validation_metrics = choose_threshold_by_utility(
                 val_frame,
                 proba_val,
@@ -684,7 +651,7 @@ def run_expanding_window_cv(
             if progress_callback is not None:
                 progress_callback(
                     f"fold {fold}/{len(splits)}: threshold {alert_threshold:.6g} selected "
-                    f"for budget {budget:g}/month; scoring test events"
+                    f"for {budget_label}; scoring test events"
                 )
             test_metrics, bootstrap_inputs = evaluate_early_warning(
                 df.iloc[test_idx].copy(),
@@ -695,7 +662,7 @@ def run_expanding_window_cv(
             )
             if progress_callback is not None:
                 progress_callback(
-                    f"fold {fold}/{len(splits)}: test events scored for budget {budget:g}/month; "
+                    f"fold {fold}/{len(splits)}: test events scored for {budget_label}; "
                     f"running {args.n_bootstrap:,} bootstrap draws"
                 )
             budget_bootstrap_ci, budget_bootstrap_samples_fold = event_block_bootstrap_ci(
@@ -703,10 +670,12 @@ def run_expanding_window_cv(
                 false_alert_cost=args.false_alert_cost,
                 block_hours=args.bootstrap_block_hours,
                 n_bootstrap=args.n_bootstrap,
-                random_state=args.random_state + fold + int(round(budget * 10_000)),
+                random_state=args.random_state + fold + (
+                    0 if budget is None else int(round(budget * 10_000))
+                ),
             )
             if progress_callback is not None:
-                progress_callback(f"fold {fold}/{len(splits)}: bootstrap complete for budget {budget:g}/month")
+                progress_callback(f"fold {fold}/{len(splits)}: bootstrap complete for {budget_label}")
             budget_rows.append({
                 "fold": fold,
                 "model_name": model_name,
@@ -715,6 +684,7 @@ def run_expanding_window_cv(
                 "target_window": args.target_window,
                 "depeg_side": args.depeg_side,
                 "false_alert_budget_per_month": budget,
+                "hard_false_alert_budget_applied": budget is not None,
                 "threshold_selected_on_validation": alert_threshold,
                 **{f"validation_{k}": v for k, v in validation_metrics.items()},
                 **{f"test_{k}": v for k, v in test_metrics.items()},
@@ -722,13 +692,15 @@ def run_expanding_window_cv(
             })
             if budget_bootstrap_samples_fold:
                 budget_bootstrap_samples[budget].append(budget_bootstrap_samples_fold)
-            if np.isclose(budget, primary_budget):
+            if (primary_budget is None and budget is None) or (
+                primary_budget is not None and budget is not None and np.isclose(budget, primary_budget)
+            ):
                 primary_test_metrics = test_metrics
                 primary_bootstrap_ci = budget_bootstrap_ci
                 primary_bootstrap_samples = budget_bootstrap_samples_fold
 
         if primary_test_metrics is None:
-            raise RuntimeError("Primary false-alert budget was not evaluated")
+            raise RuntimeError("Primary alert-threshold policy was not evaluated")
 
         row = {
             "fold": fold,
@@ -984,7 +956,7 @@ def run_expanding_window_cv(
         "cv_test_frac": args.cv_test_frac,
         "cv_min_train_frac": args.cv_min_train_frac,
         "cv_val_frac": args.cv_val_frac,
-        "final_test_frac": args.final_test_frac,
+        "no_hard_false_alert_budget": args.no_hard_false_alert_budget,
 
         "cv_auc_mean": None if np.isnan(cv_auc_mean) else cv_auc_mean,
         "cv_auc_std": None if np.isnan(cv_auc_std) else cv_auc_std,
@@ -1028,139 +1000,6 @@ def run_expanding_window_cv(
         **{f"fold_{int(r['fold'])}_brier_skill_score": r["fold_brier_skill_score"] for _, r in fold_df.iterrows()},
     }
 
-
-def evaluate_locked_final_test(
-    development_df,
-    final_test_df,
-    full_context_df,
-    feature_cols,
-    target_col,
-    model_name,
-    args,
-    logger,
-    model_factory=None,
-    fit_callback=None,
-):
-    """Fit one already-selected model and score the untouched final test period.
-
-    Model/utility choices are made from the development-only CV summaries.  This
-    routine uses only the tail of the development period to select the alert
-    threshold, then applies that locked threshold once to the final test set.
-    """
-    if model_factory is None:
-        model_factory = build_model
-    if fit_callback is None:
-        fit_callback = fit_model
-
-    X_development = development_df[feature_cols].copy()
-    y_development = development_df[target_col].astype(int).copy()
-    X_final_test = final_test_df[feature_cols].copy()
-    y_final_test = final_test_df[target_col].astype(int).copy()
-    X_fit, y_fit, X_validation, y_validation = split_train_val_tail(
-        X_development,
-        y_development,
-        val_frac=args.cv_val_frac,
-        embargo_periods=args.effective_embargo_hours,
-    )
-    if X_validation is None or y_validation is None:
-        raise ValueError("A chronological validation tail is required for the final alert threshold.")
-
-    X_fit_s, X_validation_s, X_final_test_s, _ = apply_scaling(
-        X_fit, X_validation, X_final_test, scaler_name=args.scaler
-    )
-    n_pos = int((y_fit == 1).sum())
-    n_neg = int((y_fit == 0).sum())
-    pos_weight = float(n_neg / max(n_pos, 1))
-    use_early_stopping = pd.Series(y_validation).nunique() > 1
-    model = model_factory(
-        model_name=model_name,
-        args=args,
-        pos_weight=pos_weight,
-        use_early_stopping=use_early_stopping,
-    )
-    fit_callback(
-        model=model,
-        model_name=model_name,
-        args=args,
-        X_train=X_fit_s,
-        y_train=y_fit,
-        X_val=X_validation_s if use_early_stopping else None,
-        y_val=y_validation if use_early_stopping else None,
-    )
-    proba_validation = model.predict_proba(X_validation_s)[:, 1]
-    proba_final_test = model.predict_proba(X_final_test_s)[:, 1]
-
-    validation_frame = development_df.iloc[-len(X_validation_s):].copy()
-    evaluation_kwargs = {
-        "timestamp_col": "timestamp",
-        "depeg_col": "depeg_bps",
-        "threshold_bps": args.target_threshold,
-        "depeg_side": args.depeg_side,
-        "dynamic_threshold": args.dynamic_threshold,
-        "min_lead_hours": args.min_lead_hours,
-        "max_lead_hours": args.max_lead_hours,
-        "target_lead_hours": args.utility_target_lead_hours,
-        "min_lead_utility": args.min_lead_utility,
-        "utility_power": args.utility_power,
-        "cooldown_hours": args.alert_cooldown_hours,
-        "event_reset_hours": args.depeg_event_reset_hours,
-        "false_alert_cost": args.false_alert_cost,
-    }
-    alert_threshold, validation_metrics = choose_threshold_by_utility(
-        validation_frame,
-        proba_validation,
-        false_alert_budget_per_month=args.false_alert_budget_per_month,
-        threshold_grid_size=args.threshold_grid_size,
-        event_context_frame=development_df.copy(),
-        **evaluation_kwargs,
-    )
-    final_metrics, bootstrap_inputs = evaluate_early_warning(
-        final_test_df,
-        proba_final_test,
-        alert_threshold,
-        event_context_frame=full_context_df.copy(),
-        **evaluation_kwargs,
-    )
-    final_ci, _ = event_block_bootstrap_ci(
-        bootstrap_inputs,
-        false_alert_cost=args.false_alert_cost,
-        block_hours=args.bootstrap_block_hours,
-        n_bootstrap=args.n_bootstrap,
-        random_state=args.random_state + 10_000,
-    )
-    probability_metrics = {
-        key.removeprefix("fold_"): value
-        for key, value in compute_fold_metrics(y_final_test, proba_final_test).items()
-    }
-    payload = {
-        "model_name": model_name,
-        "fit_rows": len(X_fit),
-        "validation_rows": len(X_validation),
-        "final_test_rows": len(X_final_test),
-        "threshold_selected_on_validation": alert_threshold,
-        **{f"validation_{key}": value for key, value in validation_metrics.items()},
-        **{f"final_test_{key}": value for key, value in probability_metrics.items()},
-        **{f"final_test_{key}": value for key, value in final_metrics.items()},
-        **{f"final_test_{key}": value for key, value in final_ci.items()},
-    }
-    logger.save_dataframe(pd.DataFrame([payload]), "holdout/final_test_metrics.csv")
-    logger.save_json(payload, "holdout/final_test_metrics.json")
-    logger.save_dataframe(
-        pd.DataFrame({
-            "timestamp": final_test_df["timestamp"].to_numpy(),
-            "depeg_bps": final_test_df["depeg_bps"].to_numpy(),
-            "target": y_final_test.to_numpy(),
-            "probability": proba_final_test,
-            "locked_alert_threshold": alert_threshold,
-        }),
-        "holdout/final_test_predictions.csv",
-    )
-    for key, value in payload.items():
-        if isinstance(value, (int, float, np.integer, np.floating)):
-            logger.log_metric(key, value)
-    del model
-    gc.collect()
-    return payload
 
 # -------------------------------------------------------------------
 # Main
@@ -1213,26 +1052,20 @@ if __name__ == "__main__":
     cv_args.add_argument(
     "--cv_test_frac",
     type=float,
-    default=0.35,
-    help="fraction of the development period used as the chronological evaluation window in every CV fold"
+    default=0.30,
+    help="fraction of the full dataset used as test set in every fold"
     )
     cv_args.add_argument(
         "--cv_min_train_frac",
         type=float,
-        default=0.50,
-        help="minimum fraction of the development period used as training set in the first fold"
+        default=0.68,
+        help="minimum fraction of the full dataset used as training set in the first fold"
     )
     cv_args.add_argument(
         "--cv_val_frac",
         type=float,
-        default=0.35,
-        help="fraction of each training fold reserved as its chronological validation tail for early stopping and alert-threshold selection"
-    )
-    cv_args.add_argument(
-        "--final_test_frac",
-        type=float,
-        default=0.20,
-        help="final chronological fraction held out from all CV, model selection, and threshold tuning",
+        default=0.30,
+        help="fraction of each training fold used as tail validation set for early stopping and alert-threshold selection"
     )
     cv_args.add_argument(
         "--cv_embargo_hours",
@@ -1243,21 +1076,34 @@ if __name__ == "__main__":
     cv_args.add_argument(
         "--false_alert_budget_per_month",
         type=float,
-        default=2.0,
+        default=4.0,
         help="primary operational cap on false alert episodes per month",
     )
     cv_args.add_argument(
         "--false_alert_budgets",
         nargs="+",
         type=float,
-        default=[0.5, 1.0, 2.0],
+        default=[0.5, 1.0, 2.0, 3.0, 4.0],
         help="budgets to evaluate and expose to the selection-evolution plot",
     )
     cv_args.add_argument(
         "--false_alert_cost",
         type=float,
-        default=0.05,
+        default=0.25,
         help="cost of one unnecessary alert episode, in units of a perfectly timed warning; utility is reported per calendar month",
+    )
+    cv_args.add_argument(
+        "--no_hard_false_alert_budget",
+        dest="no_hard_false_alert_budget",
+        action="store_true",
+        default=True,
+        help="select the primary alert threshold by penalised utility only, without rejecting thresholds above the false-alert budget",
+    )
+    cv_args.add_argument(
+        "--hard_false_alert_budget",
+        dest="no_hard_false_alert_budget",
+        action="store_false",
+        help="enforce --false_alert_budget_per_month while selecting the primary threshold",
     )
     cv_args.add_argument(
         "--min_lead_hours",
@@ -1282,7 +1128,7 @@ if __name__ == "__main__":
     cv_args.add_argument(
         "--min_lead_utility",
         type=float,
-        default=0.10,
+        default=0.50,
         help="event utility awarded at exactly --min_lead_hours (must lie in [0, 1])",
     )
     cv_args.add_argument(
@@ -1364,8 +1210,6 @@ if __name__ == "__main__":
         parser.error("--utility_power must be positive")
     if args.alert_cooldown_hours < 0 or args.depeg_event_reset_hours < 0:
         parser.error("Alert and depeg reset periods must be non-negative")
-    if not 0 < args.final_test_frac < 1:
-        parser.error("--final_test_frac must lie in (0, 1)")
     if args.false_alert_budget_per_month < 0 or any(budget < 0 for budget in args.false_alert_budgets):
         parser.error("False-alert budgets must be non-negative")
     # The target looks ahead ``target_window`` rows.  Purging no fewer rows at
@@ -1395,12 +1239,6 @@ if __name__ == "__main__":
     df = df.sort_values(TIME_COL).reset_index(drop=True)
 
     feature_cols = [c for c in df.columns if c not in [TIME_COL, TARGET_COL]]
-    full_df = df.copy()
-    development_df, final_test_df, final_holdout_metadata = reserve_final_holdout(
-        full_df,
-        final_test_frac=args.final_test_frac,
-        embargo_periods=args.effective_embargo_hours,
-    )
 
     # Shared experiment-level metadata
     experiment_logger = LocalLightningLogger(
@@ -1416,15 +1254,14 @@ if __name__ == "__main__":
         "cv_val_frac": args.cv_val_frac,
         "cv_test_frac": args.cv_test_frac,
         "cv_min_train_frac": args.cv_min_train_frac,
-        "final_test_frac": args.final_test_frac,
         "cv_embargo_hours_requested": args.cv_embargo_hours,
         "effective_embargo_hours": args.effective_embargo_hours,
         "scaler": args.scaler,
         "models_compared": args.model_names,
-        "n_rows": len(full_df),
-        **final_holdout_metadata,
+        "n_rows": len(df),
         "n_features": len(feature_cols),
         "false_alert_budget_per_month": args.false_alert_budget_per_month,
+        "no_hard_false_alert_budget": args.no_hard_false_alert_budget,
         "false_alert_budgets": args.false_alert_budgets,
         "false_alert_cost": args.false_alert_cost,
         "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
@@ -1437,11 +1274,6 @@ if __name__ == "__main__":
     })
 
     print(f"Experiment logs will be saved under: {experiment_logger.exp_dir}")
-    print(
-        f"Reserved final holdout: {len(final_test_df):,} rows from "
-        f"{final_holdout_metadata['final_test_start_timestamp']} onward; "
-        f"CV uses {len(development_df):,} earlier rows."
-    )
 
     summaries = []
 
@@ -1462,7 +1294,6 @@ if __name__ == "__main__":
             "cv_val_frac": args.cv_val_frac,
             "cv_test_frac": args.cv_test_frac,
             "cv_min_train_frac": args.cv_min_train_frac,
-            "final_test_frac": args.final_test_frac,
             "cv_embargo_hours_requested": args.cv_embargo_hours,
             "effective_embargo_hours": args.effective_embargo_hours,
             "scaler": args.scaler,
@@ -1479,6 +1310,7 @@ if __name__ == "__main__":
             "dynamic_threshold": int(args.dynamic_threshold),
             "n_features": len(feature_cols),
             "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "no_hard_false_alert_budget": args.no_hard_false_alert_budget,
             "false_alert_budgets": args.false_alert_budgets,
             "false_alert_cost": args.false_alert_cost,
             "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
@@ -1491,7 +1323,7 @@ if __name__ == "__main__":
         })
 
         summary = run_expanding_window_cv(
-            df=development_df,
+            df=df,
             feature_cols=feature_cols,
             target_col=TARGET_COL,
             model_name=model_name,
@@ -1506,8 +1338,8 @@ if __name__ == "__main__":
         raise RuntimeError("No CV summaries were produced.")
 
     # Primary selection is the deployment utility, not a row-level ranking
-    # metric.  Each outer test fold uses a threshold selected only on its prior
-    # validation period at the pre-specified false-alert budget.
+    # metric. Each outer test fold uses a threshold selected only on its prior
+    # validation period, with either the configured cap or utility-only policy.
     best_utility = summary_df["cv_event_utility_score_mean"].max()
     if pd.isna(best_utility):
         raise RuntimeError(
@@ -1529,11 +1361,15 @@ if __name__ == "__main__":
     summary_df["selected_model"] = summary_df["model_name"] == selected_model
     summary_df["selection_rank"] = np.nan
     summary_df.loc[candidates.index, "selection_rank"] = np.arange(1, len(candidates) + 1)
+    hard_budget_description = (
+        "without a hard false-alert cap (false alerts remain utility-penalised)"
+        if args.no_hard_false_alert_budget
+        else f"at a fixed false-alert budget of {args.false_alert_budget_per_month:.3f} episodes/month"
+    )
     summary_df["selection_policy"] = (
-        "Primary: highest mean outer-fold operational utility per calendar month at a fixed false-alert "
-        f"budget of {args.false_alert_budget_per_month:.3f} episodes/month. Among models within "
-        f"{args.utility_tolerance:.4f} utility of the leader: higher timely event recall, "
-        "then lower false-alert burden and lower utility variation."
+        "Primary: highest mean outer-fold operational utility per calendar month "
+        f"{hard_budget_description}. Among models within {args.utility_tolerance:.4f} utility "
+        "of the leader: higher timely event recall, then lower false-alert burden and lower utility variation."
     )
     summary_df = summary_df.sort_values(
         ["selected_model", "cv_event_utility_score_mean"], ascending=[False, False]
@@ -1542,6 +1378,7 @@ if __name__ == "__main__":
         {
             "selected_model": selected_model,
             "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "no_hard_false_alert_budget": args.no_hard_false_alert_budget,
             "utility_tolerance": args.utility_tolerance,
             "selection_policy": summary_df["selection_policy"].iloc[0],
         },
@@ -1552,37 +1389,6 @@ if __name__ == "__main__":
     experiment_logger.save_json(
         summary_df.to_dict(orient="records"),
         "comparison/model_comparison_summary.json"
-    )
-
-    # The final period has not been seen by any CV fold, utility sensitivity,
-    # model comparison, or alert-threshold selection.  Fit the selected model on
-    # development data only, lock its threshold on the chronological validation
-    # tail, and report the one-shot holdout result separately.
-    final_holdout_metrics = evaluate_locked_final_test(
-        development_df=development_df,
-        final_test_df=final_test_df,
-        full_context_df=full_df,
-        feature_cols=feature_cols,
-        target_col=TARGET_COL,
-        model_name=selected_model,
-        args=args,
-        logger=experiment_logger,
-    )
-    experiment_logger.save_json(
-        {
-            "selected_model": selected_model,
-            "false_alert_budget_per_month": args.false_alert_budget_per_month,
-            "utility_tolerance": args.utility_tolerance,
-            "selection_policy": summary_df["selection_policy"].iloc[0],
-            "final_holdout": {
-                "test_start": final_holdout_metadata["final_test_start_timestamp"],
-                "test_end": final_holdout_metadata["final_test_end_timestamp"],
-                "threshold_selected_on_validation": final_holdout_metrics["threshold_selected_on_validation"],
-                "operational_utility_per_month": final_holdout_metrics["final_test_operational_utility_per_month"],
-                "brier_score": final_holdout_metrics["final_test_brier_score"],
-            },
-        },
-        "comparison/selected_model.json",
     )
 
     # Overall comparison: selection metrics, not in-sample fit metrics.
@@ -1618,11 +1424,6 @@ if __name__ == "__main__":
     print("\nDone.")
     print(f"Summary saved to: {experiment_logger.run_dir}")
     print(f"Selected model: {selected_model}")
-    print(
-        "Locked final-test metrics: "
-        f"utility/month={final_holdout_metrics['final_test_operational_utility_per_month']}, "
-        f"Brier={final_holdout_metrics['final_test_brier_score']}"
-    )
     print(summary_df[[
         "model_name", "selected_model", "cv_event_utility_score_mean",
         "cv_timely_event_recall_mean", "cv_false_alerts_per_month_mean",

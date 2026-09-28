@@ -49,11 +49,11 @@ bash compare_model_cv_15bp.sh
 
 ## Operational evaluation protocol
 
-Model selection is performed only on chronological development folds. The final
-20% of observations is held out before cross-validation and is scored once only
-after the winning model has been selected. Within each fold, the alert cutoff is
-selected on a chronological validation tail under the specified false-alert
-episode budget; the outer fold then evaluates that locked cutoff.
+Model selection uses the full history through expanding chronological folds.
+Within each fold, the alert cutoff is selected on a chronological validation
+tail and then evaluated on the later outer-fold period. The default runner
+selects the cutoff by penalised utility without a hard false-alert cap; the
+0.5–4 episode/month caps remain available as sensitivity specifications.
 
 The primary score is operational utility per calendar month:
 
@@ -64,8 +64,10 @@ U_{\mathrm{month}} = \frac{\sum_e v(\ell_e) - c_{\mathrm{FA}}N_{\mathrm{FA}}}{M}
 `c_FA` is therefore the cost of one unnecessary vault intervention relative to
 one perfectly timed warning. Both event value and false-alert episode cost use
 the same calendar-time denominator. The default lead-time curve rises from
-0.10 at one hour to one at five hours and then plateaus through the 24-hour
+0.50 at one hour to one at five hours and then plateaus through the 24-hour
 forecast horizon; use `--utility_target_lead_hours` to run a sensitivity curve.
+The default false-alert cost is 0.25, so two unnecessary alert episodes offset
+the utility of one correctly timed one-hour warning (0.50).
 
 Realised depegs are declustered: a new event requires 24 threshold-free hours
 after the prior depeg (`--depeg_event_reset_hours`). Alerts are likewise counted

@@ -323,11 +323,15 @@ def evaluate_early_warning(
 def choose_threshold_by_utility(
     frame: pd.DataFrame,
     probabilities: Iterable[float],
-    false_alert_budget_per_month: float,
+    false_alert_budget_per_month: float | None,
     threshold_grid_size: int,
     **evaluation_kwargs,
 ) -> Tuple[float, Dict[str, float]]:
-    """Select a threshold on validation data under a pre-specified FA budget."""
+    """Select the validation threshold, optionally subject to an FA cap.
+
+    With ``false_alert_budget_per_month=None``, utility alone selects the
+    operating point; false-alert episodes still incur their stated cost.
+    """
     scores = np.asarray(probabilities, dtype=float)
     finite = scores[np.isfinite(scores)]
     if len(finite) == 0:
@@ -345,7 +349,10 @@ def choose_threshold_by_utility(
     candidates = []
     for threshold in thresholds:
         metrics, _ = evaluate_early_warning(frame, scores, float(threshold), **evaluation_kwargs)
-        if metrics["false_alerts_per_month"] <= false_alert_budget_per_month + 1e-12:
+        if (
+            false_alert_budget_per_month is None
+            or metrics["false_alerts_per_month"] <= false_alert_budget_per_month + 1e-12
+        ):
             candidates.append(metrics)
     if not candidates:
         # The no-alert candidate should always be feasible, but retain a safe fallback.

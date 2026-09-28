@@ -29,12 +29,12 @@ DEPEG_SIDE="both"
 EVAL_METRIC="auc"
 # Model selection is event-level utility at this operating point.  The full
 # list is also evaluated so the selection-frontier plot can show sensitivity.
-FALSE_ALERT_BUDGET=2.0
-FALSE_ALERT_BUDGETS=(0.5 1.0 2.0)
+FALSE_ALERT_BUDGET=4.0
+FALSE_ALERT_BUDGETS=(0.5 1.0 2.0 3.0 4.0)
 UTILITY_TOLERANCE=0.01
-FALSE_ALERT_COST=0.05
+FALSE_ALERT_COST=0.25
 MIN_LEAD_HOURS=1
-MIN_LEAD_UTILITY=0.10
+MIN_LEAD_UTILITY=0.50
 UTILITY_POWER=1.0
 # Keep operational scoring aligned with "depeg within TARGET_WINDOW hours".
 MAX_LEAD_HOURS="${TARGET_WINDOW}"
@@ -44,7 +44,6 @@ MAX_LEAD_HOURS="${TARGET_WINDOW}"
 UTILITY_TARGET_LEAD_HOURS=5
 ALERT_COOLDOWN_HOURS=24
 DEPEG_EVENT_RESET_HOURS=24
-FINAL_TEST_FRAC=0.20
 N_BOOTSTRAP=1000
 
 echo "===================================================="
@@ -72,9 +71,9 @@ for TARGET_THRESHOLD in "${DEPEG_THRESHOLDS[@]}"; do
       --model_names "${MODELS[@]}" \
       --scaler "${SCALER}" \
       --cv_embargo_hours 48 \
-      --final_test_frac "${FINAL_TEST_FRAC}" \
       --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
       --false_alert_budgets "${FALSE_ALERT_BUDGETS[@]}" \
+      --no_hard_false_alert_budget \
       --false_alert_cost "${FALSE_ALERT_COST}" \
       --min_lead_hours "${MIN_LEAD_HOURS}" \
       --min_lead_utility "${MIN_LEAD_UTILITY}" \
@@ -100,7 +99,7 @@ python "${PAPER_REPORT_SCRIPT}" \
   --utility_tolerance "${UTILITY_TOLERANCE}"
 
 echo "===================================================="
-echo "Selecting the CV winner by event utility at the false-alert budget"
+echo "Selecting the CV winner by penalised operational utility"
 echo "===================================================="
 
 SELECTED_TSV="${LOG_DIR}/${EXPERIMENT_NAME}/selected_for_full_retraining.tsv"
