@@ -29,12 +29,19 @@ def depeg_event_starts(
     threshold_bps: float,
     depeg_side: str,
     dynamic_threshold: bool,
+    reset_hours: float = 24.0,
 ) -> pd.DatetimeIndex:
-    """Return the first timestamp of each contiguous realised depeg episode.
+    """Return declustered starts of realised depeg episodes.
 
     Dynamic events reproduce the historical rolling-quantile rule used to build
     the classification label.  The function deliberately uses realised prices
     only for post-hoc evaluation; they are never model inputs at alert time.
+
+    A new event is not created by every threshold recrossing.  After an event,
+    the realised depeg condition must be absent continuously for ``reset_hours``
+    before a subsequent crossing can start another event.  This makes the
+    recovery rule explicit and prevents one dislocation from being rewarded as
+    several independent warnings.
     """
     if frame.empty:
         return pd.DatetimeIndex([], tz="UTC")
@@ -67,8 +74,21 @@ def depeg_event_starts(
             dynamic = (x > upper) | (x < lower)
         event_mask = event_mask | (dynamic & eligible).fillna(False)
 
-    starts = event_mask & ~event_mask.shift(fill_value=False)
-    return pd.DatetimeIndex(ts.loc[starts])
+    if reset_hours < 0:
+        raise ValueError("reset_hours must be non-negative")
+    if reset_hours == 0:
+        starts = event_mask & ~event_mask.shift(fill_value=False)
+        return pd.DatetimeIndex(ts.loc[starts])
+
+    starts = []
+    last_active_time = None
+    for time, active in zip(ts, event_mask):
+        if not active:
+            continue
+        if last_active_time is None or time - last_active_time >= pd.Timedelta(hours=reset_hours):
+            starts.append(time)
+        last_active_time = time
+    return pd.DatetimeIndex(pd.to_datetime(starts, utc=True))
 
 
 def alert_episode_times(
@@ -77,16 +97,42 @@ def alert_episode_times(
     threshold: float,
     cooldown_hours: float,
 ) -> pd.DatetimeIndex:
-    """Collapse above-threshold rows into alert episodes with a cooldown."""
+    """Return starts of alert episodes using an explicit quiet-period reset.
+
+    An episode starts on the first above-threshold observation.  It cannot start
+    again until the score has remained below the threshold for ``cooldown_hours``.
+    Thus six consecutive alerted hours are one episode, rather than six alerts
+    (or repeated 24-hour reminders while the same score remains elevated).
+    """
+    if cooldown_hours < 0:
+        raise ValueError("cooldown_hours must be non-negative")
     ts = _as_utc_timestamp(pd.Series(timestamps))
     prob = np.asarray(probabilities, dtype=float)
+    if len(ts) != len(prob):
+        raise ValueError("timestamps and probabilities must contain the same number of rows")
     cooldown = pd.Timedelta(hours=cooldown_hours)
-    next_allowed = None
+    in_episode = False
+    below_since = None
     episodes = []
     for time, score in zip(ts, prob):
-        if score >= threshold and (next_allowed is None or time >= next_allowed):
-            episodes.append(time)
-            next_allowed = time + cooldown
+        if np.isfinite(score) and score >= threshold:
+            # If the quiet period ended exactly at this next crossing, close
+            # the prior episode before starting the new one.
+            if (
+                in_episode
+                and below_since is not None
+                and time - below_since >= cooldown
+            ):
+                in_episode = False
+            if not in_episode:
+                episodes.append(time)
+                in_episode = True
+            below_since = None
+        elif in_episode:
+            if below_since is None:
+                below_since = time
+            if time - below_since >= cooldown:
+                in_episode = False
     # ``DatetimeIndex(list_of_timestamps)`` can infer a tz-naive dtype under
     # some pandas versions.  The realised event timestamps are explicitly UTC,
     # so force the same representation for episode/window comparisons.
@@ -100,11 +146,12 @@ def lead_time_utility(
     min_lead_utility: float,
     utility_power: float = 1.0,
 ) -> float:
-    """Zero before the valid window; rise to one at the target lead.
+    """Zero before the valid window; rise to one and plateau at target lead.
 
-    ``utility_power=1`` is the existing linear curve. Values below one are
-    concave (more value for short-but-valid lead times); values above one are
-    convex (most value reserved for long lead times).
+    ``utility_power=1`` is linear up to ``target_lead_hours``.  The clipped
+    progress means all longer valid warnings receive utility one, providing the
+    requested diminishing-return plateau rather than rewarding ever-earlier
+    alerts through the full forecast horizon.
     """
     if utility_power <= 0:
         raise ValueError("utility_power must be positive")
@@ -133,6 +180,7 @@ def evaluate_early_warning(
     cooldown_hours: float,
     false_alert_cost: float,
     utility_power: float = 1.0,
+    event_reset_hours: float = 24.0,
     event_context_frame: pd.DataFrame | None = None,
 ) -> Tuple[Dict[str, float], Dict[str, np.ndarray]]:
     """Evaluate one fixed threshold without using labels to choose it.
@@ -140,7 +188,9 @@ def evaluate_early_warning(
     Boundary-incomplete windows are excluded: an eligible event must have its
     full warning window inside the evaluated frame, and the final
     ``min_lead_hours`` cannot start a new scored alert episode.  This avoids
-    crediting or penalising alerts whose outcome lies outside the fold.
+    crediting or penalising alerts whose outcome lies outside the fold.  The
+    primary utility is total operational value per calendar month: event value
+    and false-alert episode costs use the same calendar-time denominator.
     """
     if max_lead_hours < min_lead_hours:
         raise ValueError("max_lead_hours must be >= min_lead_hours")
@@ -171,6 +221,7 @@ def evaluate_early_warning(
         threshold_bps=threshold_bps,
         depeg_side=depeg_side,
         dynamic_threshold=dynamic_threshold,
+        reset_hours=event_reset_hours,
     )
     eligible_events = event_starts[
         (event_starts - pd.Timedelta(hours=max_lead_hours) >= score_start)
@@ -180,17 +231,29 @@ def evaluate_early_warning(
     alert_times = alert_episode_times(
         ts.loc[scored_rows], prob[scored_rows.to_numpy()], threshold, cooldown_hours
     )
+    # An episode already high at the start of an evaluation interval may have
+    # begun before the interval.  Its initial alert time is unobserved here, so
+    # do not invent a convenient new start at the boundary and later credit it
+    # to an event.  It is boundary-censored rather than counted as either a
+    # false or a matched alert episode.
+    starts_above_threshold = bool(len(prob) and np.isfinite(prob[0]) and prob[0] >= threshold)
+    if starts_above_threshold and len(alert_times) and alert_times[0] == score_start:
+        alert_times = alert_times[1:]
 
     event_utilities = []
     detected = []
     lead_hours = []
-    timely_window_alerts = set()
+    matched_alerts = set()
     for event_time in eligible_events:
         window_start = event_time - pd.Timedelta(hours=max_lead_hours)
         window_end = event_time - pd.Timedelta(hours=min_lead_hours)
         in_window = alert_times[(alert_times >= window_start) & (alert_times <= window_end)]
+        in_window = pd.DatetimeIndex([time for time in in_window if time not in matched_alerts])
         if len(in_window):
-            timely_window_alerts.update(in_window.tolist())
+            # An alert episode is scored at its initial alert time and can match
+            # at most one event.  An older still-active episode is not allowed
+            # to gain retrospective credit merely because it overlaps a window.
+            matched_alerts.add(in_window[0])
             first_alert = in_window[0]
             lead = float((event_time - first_alert).total_seconds() / 3600.0)
             lead_hours.append(lead)
@@ -208,12 +271,15 @@ def evaluate_early_warning(
             detected.append(0.0)
             event_utilities.append(0.0)
 
-    false_alert_times = [t for t in alert_times if t not in timely_window_alerts]
+    false_alert_times = [t for t in alert_times if t not in matched_alerts]
     duration_hours = max((score_end - score_start).total_seconds() / 3600.0 + 1.0, 1.0)
-    fa_per_month = len(false_alert_times) / duration_hours * HOURS_PER_MONTH
+    duration_months = duration_hours / HOURS_PER_MONTH
+    fa_per_month = len(false_alert_times) / duration_months
+    event_value_per_month = float(np.sum(event_utilities) / duration_months)
+    false_alert_cost_per_month = float(false_alert_cost * len(false_alert_times) / duration_months)
+    utility = event_value_per_month - false_alert_cost_per_month
     event_utility = float(np.mean(event_utilities)) if event_utilities else np.nan
-    utility = event_utility - false_alert_cost * fa_per_month if event_utilities else np.nan
-    precision = len(timely_window_alerts) / len(alert_times) if len(alert_times) else np.nan
+    precision = len(matched_alerts) / len(alert_times) if len(alert_times) else np.nan
 
     metrics = {
         "alert_threshold": float(threshold),
@@ -224,12 +290,22 @@ def evaluate_early_warning(
         "lead_hours_iqr_low": float(np.quantile(lead_hours, 0.25)) if lead_hours else np.nan,
         "lead_hours_iqr_high": float(np.quantile(lead_hours, 0.75)) if lead_hours else np.nan,
         "alert_episodes": int(len(alert_times)),
+        "boundary_censored_alert_episodes": int(starts_above_threshold),
+        "matched_alert_episodes": int(len(matched_alerts)),
         "false_alert_episodes": int(len(false_alert_times)),
         "false_alerts_per_month": float(fa_per_month),
         "alert_episode_precision": float(precision) if not np.isnan(precision) else np.nan,
         "event_utility": event_utility,
+        "event_value_total": float(np.sum(event_utilities)),
+        "event_value_per_month": event_value_per_month,
+        "false_alert_cost_total": float(false_alert_cost * len(false_alert_times)),
+        "false_alert_cost_per_month": false_alert_cost_per_month,
+        # Retained for downstream compatibility.  This is now explicitly a
+        # calendar-time utility, rather than a per-event average minus a rate.
         "event_utility_score": utility,
+        "operational_utility_per_month": utility,
         "evaluation_hours": float(duration_hours),
+        "evaluation_months": float(duration_months),
     }
     bootstrap_inputs = {
         "event_utilities": np.asarray(event_utilities, dtype=float),
@@ -347,7 +423,8 @@ def event_block_bootstrap_ci(
         )
         samples["false_alerts_per_month"][draw] = fa_rate
         samples["timely_event_recall"][draw] = detected[event_idx].mean()
-        samples["event_utility_score"][draw] = event_utilities[event_idx].mean() - false_alert_cost * fa_rate
+        event_value_per_month = event_utilities[event_idx].sum() / (block_duration[block_idx].sum() / HOURS_PER_MONTH)
+        samples["event_utility_score"][draw] = event_value_per_month - false_alert_cost * fa_rate
         detected_leads = lead_hours[rng.integers(0, len(lead_hours), size=len(lead_hours))] if len(lead_hours) else []
         if len(detected_leads):
             samples["median_lead_hours"][draw] = np.median(detected_leads)
@@ -366,10 +443,14 @@ def _empty_metrics(threshold: float) -> Dict[str, float]:
         "alert_threshold": float(threshold), "n_events": 0, "events_detected": 0,
         "timely_event_recall": np.nan, "median_lead_hours": np.nan,
         "lead_hours_iqr_low": np.nan, "lead_hours_iqr_high": np.nan,
-        "alert_episodes": 0, "false_alert_episodes": 0,
+        "alert_episodes": 0, "boundary_censored_alert_episodes": 0,
+        "matched_alert_episodes": 0, "false_alert_episodes": 0,
         "false_alerts_per_month": np.nan, "alert_episode_precision": np.nan,
-        "event_utility": np.nan, "event_utility_score": np.nan,
-        "evaluation_hours": 0.0,
+        "event_utility": np.nan, "event_value_total": 0.0,
+        "event_value_per_month": np.nan, "false_alert_cost_total": 0.0,
+        "false_alert_cost_per_month": np.nan, "event_utility_score": np.nan,
+        "operational_utility_per_month": np.nan, "evaluation_hours": 0.0,
+        "evaluation_months": 0.0,
     }
 
 

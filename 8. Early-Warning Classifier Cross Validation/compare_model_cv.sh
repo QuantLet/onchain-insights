@@ -38,8 +38,13 @@ MIN_LEAD_UTILITY=0.10
 UTILITY_POWER=1.0
 # Keep operational scoring aligned with "depeg within TARGET_WINDOW hours".
 MAX_LEAD_HOURS="${TARGET_WINDOW}"
-UTILITY_TARGET_LEAD_HOURS="${TARGET_WINDOW}"
+# Operational primary specification: a warning has reached full value after
+# five hours; additional notice through the 24-hour forecast window is not
+# rewarded further.
+UTILITY_TARGET_LEAD_HOURS=5
 ALERT_COOLDOWN_HOURS=24
+DEPEG_EVENT_RESET_HOURS=24
+FINAL_TEST_FRAC=0.20
 N_BOOTSTRAP=1000
 
 echo "===================================================="
@@ -67,6 +72,7 @@ for TARGET_THRESHOLD in "${DEPEG_THRESHOLDS[@]}"; do
       --model_names "${MODELS[@]}" \
       --scaler "${SCALER}" \
       --cv_embargo_hours 48 \
+      --final_test_frac "${FINAL_TEST_FRAC}" \
       --false_alert_budget_per_month "${FALSE_ALERT_BUDGET}" \
       --false_alert_budgets "${FALSE_ALERT_BUDGETS[@]}" \
       --false_alert_cost "${FALSE_ALERT_COST}" \
@@ -76,6 +82,7 @@ for TARGET_THRESHOLD in "${DEPEG_THRESHOLDS[@]}"; do
       --max_lead_hours "${MAX_LEAD_HOURS}" \
       --utility_target_lead_hours "${UTILITY_TARGET_LEAD_HOURS}" \
       --alert_cooldown_hours "${ALERT_COOLDOWN_HOURS}" \
+      --depeg_event_reset_hours "${DEPEG_EVENT_RESET_HOURS}" \
       --n_bootstrap "${N_BOOTSTRAP}" \
       --utility_tolerance "${UTILITY_TOLERANCE}"
   done

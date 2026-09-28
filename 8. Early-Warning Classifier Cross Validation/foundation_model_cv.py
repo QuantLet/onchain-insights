@@ -29,7 +29,12 @@ SHAP_DIR = REPO_ROOT / "9. SHAP explanations of Early Warning Model"
 if not (SCRIPT_DIR / "utils").is_dir() and (SHAP_DIR / "utils").is_dir():
     sys.path.insert(0, str(SHAP_DIR))
 
-from cv_model_comparison import LocalLightningLogger, run_expanding_window_cv  # noqa: E402
+from cv_model_comparison import (  # noqa: E402
+    LocalLightningLogger,
+    evaluate_locked_final_test,
+    reserve_final_holdout,
+    run_expanding_window_cv,
+)
 
 
 class ProgressReporter:
@@ -408,7 +413,7 @@ def select_within_alpha(summary_df: pd.DataFrame, tolerance: float) -> pd.DataFr
     result["selection_rank"] = np.nan
     result.loc[candidates.index, "selection_rank"] = np.arange(1, len(candidates) + 1)
     result["selection_policy"] = (
-        "Mean outer-fold event utility at fixed validation false-alert budget; "
+        "Mean outer-fold operational utility per calendar month at fixed validation false-alert budget; "
         "within utility tolerance: higher recall, lower false-alert burden, "
         "lower utility variation"
     )
@@ -429,9 +434,10 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dynamic_threshold", action="store_true")
     parser.add_argument("--scaler", choices=["none", "standard", "robust"], default="robust")
     parser.add_argument("--n_splits", type=int, default=5)
-    parser.add_argument("--cv_test_frac", type=float, default=0.30)
-    parser.add_argument("--cv_min_train_frac", type=float, default=0.68)
-    parser.add_argument("--cv_val_frac", type=float, default=0.30)
+    parser.add_argument("--cv_test_frac", type=float, default=0.35)
+    parser.add_argument("--cv_min_train_frac", type=float, default=0.50)
+    parser.add_argument("--cv_val_frac", type=float, default=0.35)
+    parser.add_argument("--final_test_frac", type=float, default=0.20)
     parser.add_argument("--cv_embargo_hours", type=int, default=48)
     parser.add_argument("--false_alert_budget_per_month", type=float, default=2.0)
     parser.add_argument("--false_alert_budgets", type=float, nargs="+", default=[0.5, 1.0, 2.0])
@@ -442,6 +448,7 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min_lead_utility", type=float, default=0.10)
     parser.add_argument("--utility_power", type=float, default=1.0)
     parser.add_argument("--alert_cooldown_hours", type=float, default=24.0)
+    parser.add_argument("--depeg_event_reset_hours", type=float, default=24.0)
     parser.add_argument("--threshold_grid_size", type=int, default=201)
     parser.add_argument("--n_bootstrap", type=int, default=1000)
     parser.add_argument("--bootstrap_block_hours", type=float, default=168.0)
@@ -481,13 +488,17 @@ def main() -> None:
     if args.max_lead_hours is None:
         args.max_lead_hours = float(args.target_window)
     if args.utility_target_lead_hours is None:
-        args.utility_target_lead_hours = args.max_lead_hours
+        args.utility_target_lead_hours = min(5.0, args.max_lead_hours)
     if not (0 <= args.min_lead_hours <= args.max_lead_hours):
         parser.error("Require 0 <= min_lead_hours <= max_lead_hours")
     if args.utility_target_lead_hours < args.min_lead_hours:
         parser.error("utility_target_lead_hours must be at least min_lead_hours")
     if not 0 <= args.min_lead_utility <= 1 or args.utility_power <= 0:
         parser.error("Invalid utility start value or power")
+    if not 0 < args.final_test_frac < 1:
+        parser.error("final_test_frac must lie in (0, 1)")
+    if args.alert_cooldown_hours < 0 or args.depeg_event_reset_hours < 0:
+        parser.error("alert and depeg reset periods must be non-negative")
     if args.false_alert_budget_per_month < 0 or any(b < 0 for b in args.false_alert_budgets):
         parser.error("False-alert budgets must be non-negative")
     args.effective_embargo_hours = max(args.cv_embargo_hours, args.target_window)
@@ -515,7 +526,19 @@ def main() -> None:
         )
         dataset_path = args.dataset_dir / dataset_name
         df, feature_cols = load_cv_frame(dataset_path)
+        full_df = df.copy()
+        development_df, final_test_df, final_holdout_metadata = reserve_final_holdout(
+            full_df,
+            final_test_frac=args.final_test_frac,
+            embargo_periods=args.effective_embargo_hours,
+        )
         print(f"alpha={alpha:g}: {len(df)} rows, {len(feature_cols)} features from {dataset_path}", flush=True)
+        print(
+            f"Reserved final holdout: {len(final_test_df):,} rows from "
+            f"{final_holdout_metadata['final_test_start_timestamp']} onward; "
+            f"CV uses {len(development_df):,} earlier rows.",
+            flush=True,
+        )
         base_run_name = f"threshold_{args.target_threshold}_alpha_{alpha}"
         summaries = []
         for model_name in args.model_names:
@@ -527,7 +550,8 @@ def main() -> None:
             logger.log_params({
                 **{k: v for k, v in vars(args).items() if k not in ("dataset_dir", "log_dir")},
                 "dataset_path": str(dataset_path), "model_name": model_name,
-                "n_rows": len(df), "n_features": len(feature_cols),
+                "n_rows": len(full_df), "n_features": len(feature_cols),
+                **final_holdout_metadata,
                 "package_versions": versions,
                 "gpu_info": gpu_info[model_name],
                 "tabpfn_version": "3.5" if model_name == "tabpfn_3_5" else None,
@@ -539,7 +563,7 @@ def main() -> None:
                 args.progress_interval_seconds,
             ) as progress:
                 summaries.append(run_expanding_window_cv(
-                    df=df, feature_cols=feature_cols, target_col="target",
+                    df=development_df, feature_cols=feature_cols, target_col="target",
                     model_name=model_name, args=args, logger=logger,
                     model_factory=build_foundation_model,
                     fit_callback=fit_foundation_model,
@@ -557,6 +581,7 @@ def main() -> None:
             "dataset_path": str(dataset_path), "models_compared": args.model_names,
             "false_alert_budget_per_month": args.false_alert_budget_per_month,
             "effective_embargo_hours": args.effective_embargo_hours,
+            **final_holdout_metadata,
             "package_versions": versions,
             "gpu_info": gpu_info,
         })
@@ -567,10 +592,29 @@ def main() -> None:
             summary_df, "comparison/model_comparison_summary.parquet",
         )
         selected = summary_df.loc[summary_df["selected_model"], "model_name"].iloc[0]
+        final_holdout_metrics = evaluate_locked_final_test(
+            development_df=development_df,
+            final_test_df=final_test_df,
+            full_context_df=full_df,
+            feature_cols=feature_cols,
+            target_col="target",
+            model_name=selected,
+            args=args,
+            logger=experiment_logger,
+            model_factory=build_foundation_model,
+            fit_callback=fit_foundation_model,
+        )
         experiment_logger.save_json({
             "selected_model": selected,
             "false_alert_budget_per_month": args.false_alert_budget_per_month,
             "utility_tolerance": args.utility_tolerance,
+            "final_holdout": {
+                "test_start": final_holdout_metadata["final_test_start_timestamp"],
+                "test_end": final_holdout_metadata["final_test_end_timestamp"],
+                "threshold_selected_on_validation": final_holdout_metrics["threshold_selected_on_validation"],
+                "operational_utility_per_month": final_holdout_metrics["final_test_operational_utility_per_month"],
+                "brier_score": final_holdout_metrics["final_test_brier_score"],
+            },
         }, "comparison/selected_model.json")
         print(summary_df[["model_name", "alpha", "cv_event_utility_score_mean",
                           "cv_timely_event_recall_mean", "cv_false_alerts_per_month_mean"]]

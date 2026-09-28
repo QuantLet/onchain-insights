@@ -47,6 +47,36 @@ cd '8. Early-Warning Classifier Cross Validation/'
 bash compare_model_cv_15bp.sh
 ```
 
+## Operational evaluation protocol
+
+Model selection is performed only on chronological development folds. The final
+20% of observations is held out before cross-validation and is scored once only
+after the winning model has been selected. Within each fold, the alert cutoff is
+selected on a chronological validation tail under the specified false-alert
+episode budget; the outer fold then evaluates that locked cutoff.
+
+The primary score is operational utility per calendar month:
+
+\[
+U_{\mathrm{month}} = \frac{\sum_e v(\ell_e) - c_{\mathrm{FA}}N_{\mathrm{FA}}}{M}.
+\]
+
+`c_FA` is therefore the cost of one unnecessary vault intervention relative to
+one perfectly timed warning. Both event value and false-alert episode cost use
+the same calendar-time denominator. The default lead-time curve rises from
+0.10 at one hour to one at five hours and then plateaus through the 24-hour
+forecast horizon; use `--utility_target_lead_hours` to run a sensitivity curve.
+
+Realised depegs are declustered: a new event requires 24 threshold-free hours
+after the prior depeg (`--depeg_event_reset_hours`). Alerts are likewise counted
+as episodes, not alerted rows: a new episode requires 24 continuous
+below-threshold hours (`--alert_cooldown_hours`). An episode is scored using its
+initial alert time and may match at most one depeg event. An episode already
+active at a fold boundary is boundary-censored rather than being assigned an
+artificial new start inside the fold. The outputs report Brier score (and Brier
+skill score) separately from operational utility so that probability calibration
+is not conflated with alert-policy value.
+
 - This shell script also runs sensitivity analysis on the depeg threshold (defaults to 5 10 15 25 bps):
 
 ```bash

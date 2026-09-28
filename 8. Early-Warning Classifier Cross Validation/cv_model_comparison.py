@@ -213,6 +213,43 @@ def make_overlapping_expanding_window_splits(
 
     return splits
 
+
+def reserve_final_holdout(
+    df: pd.DataFrame,
+    *,
+    final_test_frac: float,
+    embargo_periods: int,
+) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """Reserve the final chronological segment before any CV/model selection.
+
+    The embargo immediately before the holdout is removed from development
+    fitting/validation.  It remains available as realised-price context for
+    post-hoc event construction, but no fitted model can train on labels whose
+    look-ahead overlaps the held-out test period.
+    """
+    if not 0 < final_test_frac < 1:
+        raise ValueError("final_test_frac must be in (0, 1)")
+    n_rows = len(df)
+    test_size = int(np.ceil(n_rows * final_test_frac))
+    test_start = n_rows - test_size
+    development_end = test_start - embargo_periods
+    if development_end <= 1:
+        raise ValueError(
+            "The final holdout plus embargo leaves no development data; reduce "
+            "--final_test_frac or --cv_embargo_hours."
+        )
+    development = df.iloc[:development_end].copy().reset_index(drop=True)
+    final_test = df.iloc[test_start:].copy().reset_index(drop=True)
+    metadata = {
+        "development_rows": len(development),
+        "final_test_rows": len(final_test),
+        "holdout_embargo_rows": test_start - development_end,
+        "development_end_timestamp": development["timestamp"].iloc[-1],
+        "final_test_start_timestamp": final_test["timestamp"].iloc[0],
+        "final_test_end_timestamp": final_test["timestamp"].iloc[-1],
+    }
+    return development, final_test, metadata
+
 class LocalLightningLogger:
     def __init__(self, base_dir="lightning_logs", experiment_name="default", run_name: Optional[str] = None):
         self.base_dir = Path(base_dir)
@@ -533,6 +570,7 @@ def run_expanding_window_cv(
         "min_lead_utility": args.min_lead_utility,
         "utility_power": args.utility_power,
         "cooldown_hours": args.alert_cooldown_hours,
+        "event_reset_hours": args.depeg_event_reset_hours,
         "false_alert_cost": args.false_alert_cost,
     }
 
@@ -739,6 +777,10 @@ def run_expanding_window_cv(
         logger.log_metric(f"fold_{fold}_tpr_at_best_threshold", fold_metrics["tpr_at_best_threshold"])
         logger.log_metric(f"fold_{fold}_fpr_at_best_threshold", fold_metrics["fpr_at_best_threshold"])
         logger.log_metric(f"fold_{fold}_event_utility_score", primary_test_metrics["event_utility_score"])
+        logger.log_metric(
+            f"fold_{fold}_operational_utility_per_month",
+            primary_test_metrics["operational_utility_per_month"],
+        )
         logger.log_metric(f"fold_{fold}_timely_event_recall", primary_test_metrics["timely_event_recall"])
         logger.log_metric(f"fold_{fold}_false_alerts_per_month", primary_test_metrics["false_alerts_per_month"])
 
@@ -827,6 +869,8 @@ def run_expanding_window_cv(
     logger.log_metric("cv_fpr_at_best_threshold_std", cv_fpr_best_std)
     logger.log_metric("cv_event_utility_score_mean", cv_utility_mean)
     logger.log_metric("cv_event_utility_score_std", cv_utility_std)
+    logger.log_metric("cv_operational_utility_per_month_mean", cv_utility_mean)
+    logger.log_metric("cv_operational_utility_per_month_std", cv_utility_std)
     logger.log_metric("cv_timely_event_recall_mean", cv_event_recall_mean)
     logger.log_metric("cv_timely_event_recall_std", cv_event_recall_std)
     logger.log_metric("cv_false_alerts_per_month_mean", cv_false_alerts_mean)
@@ -919,9 +963,9 @@ def run_expanding_window_cv(
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.plot(fold_df["fold"], fold_df["fold_event_utility_score"], marker="o", color="darkorange")
     ax.axhline(0, color="gray", linewidth=1, linestyle="--")
-    ax.set_title(f"{model_name} – event-level utility by chronological fold")
+    ax.set_title(f"{model_name} – operational utility by chronological fold")
     ax.set_xlabel("Fold")
-    ax.set_ylabel("Utility")
+    ax.set_ylabel("Utility / month")
     ax.set_xticks(fold_df["fold"].tolist())
     ax.grid(alpha=0.3)
     fig.tight_layout()
@@ -939,6 +983,8 @@ def run_expanding_window_cv(
         "n_splits": args.n_splits,
         "cv_test_frac": args.cv_test_frac,
         "cv_min_train_frac": args.cv_min_train_frac,
+        "cv_val_frac": args.cv_val_frac,
+        "final_test_frac": args.final_test_frac,
 
         "cv_auc_mean": None if np.isnan(cv_auc_mean) else cv_auc_mean,
         "cv_auc_std": None if np.isnan(cv_auc_std) else cv_auc_std,
@@ -966,6 +1012,8 @@ def run_expanding_window_cv(
         "false_alert_budget_per_month": primary_budget,
         "cv_event_utility_score_mean": None if np.isnan(cv_utility_mean) else cv_utility_mean,
         "cv_event_utility_score_std": None if np.isnan(cv_utility_std) else cv_utility_std,
+        "cv_operational_utility_per_month_mean": None if np.isnan(cv_utility_mean) else cv_utility_mean,
+        "cv_operational_utility_per_month_std": None if np.isnan(cv_utility_std) else cv_utility_std,
         "cv_timely_event_recall_mean": None if np.isnan(cv_event_recall_mean) else cv_event_recall_mean,
         "cv_timely_event_recall_std": None if np.isnan(cv_event_recall_std) else cv_event_recall_std,
         "cv_false_alerts_per_month_mean": None if np.isnan(cv_false_alerts_mean) else cv_false_alerts_mean,
@@ -979,6 +1027,140 @@ def run_expanding_window_cv(
         **{f"fold_{int(r['fold'])}_brier_score": r["fold_brier_score"] for _, r in fold_df.iterrows()},
         **{f"fold_{int(r['fold'])}_brier_skill_score": r["fold_brier_skill_score"] for _, r in fold_df.iterrows()},
     }
+
+
+def evaluate_locked_final_test(
+    development_df,
+    final_test_df,
+    full_context_df,
+    feature_cols,
+    target_col,
+    model_name,
+    args,
+    logger,
+    model_factory=None,
+    fit_callback=None,
+):
+    """Fit one already-selected model and score the untouched final test period.
+
+    Model/utility choices are made from the development-only CV summaries.  This
+    routine uses only the tail of the development period to select the alert
+    threshold, then applies that locked threshold once to the final test set.
+    """
+    if model_factory is None:
+        model_factory = build_model
+    if fit_callback is None:
+        fit_callback = fit_model
+
+    X_development = development_df[feature_cols].copy()
+    y_development = development_df[target_col].astype(int).copy()
+    X_final_test = final_test_df[feature_cols].copy()
+    y_final_test = final_test_df[target_col].astype(int).copy()
+    X_fit, y_fit, X_validation, y_validation = split_train_val_tail(
+        X_development,
+        y_development,
+        val_frac=args.cv_val_frac,
+        embargo_periods=args.effective_embargo_hours,
+    )
+    if X_validation is None or y_validation is None:
+        raise ValueError("A chronological validation tail is required for the final alert threshold.")
+
+    X_fit_s, X_validation_s, X_final_test_s, _ = apply_scaling(
+        X_fit, X_validation, X_final_test, scaler_name=args.scaler
+    )
+    n_pos = int((y_fit == 1).sum())
+    n_neg = int((y_fit == 0).sum())
+    pos_weight = float(n_neg / max(n_pos, 1))
+    use_early_stopping = pd.Series(y_validation).nunique() > 1
+    model = model_factory(
+        model_name=model_name,
+        args=args,
+        pos_weight=pos_weight,
+        use_early_stopping=use_early_stopping,
+    )
+    fit_callback(
+        model=model,
+        model_name=model_name,
+        args=args,
+        X_train=X_fit_s,
+        y_train=y_fit,
+        X_val=X_validation_s if use_early_stopping else None,
+        y_val=y_validation if use_early_stopping else None,
+    )
+    proba_validation = model.predict_proba(X_validation_s)[:, 1]
+    proba_final_test = model.predict_proba(X_final_test_s)[:, 1]
+
+    validation_frame = development_df.iloc[-len(X_validation_s):].copy()
+    evaluation_kwargs = {
+        "timestamp_col": "timestamp",
+        "depeg_col": "depeg_bps",
+        "threshold_bps": args.target_threshold,
+        "depeg_side": args.depeg_side,
+        "dynamic_threshold": args.dynamic_threshold,
+        "min_lead_hours": args.min_lead_hours,
+        "max_lead_hours": args.max_lead_hours,
+        "target_lead_hours": args.utility_target_lead_hours,
+        "min_lead_utility": args.min_lead_utility,
+        "utility_power": args.utility_power,
+        "cooldown_hours": args.alert_cooldown_hours,
+        "event_reset_hours": args.depeg_event_reset_hours,
+        "false_alert_cost": args.false_alert_cost,
+    }
+    alert_threshold, validation_metrics = choose_threshold_by_utility(
+        validation_frame,
+        proba_validation,
+        false_alert_budget_per_month=args.false_alert_budget_per_month,
+        threshold_grid_size=args.threshold_grid_size,
+        event_context_frame=development_df.copy(),
+        **evaluation_kwargs,
+    )
+    final_metrics, bootstrap_inputs = evaluate_early_warning(
+        final_test_df,
+        proba_final_test,
+        alert_threshold,
+        event_context_frame=full_context_df.copy(),
+        **evaluation_kwargs,
+    )
+    final_ci, _ = event_block_bootstrap_ci(
+        bootstrap_inputs,
+        false_alert_cost=args.false_alert_cost,
+        block_hours=args.bootstrap_block_hours,
+        n_bootstrap=args.n_bootstrap,
+        random_state=args.random_state + 10_000,
+    )
+    probability_metrics = {
+        key.removeprefix("fold_"): value
+        for key, value in compute_fold_metrics(y_final_test, proba_final_test).items()
+    }
+    payload = {
+        "model_name": model_name,
+        "fit_rows": len(X_fit),
+        "validation_rows": len(X_validation),
+        "final_test_rows": len(X_final_test),
+        "threshold_selected_on_validation": alert_threshold,
+        **{f"validation_{key}": value for key, value in validation_metrics.items()},
+        **{f"final_test_{key}": value for key, value in probability_metrics.items()},
+        **{f"final_test_{key}": value for key, value in final_metrics.items()},
+        **{f"final_test_{key}": value for key, value in final_ci.items()},
+    }
+    logger.save_dataframe(pd.DataFrame([payload]), "holdout/final_test_metrics.csv")
+    logger.save_json(payload, "holdout/final_test_metrics.json")
+    logger.save_dataframe(
+        pd.DataFrame({
+            "timestamp": final_test_df["timestamp"].to_numpy(),
+            "depeg_bps": final_test_df["depeg_bps"].to_numpy(),
+            "target": y_final_test.to_numpy(),
+            "probability": proba_final_test,
+            "locked_alert_threshold": alert_threshold,
+        }),
+        "holdout/final_test_predictions.csv",
+    )
+    for key, value in payload.items():
+        if isinstance(value, (int, float, np.integer, np.floating)):
+            logger.log_metric(key, value)
+    del model
+    gc.collect()
+    return payload
 
 # -------------------------------------------------------------------
 # Main
@@ -1031,20 +1213,26 @@ if __name__ == "__main__":
     cv_args.add_argument(
     "--cv_test_frac",
     type=float,
-    default=0.30,
-    help="fraction of the full dataset used as test set in every fold"
+    default=0.35,
+    help="fraction of the development period used as the chronological evaluation window in every CV fold"
     )
     cv_args.add_argument(
         "--cv_min_train_frac",
         type=float,
-        default=0.68,
-        help="minimum fraction of the full dataset used as training set in the first fold"
+        default=0.50,
+        help="minimum fraction of the development period used as training set in the first fold"
     )
     cv_args.add_argument(
         "--cv_val_frac",
         type=float,
-        default=0.30,
-        help="fraction of each training fold used as tail validation set for early stopping"
+        default=0.35,
+        help="fraction of each training fold reserved as its chronological validation tail for early stopping and alert-threshold selection"
+    )
+    cv_args.add_argument(
+        "--final_test_frac",
+        type=float,
+        default=0.20,
+        help="final chronological fraction held out from all CV, model selection, and threshold tuning",
     )
     cv_args.add_argument(
         "--cv_embargo_hours",
@@ -1069,7 +1257,7 @@ if __name__ == "__main__":
         "--false_alert_cost",
         type=float,
         default=0.05,
-        help="utility penalty for one false alert episode per month",
+        help="cost of one unnecessary alert episode, in units of a perfectly timed warning; utility is reported per calendar month",
     )
     cv_args.add_argument(
         "--min_lead_hours",
@@ -1088,8 +1276,8 @@ if __name__ == "__main__":
         "--utility_target_lead_hours",
         type=float,
         default=None,
-        help=("lead time at which event utility reaches one; defaults to the "
-              "effective maximum lead time"),
+        help=("lead time at which event utility reaches one and plateaus; defaults "
+              "to five hours (or the maximum lead time if that is shorter)"),
     )
     cv_args.add_argument(
         "--min_lead_utility",
@@ -1108,7 +1296,13 @@ if __name__ == "__main__":
         "--alert_cooldown_hours",
         type=float,
         default=24.0,
-        help="refractory period that collapses repeated alerts into one episode",
+        help="required below-threshold quiet period before a new alert episode can start",
+    )
+    cv_args.add_argument(
+        "--depeg_event_reset_hours",
+        type=float,
+        default=24.0,
+        help="required threshold-free recovery period before a new realised depeg event can start",
     )
     cv_args.add_argument(
         "--threshold_grid_size",
@@ -1159,7 +1353,7 @@ if __name__ == "__main__":
     if args.max_lead_hours is None:
         args.max_lead_hours = float(args.target_window)
     if args.utility_target_lead_hours is None:
-        args.utility_target_lead_hours = args.max_lead_hours
+        args.utility_target_lead_hours = min(5.0, args.max_lead_hours)
     if args.min_lead_hours < 0 or args.max_lead_hours < args.min_lead_hours:
         parser.error("Require 0 <= --min_lead_hours <= --max_lead_hours")
     if args.utility_target_lead_hours < args.min_lead_hours:
@@ -1168,6 +1362,10 @@ if __name__ == "__main__":
         parser.error("--min_lead_utility must lie in [0, 1]")
     if args.utility_power <= 0:
         parser.error("--utility_power must be positive")
+    if args.alert_cooldown_hours < 0 or args.depeg_event_reset_hours < 0:
+        parser.error("Alert and depeg reset periods must be non-negative")
+    if not 0 < args.final_test_frac < 1:
+        parser.error("--final_test_frac must lie in (0, 1)")
     if args.false_alert_budget_per_month < 0 or any(budget < 0 for budget in args.false_alert_budgets):
         parser.error("False-alert budgets must be non-negative")
     # The target looks ahead ``target_window`` rows.  Purging no fewer rows at
@@ -1197,6 +1395,12 @@ if __name__ == "__main__":
     df = df.sort_values(TIME_COL).reset_index(drop=True)
 
     feature_cols = [c for c in df.columns if c not in [TIME_COL, TARGET_COL]]
+    full_df = df.copy()
+    development_df, final_test_df, final_holdout_metadata = reserve_final_holdout(
+        full_df,
+        final_test_frac=args.final_test_frac,
+        embargo_periods=args.effective_embargo_hours,
+    )
 
     # Shared experiment-level metadata
     experiment_logger = LocalLightningLogger(
@@ -1210,11 +1414,15 @@ if __name__ == "__main__":
         "alpha": args.alpha,
         "n_splits": args.n_splits,
         "cv_val_frac": args.cv_val_frac,
+        "cv_test_frac": args.cv_test_frac,
+        "cv_min_train_frac": args.cv_min_train_frac,
+        "final_test_frac": args.final_test_frac,
         "cv_embargo_hours_requested": args.cv_embargo_hours,
         "effective_embargo_hours": args.effective_embargo_hours,
         "scaler": args.scaler,
         "models_compared": args.model_names,
-        "n_rows": len(df),
+        "n_rows": len(full_df),
+        **final_holdout_metadata,
         "n_features": len(feature_cols),
         "false_alert_budget_per_month": args.false_alert_budget_per_month,
         "false_alert_budgets": args.false_alert_budgets,
@@ -1222,11 +1430,18 @@ if __name__ == "__main__":
         "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
         "min_lead_utility": args.min_lead_utility,
         "utility_power": args.utility_power,
+        "utility_target_lead_hours": args.utility_target_lead_hours,
         "alert_cooldown_hours": args.alert_cooldown_hours,
+        "depeg_event_reset_hours": args.depeg_event_reset_hours,
         "n_bootstrap": args.n_bootstrap,
     })
 
     print(f"Experiment logs will be saved under: {experiment_logger.exp_dir}")
+    print(
+        f"Reserved final holdout: {len(final_test_df):,} rows from "
+        f"{final_holdout_metadata['final_test_start_timestamp']} onward; "
+        f"CV uses {len(development_df):,} earlier rows."
+    )
 
     summaries = []
 
@@ -1245,6 +1460,9 @@ if __name__ == "__main__":
             "dataset_path": dataset_path,
             "n_splits": args.n_splits,
             "cv_val_frac": args.cv_val_frac,
+            "cv_test_frac": args.cv_test_frac,
+            "cv_min_train_frac": args.cv_min_train_frac,
+            "final_test_frac": args.final_test_frac,
             "cv_embargo_hours_requested": args.cv_embargo_hours,
             "effective_embargo_hours": args.effective_embargo_hours,
             "scaler": args.scaler,
@@ -1265,12 +1483,15 @@ if __name__ == "__main__":
             "false_alert_cost": args.false_alert_cost,
             "warning_window_hours": [args.min_lead_hours, args.max_lead_hours],
             "min_lead_utility": args.min_lead_utility,
+            "utility_target_lead_hours": args.utility_target_lead_hours,
+            "utility_power": args.utility_power,
             "alert_cooldown_hours": args.alert_cooldown_hours,
+            "depeg_event_reset_hours": args.depeg_event_reset_hours,
             "n_bootstrap": args.n_bootstrap,
         })
 
         summary = run_expanding_window_cv(
-            df=df,
+            df=development_df,
             feature_cols=feature_cols,
             target_col=TARGET_COL,
             model_name=model_name,
@@ -1309,7 +1530,7 @@ if __name__ == "__main__":
     summary_df["selection_rank"] = np.nan
     summary_df.loc[candidates.index, "selection_rank"] = np.arange(1, len(candidates) + 1)
     summary_df["selection_policy"] = (
-        "Primary: highest mean outer-fold event utility at a fixed false-alert "
+        "Primary: highest mean outer-fold operational utility per calendar month at a fixed false-alert "
         f"budget of {args.false_alert_budget_per_month:.3f} episodes/month. Among models within "
         f"{args.utility_tolerance:.4f} utility of the leader: higher timely event recall, "
         "then lower false-alert burden and lower utility variation."
@@ -1333,14 +1554,45 @@ if __name__ == "__main__":
         "comparison/model_comparison_summary.json"
     )
 
+    # The final period has not been seen by any CV fold, utility sensitivity,
+    # model comparison, or alert-threshold selection.  Fit the selected model on
+    # development data only, lock its threshold on the chronological validation
+    # tail, and report the one-shot holdout result separately.
+    final_holdout_metrics = evaluate_locked_final_test(
+        development_df=development_df,
+        final_test_df=final_test_df,
+        full_context_df=full_df,
+        feature_cols=feature_cols,
+        target_col=TARGET_COL,
+        model_name=selected_model,
+        args=args,
+        logger=experiment_logger,
+    )
+    experiment_logger.save_json(
+        {
+            "selected_model": selected_model,
+            "false_alert_budget_per_month": args.false_alert_budget_per_month,
+            "utility_tolerance": args.utility_tolerance,
+            "selection_policy": summary_df["selection_policy"].iloc[0],
+            "final_holdout": {
+                "test_start": final_holdout_metadata["final_test_start_timestamp"],
+                "test_end": final_holdout_metadata["final_test_end_timestamp"],
+                "threshold_selected_on_validation": final_holdout_metrics["threshold_selected_on_validation"],
+                "operational_utility_per_month": final_holdout_metrics["final_test_operational_utility_per_month"],
+                "brier_score": final_holdout_metrics["final_test_brier_score"],
+            },
+        },
+        "comparison/selected_model.json",
+    )
+
     # Overall comparison: selection metrics, not in-sample fit metrics.
     fig, ax = plt.subplots(1, 2, figsize=(12, 5))
     colors = ["darkorange" if selected else "steelblue" for selected in summary_df["selected_model"]]
     ax[0].bar(summary_df["model_name"], summary_df["cv_event_utility_score_mean"],
               yerr=summary_df["cv_event_utility_score_std"], color=colors, capsize=4)
-    ax[0].set_title("Mean OOS event utility (primary)")
+    ax[0].set_title("Mean OOS operational utility / month (primary)")
     ax[0].set_xlabel("Model")
-    ax[0].set_ylabel("Utility")
+    ax[0].set_ylabel("Utility / month")
     ax[0].grid(axis="y", alpha=0.3)
     ax[1].bar(summary_df["model_name"], summary_df["cv_timely_event_recall_mean"],
               yerr=summary_df["cv_timely_event_recall_std"], color=colors, capsize=4)
@@ -1366,6 +1618,11 @@ if __name__ == "__main__":
     print("\nDone.")
     print(f"Summary saved to: {experiment_logger.run_dir}")
     print(f"Selected model: {selected_model}")
+    print(
+        "Locked final-test metrics: "
+        f"utility/month={final_holdout_metrics['final_test_operational_utility_per_month']}, "
+        f"Brier={final_holdout_metrics['final_test_brier_score']}"
+    )
     print(summary_df[[
         "model_name", "selected_model", "cv_event_utility_score_mean",
         "cv_timely_event_recall_mean", "cv_false_alerts_per_month_mean",
