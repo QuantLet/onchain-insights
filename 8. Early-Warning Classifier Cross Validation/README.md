@@ -59,10 +59,10 @@ a penalty-only sensitivity run, but is not the default policy.
 
 The primary score is operational utility per declustered depeg event:
 
-\[
+$$
 U_{\mathrm{event}} =
 \frac{\sum_{e\in E} v(\ell_e) - c_{\mathrm{FA}}N_{\mathrm{FA}}}{|E|}.
-\]
+$$
 
 `c_FA` is therefore the cost of one unnecessary vault intervention relative to
 one perfectly timed warning. Both the correctly warned events and false-alert
