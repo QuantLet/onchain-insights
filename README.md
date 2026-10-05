@@ -297,33 +297,30 @@ Run the notebook:
 
 This quantlet provides code to run full cross-validation analysis of common tree-based architectures on the previously built dataset of stablecoin liquidity data. The binary task is that of predicting a depeg deviation above 15 bps in the next 24 hours. The scripts allow Cross-validation for model selection and final retraining including a full suite of diagnostics for the final model's performance and explanations through internal feature impartance and SHAP explanations.
 
-<p align="center">
+<div align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/roc_pr.png"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8. Early-Warning Classifier Cross Validation/lightning_logs/cv_model_comparison_2026-09-23_15bp_full_retraining/catboost_threshold_15_alpha_0.3_fullfeatures_threshold_specific_event_utility_then_timely_recall_then_false_alert_burden/artifacts/plots/roc_pr.png"
     alt="Final retraining ROC and PR curves"
     width="100%"
   />
-</p>
+</div>
 
 <p align="center">
   <b>Final retraining AUC/AUPRC</b>
 </p>
 
-<p align="center">
+<br>
+
+<div align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_curve_entropy.png"
-    alt="SHAP scatter plot curve entropy"
-    width="49%"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8. Early-Warning Classifier Cross Validation/lightning_logs/cv_model_comparison_2026-09-23_15bp_full_retraining/catboost_threshold_15_alpha_0.3_fullfeatures_threshold_specific_event_utility_then_timely_recall_then_false_alert_burden/artifacts/plots/timeseries/predictions_over_time.png"
+    alt="Predictions over time"
+    width="100%"
   />
-  <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tangent_up.png"
-    alt="SHAP scatter plot tangent up"
-    width="49%"
-  />
-</p>
+</div>
 
 <p align="center">
-  <b>SHAP correlation scatter plots</b>
+  <b>24-hour ahead predicted depeg probability out-of-sample</b>
 </p>
 
 ### Recreate the plot
@@ -331,7 +328,7 @@ This quantlet provides code to run full cross-validation analysis of common tree
 View the detailed instructions in the README:
 
 ```bash
-8. Early-Warning Model/README.md
+8. Early-Warning Classifier Cross Validation/README.md
 ```
 ## Quantlet 9: SHAP explanations of Early Warning Model
 
@@ -339,41 +336,50 @@ View the detailed instructions in the README:
 
 The best performing Early Warning model is selected from the previous quantlet. SHAP explanations are produced to explain its outputs, including global summaries and local waterfalls. SHAP importance of Economic groups is highlighted.
 
-<p align="center">
+<div align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/roc_pr.png"
-    alt="Final retraining ROC and PR curves"
-    width="100%"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9. SHAP explanations of Early Warning Model/shap_beeswarm.png"
+    alt="SHAP beeswarm"
   />
-</p>
+</div>
 
 <p align="center">
-  <b>Final retraining AUC/AUPRC</b>
+  <b>Summary plot of SHAP feature attribution</b>
 </p>
 
-<p align="center">
+<br>
+
+<div align="center">
   <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_curve_entropy.png"
-    alt="SHAP scatter plot curve entropy"
-    width="49%"
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9. SHAP explanations of Early Warning Model/shap_beeswarm_net_positive.png"
+    alt="SHAP beeswarm"
   />
-  <img
-    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/8.%20Early-Warning%20Model/lightning_logs/cv_model_comparison_2026-05-25_full_retraining/random_forest_alpha_0.1_fullfeatures_top2_cv_auc/artifacts/plots/shap/shap_scatter_tangent_up.png"
-    alt="SHAP scatter plot tangent up"
-    width="49%"
-  />
-</p>
+</div>
 
 <p align="center">
-  <b>SHAP correlation scatter plots</b>
+  <b>Summary plot of SHAP feature attribution to depeg alerts</b>
 </p>
+
+<br>
+
+<div align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9. SHAP explanations of Early Warning Model/shap_grouped_importance_sum_abs.png"
+    alt="SHAP beeswarm"
+  />
+</div>
+
+<p align="center">
+  <b>SHAP attribution by economic feature group</b>
+</p>
+
 
 ### Recreate the plot
 
 View the detailed instructions in the README:
 
 ```bash
-8. Early-Warning Model/README.md
+9. SHAP explanations of Early Warning Model/README.md
 ```
 
 ## Quantlet 10: Parametric Quantile Function Characterisation
@@ -385,31 +391,31 @@ We show the use of both Chebyshev and I-spline bases for quantile function regre
 Lastly we showcase the addition of spliced GPD tails for modeling extreme events/ closed form VaR+ES estimation.
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/ispline_basis_power_tails.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/ispline_basis_power_tails.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/ispline_basis_uniform.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/ispline_basis_uniform.png" alt="Image" />
 </div>
 <p align="center">
   <b>I spline bases generated with uniform and power-tails knots</b>
 </p>
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/quantile_function_comparison.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/quantile_function_comparison.png" alt="Image" />
 </div>
 <p align="center">
   <b>Quantile function tail focus based on knot density</b>
 </p>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/gpd_spliced_quantile_logit.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/gpd_spliced_quantile_logit.png" alt="Image" />
 </div>
 <p align="center">
   <b>Spliced Quantile function with parametric GPD tails</b>
 </p>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/chaining_function.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/chaining_function.png" alt="Image" />
 </div>
 
 <p align="center">
@@ -422,7 +428,7 @@ Lastly we showcase the addition of spliced GPD tails for modeling extreme events
 Run the notebook:
 
 ```bash
-9. Parametric quantile function characterisation/code.ipynb
+10. Parametric quantile function characterisation/code.ipynb
 ```
 
 ## Quantlet 11: Forecasting architecture
@@ -430,21 +436,21 @@ Run the notebook:
 ### Description and Output
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
 </div>
 <p align="center">
   <b>Our custom Neural Network Forecasting architecture</b>
 </p>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />
 </div>
 
 <p align="center">
   <b>Dilated TCN target encoder</b>
 </p>
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/timexer_style_fusion_diagnostics.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/timexer_style_fusion_diagnostics.png" alt="Image" />
 </div>
 <p align="center">
   <b>Sparse variate cross attention with selection weights.</b>
@@ -455,7 +461,7 @@ Run the notebook:
 Run the notebook:
 
 ```bash
-10. Forecasting architecture/code.ipynb
+11. Forecasting architecture/code.ipynb
 ```
 
 ## Quantlet 12: Evaluation of Probabilistic Forecasts
