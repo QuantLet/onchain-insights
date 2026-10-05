@@ -36,6 +36,7 @@ Submitted: 25.01.2026
 | [Quantlet 9: SHAP explanations of Early Warning Model](#quantlet-9-shap-explanations-of-early-warning-model) | [View Quantlet](./9.%20Early-Warning%20Classifier%20Cross%20Validation/README.md) |
 | [Quantlet 10: Parametric Quantile Function Characterisation](#quantlet-10-parametric-quantile-function-characterisation) | [View Quantlet](./10.%20Parametric%20quantile%20function%20characterisation/README.md) |
 | [Quantlet 11: Forecasting architecture](#quantlet-11-forecasting-architecture) | [View Quantlet](./11.%20Forecasting%20architecture/README.md) |
+| [Quantlet 12: Evaluation of Probabilistic Forecasts](#quantlet-12-evaluation-of-probabilistic-forecasts) | [View Quantlet](./12.%20Evaluation%20of%20Probabilistic%20Forecasts/README.md) |
 
 # Repo Instructions
 
@@ -455,4 +456,77 @@ Run the notebook:
 
 ```bash
 10. Forecasting architecture/code.ipynb
+```
+
+## Quantlet 12: Evaluation of Probabilistic Forecasts
+
+### Description and Output
+
+This repo contains large forecast artifacts, stored in a release for ease of reproducibility.In order to populate a clone, download and extract all the release packages; their stored paths put each file back in the expected folder:
+
+```bash
+section='12. Evaluation of Probabilistic Forecasts'
+downloads="$(mktemp -d)"
+gh release download section12-forecasts-v1 \
+  --repo QuantLet/onchain-insights \
+  --pattern 'section12-*.tar.gz' \
+  --dir "$downloads"
+for asset in "$downloads"/section12-*.tar.gz; do
+  tar -xzf "$asset" -C "$section"
+done
+```
+
+This requires the GitHub CLI (`gh`) authenticated to an account with access to
+the repository.
+
+<div align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/12. Evaluation of Probabilistic Forecasts/var_exceedance_counts.png"
+    alt="Predictions over time"
+    width="100%"
+  />
+</div>
+
+<p align="center">
+  <b>Value at Risk exceedance count plot</b>
+</p>
+
+<div align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/12. Evaluation of Probabilistic Forecasts/PIT_VAR_ES_calibration.png"
+    alt="Predictions over time"
+    width="100%"
+  />
+</div>
+
+<p align="center">
+  <b>Tail calibration diagnostic plots</b>
+</p>
+
+| Model | CRPS | twCRPS | twCRPS lower (<-10) | twCRPS upper (>10) | QL 1% | QL 5% | QL 95% | QL 99% |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| SAINT | **0.8205** | **0.0665** | **0.0121** | **0.0545** | **0.0706** | **0.2081** | **0.1952** | **0.0611** |
+| GARCH | 2.2140 | 0.1060 | 0.0306 | 0.0754 | 0.1123 | 0.3884 | 0.3229 | 0.1057 |
+| TimeXer | 0.8787 | 0.0883 | 0.0206 | 0.0677 | 0.0811 | 0.2225 | 0.2062 | 0.0685 |
+| TiDE | 0.9702 | 0.0775 | 0.0132 | 0.0643 | 0.1560 | 0.3061 | 0.3009 | 0.1555 |
+| ARIMA | 4.4917 | 1.3344 | 0.6747 | 0.6597 | 0.4212 | 1.4877 | 1.4975 | 0.4232 |
+| Naive | 5.4997 | 2.1775 | 1.1169 | 1.0607 | 0.5190 | 1.8347 | 1.8347 | 0.5190 |
+
+<p align="center">
+  <b>Full benchmark table</b>
+</p>
+
+### Recreate the plot
+
+The tail diagnostics plots can be ran from the following notebook (after downloading the forecast artifacts):
+
+```bash
+./tail_diagnostics.ipynb
+```
+
+Run this for reproducing the benchmark tables in the paper:
+
+```bash
+python ./tables/tables_full_benchmark.py
+python ./tables/tables_DM_tests.py
 ```
