@@ -1,0 +1,19 @@
+\begin{tabular}{llrrr}
+\toprule
+Metric & Benchmark & Mean diff. (95\% CI) & Improvement (\%) & DM $p$-value \\
+\midrule
+\multirow{5}{*}{\textit{CRPS}}
+ & GARCH & -1.1204 [-1.3066, -0.9403] & 48.8337 & $\underline{3.78 \times 10^{-55}}$ \\
+ & TimeXer & -0.0796 [-0.1117, -0.0490] & 6.3467 & $\underline{3.07 \times 10^{-8}}$ \\
+ & TiDE & -0.2061 [-0.2386, -0.1751] & 14.9357 & $\underline{5.39 \times 10^{-42}}$ \\
+ & ARIMA & -4.6707 [-4.7678, -4.5640] & 79.9145 & $\underline{< 10^{-100}}$ \\
+ & Naive & -6.8403 [-6.9451, -6.7275] & 85.3520 & $\underline{< 10^{-100}}$ \\
+\addlinespace \midrule
+\multirow{5}{*}{\textit{twCRPS}}
+ & GARCH & -0.0213 [-0.0399, -0.0062] & 19.0970 & $\underline{4.74 \times 10^{-3}}$ \\
+ & TimeXer & -0.0383 [-0.0575, -0.0224] & 29.7649 & $\underline{4.07 \times 10^{-7}}$ \\
+ & TiDE & -0.0146 [-0.0261, -0.0045] & 13.9221 & $\underline{1.40 \times 10^{-3}}$ \\
+ & ARIMA & -2.0056 [-2.0275, -1.9783] & 95.6900 & $\underline{< 10^{-100}}$ \\
+ & Naive & -3.9011 [-3.9520, -3.8481] & 97.7368 & $\underline{< 10^{-100}}$ \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,15 @@
+
+Name of Quantlet: Onchain Insights - Curve liquidity pools
+
+Published in: Onchain Insights - Curve liquidity pools
+
+Description: This Quantlet computes a suite of probabilistic diagnostics in order to evaluate the probabilistic forecasting abilities of our model for depeg in the Uniswap pool.
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  06.05.2026
+
+Datafile: curve_3pool_hourly.parquet, hourly_pool_state_full.parquet
+
