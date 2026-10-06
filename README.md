@@ -38,6 +38,7 @@ Submitted: 25.01.2026
 | [Quantlet 11: Forecasting architecture](#quantlet-11-forecasting-architecture) | [View Quantlet](./11.%20Forecasting%20architecture/README.md) |
 | [Quantlet 12: Evaluation of Probabilistic Forecasts](#quantlet-12-evaluation-of-probabilistic-forecasts) | [View Quantlet](./12.%20Evaluation%20of%20Probabilistic%20Forecasts/README.md) |
 | [Quantlet 13: Sparse Variate Selection](#quantlet-13-sparse-variate-selection) | [View Quantlet](./13.%20SparseV%20ariate%20Selection/README.md) |
+| [Supplement: PyTorch Lightning Forecasting Repo](#supplement-pytorch-lightning-forecasting-repo) | [View Supplement](./%5BSUPPLEMENT%5D%20Pytorch%20lightning%20forecasting%20repo/README.md) |
 
 # Repo Instructions
 
@@ -575,4 +576,25 @@ The sparse selection diagnostics plots can be ran from the following notebook (a
 
 ```bash 
 13. Sparse Variate Selection/code.ipynb
+```
+
+## Supplement: PyTorch Lightning Forecasting Repo
+
+### Description and Output
+
+A minimal working copy of the probabilistic forecasting framework used in the paper, built on [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/). It includes the full ANGEL model architecture, all baselines (iTransformer, TimeXer, TSMixer, TiDE, N-BEATS), shared training logic, data loaders, and loss functions. The paper-reported hyperparameters are captured in ready-to-run shell scripts.
+
+### Recreate the results
+
+See the full setup instructions in the README:
+
+```bash
+[SUPPLEMENT] Pytorch lightning forecasting repo/README.md
+```
+
+Run ANGEL with the paper hyperparameters:
+
+```bash
+cd "[SUPPLEMENT] Pytorch lightning forecasting repo"
+bash scripts/run_ANGEL.sh
 ```
