@@ -1,0 +1,11 @@
+torch>=2.0
+lightning>=2.0
+mlflow>=2.0
+python-dotenv
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+shap
+requests
