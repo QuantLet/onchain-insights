@@ -5,9 +5,9 @@
 </div>
 
 ```
-Name of Quantlet: Onchain Insights - Curve liquidity pools
+Name of Quantlet: Onchain Insights - Evaluation of Probabilistic Forecasts
 
-Published in: Onchain Insights - Curve liquidity pools
+Published in: Onchain Insights - Evaluation of Probabilistic Forecasts
 
 Description: This Quantlet computes a suite of probabilistic diagnostics in order to evaluate the probabilistic forecasting abilities of our model for depeg in the Uniswap pool.
 
