@@ -37,6 +37,7 @@ Submitted: 25.01.2026
 | [Quantlet 10: Parametric Quantile Function Characterisation](#quantlet-10-parametric-quantile-function-characterisation) | [View Quantlet](./10.%20Parametric%20quantile%20function%20characterisation/README.md) |
 | [Quantlet 11: Forecasting architecture](#quantlet-11-forecasting-architecture) | [View Quantlet](./11.%20Forecasting%20architecture/README.md) |
 | [Quantlet 12: Evaluation of Probabilistic Forecasts](#quantlet-12-evaluation-of-probabilistic-forecasts) | [View Quantlet](./12.%20Evaluation%20of%20Probabilistic%20Forecasts/README.md) |
+| [Quantlet 13: Sparse Variate Selection](#quantlet-13-sparse-variate-selection) | [View Quantlet](./13.%20SparseV%20ariate%20Selection/README.md) |
 
 # Repo Instructions
 
@@ -535,4 +536,43 @@ Run this for reproducing the benchmark tables in the paper:
 ```bash
 python ./tables/tables_full_benchmark.py
 python ./tables/tables_DM_tests.py
+```
+
+## Quantlet 13: Sparse Variate Selection 
+
+### Description and Output
+
+This Quantlet examines the sparse covariate selection in our forecasting model. The variate selection architecture is a context-aware Gated Residual Network (introduced by Lim et al. in https://arxiv.org/abs/1912.09363) which uses sparsemax activation and entropy regularisation to enforce a sparse representation. 
+
+<div align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/13. Sparse Variate Selection/fig1_variate_support_weight.png"
+    alt="Predictions over time"
+    width="100%"
+  />
+</div>
+
+<p align="center">
+  <b>Variate Support Weight</b>
+</p>
+
+<div align="center">
+  <img
+    src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/13. Sparse Variate Selection/fig3_selection_raster.png"
+    alt="Predictions over time"
+    width="100%"
+  />
+</div>
+
+<p align="center">
+  <b>Raster plot of variate selection at test origins</b>
+</p>
+
+### Recreate the plot
+
+
+The sparse selection diagnostics plots can be ran from the following notebook (after downloading the forecast artifacts):
+
+```bash 
+13. Sparse Variate Selection/code.ipynb
 ```
