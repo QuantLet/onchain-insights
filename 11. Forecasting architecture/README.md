@@ -9,7 +9,7 @@ Name of Quantlet: Onchain Insights - Forecasting architecture
 
 Published in: Onchain Insights - Forecasting architecture
 
-Description: This Quantlet presents our custom Forecasting architecture and highlights some of its integral components, including the NHITS stack decomposition-based encoder and the L0 regularisation to enforece sparse covariate attention.
+Description: This Quantlet presents our custom Forecasting architecture and highlights some of its integral components. The target feature (the pool price) is modeled using temporal dilated causal convolutions (TCN). Covariates sequences are embedded and selected for cross attention using sparse Gated Residual Networks.
 
 Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
 
@@ -21,13 +21,13 @@ Datafile:
 
 ```
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Forecasting%20architecture/timexer_style_fusion_diagnostics.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/timexer_style_fusion_diagnostics.png" alt="Image" />
 </div>
