@@ -1,0 +1,14 @@
+
+Name of Quantlet: Onchain Insights - Sparse Variate Selection
+
+Published in: Onchain Insights - Sparse Variate Selection
+
+Description: This Quantlet examines the sparse covariate selection in our forecasting model. The variate selection architecture is a context-aware Gated Residual Network (introduced by Lim et al. in https://arxiv.org/abs/1912.09363) which uses sparsemax activation and entropy regularisation to enforce a sparse representation. 
+
+Keywords: Cryptocurrency, Blockchain, Stablecoins, Decentralized Finance, Liquidity, Depeg risk
+
+Author: Owen Chaffard
+
+Submitted:  06.10.2026
+
+
