@@ -1,0 +1,20 @@
+target_threshold,alpha,model_name,fold,alert_time,status
+10,0.3,catboost,1,2024-02-02 13:00:00+00:00,false
+10,0.3,catboost,1,2024-02-07 07:00:00+00:00,false
+10,0.3,catboost,2,2024-03-15 12:00:00+00:00,false
+10,0.3,catboost,2,2024-03-16 21:00:00+00:00,timely
+10,0.3,catboost,2,2024-04-24 20:00:00+00:00,false
+10,0.3,catboost,2,2024-04-25 14:00:00+00:00,false
+10,0.3,catboost,3,2024-05-31 19:00:00+00:00,false
+10,0.3,catboost,3,2024-06-03 03:00:00+00:00,false
+10,0.3,catboost,3,2024-08-03 00:00:00+00:00,false
+10,0.3,catboost,3,2024-08-03 13:00:00+00:00,false
+10,0.3,catboost,3,2024-08-04 19:00:00+00:00,false
+10,0.3,catboost,4,2024-11-11 17:00:00+00:00,false
+10,0.3,catboost,4,2024-11-27 00:00:00+00:00,timely
+10,0.3,catboost,4,2024-12-09 20:00:00+00:00,false
+10,0.3,catboost,4,2024-12-15 15:00:00+00:00,false
+10,0.3,catboost,4,2024-12-16 01:00:00+00:00,false
+10,0.3,catboost,4,2024-12-18 19:00:00+00:00,timely
+10,0.3,catboost,4,2024-12-30 07:00:00+00:00,false
+10,0.3,catboost,4,2024-12-31 15:00:00+00:00,right_censored

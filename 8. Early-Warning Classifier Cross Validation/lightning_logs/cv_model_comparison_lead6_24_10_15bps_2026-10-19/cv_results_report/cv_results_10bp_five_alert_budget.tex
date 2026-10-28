@@ -1,0 +1,34 @@
+\begin{table}[!htbp]
+\caption{Operational out-of-sample comparison at the 10-basis-point depeg threshold. Probability cutoffs are selected separately on each preceding validation fold to maximize event recall within 2–24 hours under a 5-false-alerts-per-month budget. Recall and pooled median-lead confidence intervals resample unique realized events; alert-burden intervals resample calendar blocks. Alert burden pools false-alert counts over fully observed follow-up hours. Consecutive above-threshold hours form one episode, with a one-hour quiet reset. All timely episodes are recognized, while each event contributes once to recall. AUC and AUPRC are secondary row-level ranking metrics. Best values in each metric are highlighted in bold red and second-best distinct values in underlined blue.}
+\label{tab:cv_model_alpha_results_10}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llrrrrrrr}
+\toprule
+Model & $\alpha$ & Event recall & False alerts/month & Median lead (h) & AUC & AUPRC & Brier score & Brier skill score \\
+\midrule
+CatBoost & 0.1 & 0.243 [0.108, 0.378] & 5.80 [2.82, 9.12] & 12.0 [7.0, 20.0] & 0.719 & 0.346 & 0.128 & -0.220 \\
+CatBoost & 0.3 & \textcolor{red}{\textbf{0.405 [0.243, 0.568]}} & 4.88 [2.92, 7.14] & 15.0 [11.5, 18.0] & \textcolor{red}{\textbf{0.761}} & 0.360 & 0.187 & -1.434 \\
+CatBoost & 0.5 & \textcolor{red}{\textbf{0.405 [0.243, 0.568]}} & 5.63 [2.87, 8.78] & 16.0 [10.5, 18.0] & 0.728 & 0.389 & 0.149 & -0.849 \\
+CatBoost & 1 & \textcolor{blue}{\underline{0.378 [0.216, 0.541]}} & 4.54 [2.28, 7.11] & 12.0 [9.0, 18.0] & 0.734 & 0.356 & 0.136 & -0.218 \\
+kumo\_tabular & 0.3 & 0.351 [0.189, 0.514] & 5.47 [3.37, 7.46] & 14.0 [7.0, 18.0] & \textcolor{blue}{\underline{0.756}} & \textcolor{blue}{\underline{0.391}} & 0.115 & \textcolor{red}{\textbf{0.006}} \\
+kumo\_tabular & 0.5 & 0.162 [0.054, 0.297] & 4.79 [2.41, 7.18] & 10.5 [7.5, 15.0] & 0.752 & 0.377 & 0.118 & -0.018 \\
+kumo\_tabular & 1 & 0.243 [0.108, 0.378] & 4.71 [2.64, 6.97] & 11.0 [4.5, 22.0] & 0.731 & 0.374 & 0.117 & -0.024 \\
+LightGBM & 0.1 & 0.270 [0.135, 0.405] & 4.88 [2.71, 7.38] & 6.5 [5.0, 13.0] & 0.674 & 0.268 & 0.135 & -0.111 \\
+LightGBM & 0.3 & 0.081 [0.000, 0.189] & \textcolor{red}{\textbf{1.43 [0.33, 2.92]}} & \textcolor{red}{\textbf{21.0 [13.0, 23.0]}} & 0.713 & 0.283 & 0.134 & -0.103 \\
+LightGBM & 0.5 & 0.135 [0.027, 0.270] & \textcolor{blue}{\underline{1.51 [0.49, 3.18]}} & \textcolor{blue}{\underline{17.0 [16.0, 24.0]}} & 0.664 & 0.290 & 0.131 & -0.077 \\
+LightGBM & 1 & 0.243 [0.108, 0.378] & 2.02 [0.75, 3.43] & 15.0 [8.0, 18.0] & 0.661 & 0.293 & 0.131 & -0.091 \\
+Random forest & 0.1 & 0.297 [0.162, 0.432] & 4.96 [2.74, 7.65] & 10.0 [7.0, 21.0] & 0.707 & 0.334 & \textcolor{blue}{\underline{0.113}} & -0.042 \\
+Random forest & 0.3 & \textcolor{blue}{\underline{0.378 [0.243, 0.541]}} & 4.46 [2.93, 6.32] & 14.0 [9.0, 20.0] & 0.725 & 0.389 & \textcolor{red}{\textbf{0.110}} & \textcolor{blue}{\underline{-0.013}} \\
+Random forest & 0.5 & 0.243 [0.108, 0.378] & 4.88 [2.72, 7.42] & 14.0 [3.0, 18.0] & 0.746 & \textcolor{red}{\textbf{0.394}} & 0.115 & -0.085 \\
+Random forest & 1 & 0.270 [0.135, 0.405] & 4.71 [2.49, 7.36] & 14.0 [9.0, 18.0] & 0.706 & 0.366 & 0.117 & -0.029 \\
+tabicl\_v2 & 0.3 & 0.189 [0.081, 0.324] & 4.29 [2.38, 6.47] & 14.0 [8.0, 19.0] & 0.707 & 0.322 & 0.123 & -0.117 \\
+tabicl\_v2 & 0.5 & 0.243 [0.108, 0.405] & 5.89 [3.37, 8.67] & \textcolor{blue}{\underline{17.0 [8.0, 21.0]}} & 0.689 & 0.309 & 0.124 & -0.167 \\
+tabicl\_v2 & 1 & 0.297 [0.162, 0.432] & 7.32 [4.25, 10.66] & 11.0 [4.0, 19.0] & 0.717 & 0.321 & 0.120 & -0.128 \\
+XGBoost & 0.1 & \textcolor{blue}{\underline{0.378 [0.216, 0.541]}} & 6.31 [4.26, 8.53] & 12.5 [8.0, 15.0] & 0.688 & 0.298 & 0.187 & -0.679 \\
+XGBoost & 0.3 & 0.297 [0.162, 0.459] & 4.62 [2.87, 6.47] & 13.0 [7.0, 15.0] & 0.685 & 0.301 & 0.220 & -1.602 \\
+XGBoost & 0.5 & 0.351 [0.216, 0.514] & 4.62 [2.98, 6.31] & 13.0 [8.0, 16.0] & 0.691 & 0.319 & 0.200 & -1.192 \\
+XGBoost & 1 & 0.324 [0.162, 0.486] & 6.22 [4.32, 8.04] & 13.5 [8.0, 18.0] & 0.699 & 0.369 & 0.180 & -0.611 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

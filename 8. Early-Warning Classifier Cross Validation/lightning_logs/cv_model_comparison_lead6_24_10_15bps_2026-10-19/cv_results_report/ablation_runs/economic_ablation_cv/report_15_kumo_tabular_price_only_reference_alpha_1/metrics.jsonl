@@ -1,0 +1,12 @@
+{"timestamp": "2026-10-26T13:54:55.857712Z", "key": "fold_1_auc", "value": 0.70649483738737, "step": null}
+{"timestamp": "2026-10-26T13:54:55.880580Z", "key": "fold_1_auprc", "value": 0.09989969637145396, "step": null}
+{"timestamp": "2026-10-26T13:54:55.898417Z", "key": "fold_1_brier_score", "value": 0.08052643776168167, "step": null}
+{"timestamp": "2026-10-26T13:54:55.918949Z", "key": "fold_1_brier_skill_score", "value": -0.6076085469111532, "step": null}
+{"timestamp": "2026-10-26T13:54:55.936448Z", "key": "fold_1_lift_at_best_threshold", "value": 1.8207602339181288, "step": null}
+{"timestamp": "2026-10-26T13:54:55.953949Z", "key": "fold_1_best_threshold_youdenJ", "value": 0.03494083881378174, "step": null}
+{"timestamp": "2026-10-26T13:54:55.970648Z", "key": "fold_1_tpr_at_best_threshold", "value": 0.6842105263157895, "step": null}
+{"timestamp": "2026-10-26T13:54:55.991475Z", "key": "fold_1_fpr_at_best_threshold", "value": 0.3585598824393828, "step": null}
+{"timestamp": "2026-10-26T13:54:56.009820Z", "key": "fold_1_event_utility_score", "value": -0.125, "step": null}
+{"timestamp": "2026-10-26T13:54:56.027788Z", "key": "fold_1_operational_utility_per_event", "value": -0.125, "step": null}
+{"timestamp": "2026-10-26T13:54:56.044551Z", "key": "fold_1_timely_event_recall", "value": 0.0, "step": null}
+{"timestamp": "2026-10-26T13:54:56.061452Z", "key": "fold_1_false_alerts_per_month", "value": 0.9323548181238035, "step": null}

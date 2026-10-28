@@ -1,0 +1,7 @@
+feature_set,removed_block,n_features,ROC AUC,AUPRC,Event recall,Median lead hours,False alerts/month
+full,none,105,0.6431269707802829,0.1985249430939056,0.1875,16.0,1.2861443263538421
+price_only_reference,all_economic_blocks,8,0.707109821372271,0.23335663996223552,0.0,,0.5725644289232608
+without_crypto_macro,crypto_macro,90,0.6612938620210118,0.17458834772623816,0.0,,0.13063304721030045
+without_lending,lending,100,0.6288674554887521,0.12589391789353765,0.0,,0.0
+without_gegenbauer_curve,gegenbauer_curve,47,0.6157809735086726,0.11904410781991548,0.0,,0.0
+without_pool_and_swap_liquidity,pool_and_swap_liquidity,86,0.6417410126480174,0.1619257908137372,0.05,17.0,1.1693017159891588

@@ -1,0 +1,36 @@
+\begin{table}[!htbp]
+\caption{Operational out-of-sample comparison at the 15-basis-point depeg threshold. Probability cutoffs are selected separately on each preceding validation fold to maximize event recall within 2–24 hours under a 5-false-alerts-per-month budget. Recall and pooled median-lead confidence intervals resample unique realized events; alert-burden intervals resample calendar blocks. Alert burden pools false-alert counts over fully observed follow-up hours. Consecutive above-threshold hours form one episode, with a one-hour quiet reset. All timely episodes are recognized, while each event contributes once to recall. AUC and AUPRC are secondary row-level ranking metrics. Best values in each metric are highlighted in bold red and second-best distinct values in underlined blue.}
+\label{tab:cv_model_alpha_results_15}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llrrrrrrr}
+\toprule
+Model & $\alpha$ & Event recall & False alerts/month & Median lead (h) & AUC & AUPRC & Brier score & Brier skill score \\
+\midrule
+CatBoost & 0.1 & 0.056 [0.000, 0.167] & 1.60 [0.43, 3.13] & 18.0 [18.0, 18.0] & 0.643 & 0.199 & 0.172 & -3.659 \\
+CatBoost & 0.3 & 0.111 [0.000, 0.278] & 1.51 [0.17, 3.21] & 2.5 [2.0, 3.0] & 0.594 & 0.103 & 0.165 & -2.832 \\
+CatBoost & 0.5 & 0.222 [0.056, 0.444] & 2.52 [0.85, 4.48] & 15.0 [9.0, 19.0] & 0.610 & 0.137 & 0.148 & -2.145 \\
+CatBoost & 1 & 0.167 [0.000, 0.333] & 2.52 [0.67, 5.18] & 12.0 [2.0, 12.0] & 0.584 & 0.119 & 0.167 & -2.657 \\
+kumo\_tabular & 0.1 & \textcolor{blue}{\underline{0.556 [0.333, 0.778]}} & 11.27 [6.66, 15.95] & 10.5 [7.0, 17.0] & 0.770 & 0.208 & 0.068 & -0.398 \\
+kumo\_tabular & 0.3 & \textcolor{blue}{\underline{0.556 [0.333, 0.778]}} & 7.90 [4.69, 11.43] & 16.0 [8.0, 22.0] & 0.781 & 0.202 & 0.067 & -0.366 \\
+kumo\_tabular & 0.5 & \textcolor{red}{\textbf{0.722 [0.500, 0.889]}} & 13.71 [9.63, 18.35] & 12.0 [6.0, 19.0] & 0.778 & 0.204 & 0.068 & -0.416 \\
+kumo\_tabular & 1 & \textcolor{red}{\textbf{0.722 [0.500, 0.890]}} & 10.59 [6.95, 14.73] & 12.0 [4.0, 21.0] & \textcolor{red}{\textbf{0.797}} & 0.204 & 0.064 & -0.289 \\
+LightGBM & 0.1 & 0.056 [0.000, 0.167] & 2.27 [0.76, 4.36] & \textcolor{red}{\textbf{22.0 [22.0, 22.0]}} & 0.598 & 0.114 & 0.062 & \textcolor{red}{\textbf{-0.044}} \\
+LightGBM & 0.3 & 0.056 [0.000, 0.167] & 2.10 [0.75, 3.81] & 19.0 [19.0, 19.0] & 0.530 & 0.109 & 0.062 & -0.044 \\
+LightGBM & 0.5 & 0.000 [0.000, 0.000] & 0.84 [0.25, 1.58] & NA & 0.525 & 0.116 & 0.062 & \textcolor{blue}{\underline{-0.044}} \\
+LightGBM & 1 & 0.000 [0.000, 0.000] & \textcolor{red}{\textbf{0.17 [0.00, 0.52]}} & NA & 0.520 & 0.129 & 0.062 & -0.045 \\
+Random forest & 0.1 & 0.111 [0.000, 0.278] & \textcolor{blue}{\underline{0.25 [0.00, 0.67]}} & 11.0 [8.0, 14.0] & 0.677 & 0.180 & \textcolor{red}{\textbf{0.061}} & -0.174 \\
+Random forest & 0.3 & 0.111 [0.000, 0.278] & 1.85 [0.00, 4.64] & 13.0 [13.0, 13.0] & 0.669 & 0.189 & \textcolor{blue}{\underline{0.061}} & -0.148 \\
+Random forest & 0.5 & 0.000 [0.000, 0.000] & 0.34 [0.00, 0.77] & NA & 0.671 & 0.160 & 0.061 & -0.138 \\
+Random forest & 1 & 0.167 [0.000, 0.333] & 1.01 [0.17, 2.11] & 12.0 [10.0, 13.0] & 0.637 & 0.108 & 0.064 & -0.179 \\
+tabicl\_v2 & 0.1 & 0.444 [0.222, 0.722] & 6.89 [3.97, 10.61] & 19.5 [5.0, 23.0] & \textcolor{blue}{\underline{0.790}} & \textcolor{blue}{\underline{0.227}} & 0.079 & -0.704 \\
+tabicl\_v2 & 0.3 & 0.444 [0.222, 0.667] & 6.64 [3.69, 10.08] & 15.5 [13.0, 21.0] & 0.775 & 0.211 & 0.076 & -0.593 \\
+tabicl\_v2 & 0.5 & 0.444 [0.222, 0.667] & 5.13 [2.81, 7.90] & 13.5 [4.0, 21.0] & 0.750 & 0.203 & 0.083 & -0.772 \\
+tabicl\_v2 & 1 & 0.389 [0.167, 0.611] & 7.23 [3.90, 11.22] & \textcolor{blue}{\underline{21.0 [5.0, 22.0]}} & 0.778 & \textcolor{red}{\textbf{0.252}} & 0.076 & -0.668 \\
+XGBoost & 0.1 & 0.222 [0.056, 0.444] & 3.53 [1.62, 5.47] & 16.5 [4.0, 24.0] & 0.583 & 0.130 & 0.239 & -4.828 \\
+XGBoost & 0.3 & 0.278 [0.056, 0.500] & 4.88 [2.92, 7.01] & 18.0 [8.0, 19.0] & 0.621 & 0.131 & 0.241 & -4.978 \\
+XGBoost & 0.5 & 0.167 [0.000, 0.333] & 2.27 [0.86, 4.15] & 13.0 [12.0, 18.0] & 0.637 & 0.141 & 0.227 & -4.540 \\
+XGBoost & 1 & 0.056 [0.000, 0.167] & 0.67 [0.00, 2.00] & 19.0 [19.0, 19.0] & 0.636 & 0.119 & 0.194 & -3.652 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

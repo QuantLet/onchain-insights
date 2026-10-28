@@ -1,0 +1,36 @@
+\begin{table}[!htbp]
+\caption{Operational out-of-sample comparison at the 15-basis-point depeg threshold. Probability cutoffs are selected separately on each preceding validation fold to maximize event recall within 2–24 hours under a 5-false-alerts-per-month budget. Recall confidence intervals resample unique realized events; lead-time and alert-burden intervals use event/calendar-block bootstrap. AUC and AUPRC are secondary row-level ranking metrics. Best values in each metric are highlighted in bold red and second-best distinct values in underlined blue.}
+\label{tab:cv_model_alpha_results_15}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llrrrrrrr}
+\toprule
+Model & $\alpha$ & Event recall & False alerts/month & Median lead (h) & AUC & AUPRC & Brier score & Brier skill score \\
+\midrule
+CatBoost & 0.1 & 0.222 [0.056, 0.444] & 1.18 [0.60, 1.87] & 13.8 [12.0, 15.5] & 0.643 & 0.199 & 0.172 & -3.659 \\
+CatBoost & 0.3 & 0.056 [0.000, 0.167] & \textcolor{red}{\textbf{0.20 [0.00, 0.47]}} & 2.0 [2.0, 2.0] & 0.594 & 0.103 & 0.165 & -2.832 \\
+CatBoost & 0.5 & 0.222 [0.056, 0.444] & 0.59 [0.12, 1.19] & 5.5 [4.0, 7.0] & 0.610 & 0.137 & 0.148 & -2.145 \\
+CatBoost & 1 & 0.056 [0.000, 0.167] & \textcolor{red}{\textbf{0.20 [0.00, 0.51]}} & 8.0 [8.0, 8.0] & 0.584 & 0.119 & 0.167 & -2.657 \\
+kumo\_tabular & 0.1 & 0.167 [0.000, 0.333] & 2.98 [2.31, 3.69] & 18.7 [18.7, 18.7] & 0.770 & 0.208 & 0.068 & -0.398 \\
+kumo\_tabular & 0.3 & 0.222 [0.056, 0.444] & 2.77 [2.14, 3.48] & 12.8 [12.0, 13.7] & 0.781 & 0.202 & 0.067 & -0.366 \\
+kumo\_tabular & 0.5 & 0.167 [0.000, 0.333] & 2.27 [1.70, 2.81] & 17.3 [17.3, 17.3] & 0.778 & 0.204 & 0.068 & -0.416 \\
+kumo\_tabular & 1 & \textcolor{red}{\textbf{0.444 [0.222, 0.667]}} & 3.11 [2.24, 4.08] & 12.4 [9.1, 15.6] & \textcolor{red}{\textbf{0.797}} & 0.204 & 0.064 & -0.289 \\
+LightGBM & 0.1 & 0.056 [0.000, 0.167] & 0.94 [0.44, 1.57] & \textcolor{red}{\textbf{22.0 [22.0, 22.0]}} & 0.598 & 0.114 & 0.062 & \textcolor{red}{\textbf{-0.044}} \\
+LightGBM & 0.3 & 0.056 [0.000, 0.167] & 0.48 [0.00, 1.11] & \textcolor{blue}{\underline{19.0 [19.0, 19.0]}} & 0.530 & 0.109 & 0.062 & -0.044 \\
+LightGBM & 0.5 & 0.000 [0.000, 0.000] & \textcolor{blue}{\underline{0.23 [0.00, 0.70]}} & NA & 0.525 & 0.116 & 0.062 & \textcolor{blue}{\underline{-0.044}} \\
+LightGBM & 1 & 0.056 [0.000, 0.167] & 0.95 [0.45, 1.59] & 9.0 [9.0, 9.0] & 0.520 & 0.129 & 0.062 & -0.045 \\
+Random forest & 0.1 & 0.111 [0.000, 0.278] & 1.44 [0.64, 2.35] & 2.0 [2.0, 2.0] & 0.677 & 0.180 & \textcolor{red}{\textbf{0.061}} & -0.174 \\
+Random forest & 0.3 & 0.056 [0.000, 0.167] & 0.74 [0.27, 1.28] & 14.0 [14.0, 14.0] & 0.669 & 0.189 & \textcolor{blue}{\underline{0.061}} & -0.148 \\
+Random forest & 0.5 & 0.000 [0.000, 0.000] & 0.99 [0.57, 1.46] & NA & 0.671 & 0.160 & 0.061 & -0.138 \\
+Random forest & 1 & 0.222 [0.056, 0.444] & 0.88 [0.44, 1.34] & 11.2 [9.0, 13.3] & 0.637 & 0.108 & 0.064 & -0.179 \\
+tabicl\_v2 & 0.1 & \textcolor{blue}{\underline{0.278 [0.111, 0.500]}} & 2.44 [1.47, 3.37] & 12.3 [11.0, 13.7] & \textcolor{blue}{\underline{0.790}} & \textcolor{blue}{\underline{0.227}} & 0.079 & -0.704 \\
+tabicl\_v2 & 0.3 & \textcolor{blue}{\underline{0.278 [0.056, 0.500]}} & 2.22 [1.50, 2.94] & 13.1 [12.5, 13.8] & 0.775 & 0.211 & 0.076 & -0.593 \\
+tabicl\_v2 & 0.5 & 0.111 [0.000, 0.278] & 1.53 [0.77, 2.50] & 7.0 [7.0, 7.0] & 0.750 & 0.203 & 0.083 & -0.772 \\
+tabicl\_v2 & 1 & 0.056 [0.000, 0.167] & 1.82 [1.02, 2.60] & 11.0 [11.0, 11.0] & 0.778 & \textcolor{red}{\textbf{0.252}} & 0.076 & -0.668 \\
+XGBoost & 0.1 & 0.111 [0.000, 0.278] & 0.90 [0.40, 1.40] & 11.5 [11.5, 11.5] & 0.583 & 0.130 & 0.239 & -4.828 \\
+XGBoost & 0.3 & \textcolor{blue}{\underline{0.278 [0.111, 0.500]}} & 2.90 [2.08, 3.73] & 17.2 [16.0, 18.3] & 0.621 & 0.131 & 0.241 & -4.978 \\
+XGBoost & 0.5 & 0.222 [0.056, 0.444] & 1.91 [1.20, 2.66] & 15.7 [14.7, 16.7] & 0.637 & 0.141 & 0.227 & -4.540 \\
+XGBoost & 1 & 0.111 [0.000, 0.278] & 1.57 [0.89, 2.25] & 14.0 [14.0, 14.0] & 0.636 & 0.119 & 0.194 & -3.652 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

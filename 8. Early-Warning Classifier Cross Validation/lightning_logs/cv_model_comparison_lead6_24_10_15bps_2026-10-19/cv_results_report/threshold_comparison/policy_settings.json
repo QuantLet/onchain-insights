@@ -1,0 +1,29 @@
+{
+  "cached_probabilities_only": true,
+  "model_fit_or_predict_calls": false,
+  "minimum_lead_hours": 2.0,
+  "maximum_lead_hours": 24.0,
+  "threshold_methods": [
+    "empirical",
+    "neyman_pearson",
+    "event_ucb"
+  ],
+  "hourly_np_fpr_targets": [
+    0.005,
+    0.01,
+    0.02
+  ],
+  "np_violation_tolerance": 0.05,
+  "np_negative_spacing_hours": 1,
+  "np_assumptions": "iid negatives, stable class-conditional scores, and calibration independent of fitted scorer; not verified",
+  "np_early_stopping_caveat": "Saved validation may have selected training iterations, violating independent calibration",
+  "event_false_alert_budget_per_month": 5.0,
+  "event_ucb_confidence": 0.95,
+  "event_ucb_block_hours": 168,
+  "event_ucb_bootstrap_draws": 2000,
+  "event_ucb_scope": "Pointwise calendar-block bootstrap upper percentile with positive Poisson count floor; no postselection or distribution-shift guarantee",
+  "model_selection": "Pooled event recall, then false-alert burden; hourly metrics are also reported",
+  "hourly_population": "Full-future-observed rows excluding current breaches and the final hour before onset",
+  "event_population": "Unique event onsets with full 2--24h score coverage; full timelines retained for episodes",
+  "alert_cooldown_hours": 1.0
+}

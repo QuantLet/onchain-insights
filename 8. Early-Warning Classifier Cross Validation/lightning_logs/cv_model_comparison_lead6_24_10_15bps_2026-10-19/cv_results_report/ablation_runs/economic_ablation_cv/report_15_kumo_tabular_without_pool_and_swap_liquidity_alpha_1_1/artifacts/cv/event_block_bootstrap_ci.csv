@@ -1,0 +1,5 @@
+fold,model_name,alpha,target_threshold,ci_method,n_bootstrap,block_hours,event_utility_score_ci_lower,event_utility_score_ci_upper,timely_event_recall_ci_lower,timely_event_recall_ci_upper,false_alerts_per_month_ci_lower,false_alerts_per_month_ci_upper,median_lead_hours_ci_lower,median_lead_hours_ci_upper
+1,kumo_tabular,1.0,15,event_and_calendar_block_bootstrap,1000,168.0,0.0,0.0,0.0,0.0,0.0,0.0,,
+2,kumo_tabular,1.0,15,event_and_calendar_block_bootstrap,1000,168.0,-0.7613636363636364,0.16477272727272727,0.0,0.75,0.0,3.6525,12.0,12.0
+3,kumo_tabular,1.0,15,event_and_calendar_block_bootstrap,1000,168.0,0.0,0.0,0.0,0.0,0.0,0.0,,
+4,kumo_tabular,1.0,15,event_and_calendar_block_bootstrap,1000,168.0,-0.25,0.3954545454545454,0.0,0.6,0.7247023809523809,4.1838487972508585,22.0,22.0

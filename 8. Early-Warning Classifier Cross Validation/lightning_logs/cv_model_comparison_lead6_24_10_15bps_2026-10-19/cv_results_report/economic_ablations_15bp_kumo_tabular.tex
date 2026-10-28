@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Economic feature ablations for kumo_tabular at 15 bp.}
+\label{tab:ablation_15_kumo_tabular}
+\begin{tabular}{llrrrrrr}
+\toprule
+feature\_set & removed\_block & n\_features & ROC AUC & AUPRC & Event recall & Median lead hours & False alerts/month \\
+\midrule
+full & none & 105 & 0.797 & 0.204 & 0.444 & 12.375 & 3.115 \\
+price\_only\_reference & all\_economic\_blocks & 8 & 0.711 & 0.211 & 0.000 & NaN & 0.065 \\
+without\_crypto\_macro & crypto\_macro & 90 & 0.817 & 0.240 & 0.000 & NaN & 0.000 \\
+without\_lending & lending & 100 & 0.803 & 0.208 & 0.000 & NaN & 0.130 \\
+without\_gegenbauer\_curve & gegenbauer\_curve & 47 & 0.709 & 0.166 & 0.000 & NaN & 0.000 \\
+without\_pool\_and\_swap\_liquidity & pool\_and\_swap\_liquidity & 86 & 0.821 & 0.206 & 0.113 & 17.000 & 0.960 \\
+\bottomrule
+\end{tabular}
+\end{table}

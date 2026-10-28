@@ -1,0 +1,14 @@
+{
+  "fold_1_auc": 0.70649483738737,
+  "fold_1_auprc": 0.09989969637145396,
+  "fold_1_brier_score": 0.08052643776168167,
+  "fold_1_brier_skill_score": -0.6076085469111532,
+  "fold_1_lift_at_best_threshold": 1.8207602339181288,
+  "fold_1_best_threshold_youdenJ": 0.03494083881378174,
+  "fold_1_tpr_at_best_threshold": 0.6842105263157895,
+  "fold_1_fpr_at_best_threshold": 0.3585598824393828,
+  "fold_1_event_utility_score": -0.125,
+  "fold_1_operational_utility_per_event": -0.125,
+  "fold_1_timely_event_recall": 0.0,
+  "fold_1_false_alerts_per_month": 0.9323548181238035
+}

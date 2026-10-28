@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Economic feature ablations for xgboost at 15 bp.}
+\label{tab:ablation_15_xgboost}
+\begin{tabular}{llrrrrrr}
+\toprule
+feature\_set & removed\_block & n\_features & ROC AUC & AUPRC & Event recall & Median lead hours & False alerts/month \\
+\midrule
+full & none & 105 & 0.621 & 0.131 & 0.287 & 17.167 & 2.896 \\
+price\_only\_reference & all\_economic\_blocks & 8 & 0.677 & 0.192 & 0.100 & 14.500 & 0.190 \\
+without\_crypto\_macro & crypto\_macro & 90 & 0.601 & 0.132 & 0.050 & 18.000 & 0.320 \\
+without\_lending & lending & 100 & 0.646 & 0.123 & 0.000 & NaN & 0.065 \\
+without\_gegenbauer\_curve & gegenbauer\_curve & 47 & 0.675 & 0.158 & 0.000 & NaN & 0.130 \\
+without\_pool\_and\_swap\_liquidity & pool\_and\_swap\_liquidity & 86 & 0.539 & 0.132 & 0.062 & 18.000 & 0.224 \\
+\bottomrule
+\end{tabular}
+\end{table}

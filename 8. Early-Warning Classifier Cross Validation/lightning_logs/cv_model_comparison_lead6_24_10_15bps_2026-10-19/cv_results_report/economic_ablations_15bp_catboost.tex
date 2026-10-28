@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Economic feature ablations for catboost at 15 bp.}
+\label{tab:ablation_15_catboost}
+\begin{tabular}{llrrrrrr}
+\toprule
+feature\_set & removed\_block & n\_features & ROC AUC & AUPRC & Event recall & Median lead hours & False alerts/month \\
+\midrule
+full & none & 105 & 0.643 & 0.199 & 0.188 & 16.000 & 1.286 \\
+price\_only\_reference & all\_economic\_blocks & 8 & 0.707 & 0.233 & 0.000 & NaN & 0.573 \\
+without\_crypto\_macro & crypto\_macro & 90 & 0.661 & 0.175 & 0.000 & NaN & 0.131 \\
+without\_lending & lending & 100 & 0.629 & 0.126 & 0.000 & NaN & 0.000 \\
+without\_gegenbauer\_curve & gegenbauer\_curve & 47 & 0.616 & 0.119 & 0.000 & NaN & 0.000 \\
+without\_pool\_and\_swap\_liquidity & pool\_and\_swap\_liquidity & 86 & 0.642 & 0.162 & 0.050 & 17.000 & 1.169 \\
+\bottomrule
+\end{tabular}
+\end{table}
