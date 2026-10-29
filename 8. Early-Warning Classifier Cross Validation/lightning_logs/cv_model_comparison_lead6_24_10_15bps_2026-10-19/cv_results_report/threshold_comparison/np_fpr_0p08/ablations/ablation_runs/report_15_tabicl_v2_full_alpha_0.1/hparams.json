@@ -50,7 +50,7 @@
   ],
   "false_alert_cost": 0.25,
   "warning_window_hours": [
-    2.0,
+    6.0,
     24.0
   ],
   "min_lead_utility": 0.0,
@@ -58,5 +58,14 @@
   "utility_power": 1.0,
   "alert_cooldown_hours": 24.0,
   "depeg_event_reset_hours": 24.0,
-  "n_bootstrap": 1000
+  "n_bootstrap": 1000,
+  "training_window_hours": [
+    6.0,
+    24.0
+  ],
+  "evaluation_window_hours": [
+    2.0,
+    24.0
+  ],
+  "refit_target_version": 2
 }

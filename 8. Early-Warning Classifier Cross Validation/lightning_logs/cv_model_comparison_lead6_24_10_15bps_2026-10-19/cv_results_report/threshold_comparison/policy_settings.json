@@ -1,9 +1,11 @@
 {
+  "base_cv_cached_probabilities_only": true,
   "cached_cv_probabilities_only": true,
   "cv_model_fit_or_predict_calls": false,
   "cached_probabilities_only": false,
   "model_fit_or_predict_calls": "selected_holdout_only_if_cache_missing",
-  "primary_policy": "np_fpr_0p1",
+  "ablations_enabled": false,
+  "primary_policy": "np_fpr_0p08",
   "holdout_mode": "auto",
   "minimum_lead_hours": 2.0,
   "maximum_lead_hours": 24.0,
@@ -11,7 +13,7 @@
     "neyman_pearson"
   ],
   "hourly_np_fpr_targets": [
-    0.1
+    0.08
   ],
   "np_violation_tolerance": 0.05,
   "np_negative_spacing_hours": 24.0,
@@ -28,5 +30,5 @@
   "alert_cooldown_hours": 12.0,
   "nproc_definition": "nominal_hourly_FPR_limit_vs_heldout_TPR_at_validation_NP_cutoffs; empirical block-bootstrap bands",
   "nproc_area_definition": "trapezoidal full integral on [0,1]; partial integral on [0,partial_max]; normalized partial divided by partial_max",
-  "nproc_partial_max": 0.05
+  "nproc_partial_max": 0.15
 }

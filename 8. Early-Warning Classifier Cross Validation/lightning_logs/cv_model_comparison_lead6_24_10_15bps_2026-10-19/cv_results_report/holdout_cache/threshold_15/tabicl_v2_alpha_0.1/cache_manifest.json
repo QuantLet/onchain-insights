@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fingerprint": "aa37b60df2e9ca13c79e107d6a298a4272754b19f3fb1b2a78627df3e10bd054",
+  "model_name": "tabicl_v2",
+  "alpha": 0.1,
+  "target_threshold": 15,
+  "minimum_lead": 2.0,
+  "maximum_lead": 24.0,
+  "cv_end": "2025-01-01",
+  "first_holdout_score": "2025-01-01 00:00:00+00:00"
+}

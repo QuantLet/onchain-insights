@@ -1,0 +1,106 @@
+feature,economic_block,economic_group
+tvlUSD_100,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+tvlUSD_500,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg0,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg1,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg2,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg3,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg4,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg5,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg6,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg7,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_total,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_shape,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_odd,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_even,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+odd_ratio,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+even_ratio,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+odd_to_even_ratio,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_low,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_mid,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_high,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+low_ratio,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+mid_ratio,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+high_ratio,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_shape_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_odd_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_even_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+odd_ratio_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+even_ratio_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+odd_to_even_ratio_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_low_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_mid_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+E_high_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+low_ratio_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+mid_ratio_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+high_ratio_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg0_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg0_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg0_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg1_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg1_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg1_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg2_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg2_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg2_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg3_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg3_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg3_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg4_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg4_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg4_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg5_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg5_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg5_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg6_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg6_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg6_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg7_MA24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg7_logret,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+Gegenbauer_0.1_deg7_vol24,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+swap_size_imbalance,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+tangent_down,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+tangent_up,uniswap_v3_liquidity_curve,Uniswap V3 liquidity-curve shape
+totalValueLockedUSD,curve_3pool_liquidity,Curve 3pool liquidity conditions
+w_USDC,curve_3pool_liquidity,Curve 3pool liquidity conditions
+w_USDT,curve_3pool_liquidity,Curve 3pool liquidity conditions
+curve_entropy,curve_3pool_liquidity,Curve 3pool liquidity conditions
+gauge_share_3crv,curve_3pool_liquidity,Curve 3pool liquidity conditions
+eth_price_usd,broader_market,Broader market conditions
+eth_SMA_1200,broader_market,Broader market conditions
+eth_EMA_4800,broader_market,Broader market conditions
+eth_RSI_24,broader_market,Broader market conditions
+eth_ATR_24,broader_market,Broader market conditions
+eth_vol_168,broader_market,Broader market conditions
+btc_price_usd,broader_market,Broader market conditions
+btc_SMA_1200,broader_market,Broader market conditions
+btc_EMA_4800,broader_market,Broader market conditions
+btc_RSI_24,broader_market,Broader market conditions
+btc_ATR_24,broader_market,Broader market conditions
+btc_vol_168,broader_market,Broader market conditions
+usd_index,broader_market,Broader market conditions
+fx_volatility,broader_market,Broader market conditions
+fear_greed_index,broader_market,Broader market conditions
+depeg_bps,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag1h,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag2h,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag3h,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag4h,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag5h,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag6h,historical_peg_deviation,Historical peg deviation
+depeg_bps_lag7h,historical_peg_deviation,Historical peg deviation
+hhi_24h_rolling_mean,liquidity_ownership_positions,Liquidity ownership and position structure
+tick_width_24h_rolling_median,liquidity_ownership_positions,Liquidity ownership and position structure
+n_in_range_log_return,liquidity_ownership_positions,Liquidity ownership and position structure
+weighted_mean_age_hours,liquidity_ownership_positions,Liquidity ownership and position structure
+net_amountUSD_100,trading_velocity_flows,Trading velocity and flows
+net_amount0,trading_velocity_flows,Trading velocity and flows
+swap_count_100,trading_velocity_flows,Trading velocity and flows
+swap_count_500,trading_velocity_flows,Trading velocity and flows
+net_amountUSD_500,trading_velocity_flows,Trading velocity and flows
+hourlyVolumeUSD,trading_velocity_flows,Trading velocity and flows
+supplied_USD_usdt,aave_lending,AAVE lending market conditions
+utilisation_rate_usdt,aave_lending,AAVE lending market conditions
+supplied_USD_usdc,aave_lending,AAVE lending market conditions
+utilisation_rate_usdc,aave_lending,AAVE lending market conditions
+liquidation_USD,aave_lending,AAVE lending market conditions

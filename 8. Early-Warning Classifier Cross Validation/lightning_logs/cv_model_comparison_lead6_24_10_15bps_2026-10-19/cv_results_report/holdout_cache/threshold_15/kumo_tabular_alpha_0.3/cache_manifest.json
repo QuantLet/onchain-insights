@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fingerprint": "f4e9a62cc128e08d56611677ba0fa0b5a172b13778bb8a69eb2bcfe88e303cec",
+  "model_name": "kumo_tabular",
+  "alpha": 0.3,
+  "target_threshold": 15,
+  "minimum_lead": 2.0,
+  "maximum_lead": 24.0,
+  "cv_end": "2025-01-01",
+  "first_holdout_score": "2025-01-01 00:00:00+00:00"
+}

@@ -1,0 +1,19 @@
+\begin{table}
+\caption{Feature ablations under the np\_fpr\_0p08 threshold policy. The full-feature control is refitted on the same fold windows as the ablations.}
+\label{tab:ablation_15_kumo_tabular}
+\begin{tabular}{llllrrr}
+\toprule
+Ablation & Event recall & False alerts/month & Median lead (h) & AUC & AUPRC & Brier score \\
+\midrule
+none & 0.611 (11/18) & 3.11 [1.90, 4.46] & 4.0 [3.0, 13.0] & 0.797 & 0.204 & 0.064 \\
+all & 0.722 (13/18) & 7.23 [5.83, 8.76] & 8.0 [5.0, 17.0] & 0.727 & 0.182 & 0.068 \\
+uniswap\_v3\_liquidity\_curve & 0.222 (4/18) & 4.04 [2.81, 5.46] & 6.5 [3.0, 15.0] & 0.682 & 0.148 & 0.061 \\
+curve\_3pool\_liquidity & 0.333 (6/18) & 4.12 [2.89, 5.47] & 7.5 [3.5, 21.0] & 0.725 & 0.140 & 0.061 \\
+broader\_market & 0.444 (8/18) & 3.53 [2.32, 4.68] & 7.5 [3.0, 13.0] & 0.785 & 0.219 & 0.060 \\
+historical\_peg\_deviation & 0.500 (9/18) & 4.29 [3.08, 5.49] & 8.0 [3.0, 14.0] & 0.746 & 0.149 & 0.061 \\
+liquidity\_ownership\_positions & 0.444 (8/18) & 2.52 [1.51, 3.62] & 6.5 [4.0, 21.0] & 0.770 & 0.152 & 0.061 \\
+trading\_velocity\_flows & 0.389 (7/18) & 3.87 [2.70, 5.20] & 9.0 [3.0, 21.0] & 0.768 & 0.156 & 0.060 \\
+aave\_lending & 0.333 (6/18) & 4.37 [3.00, 5.85] & 7.0 [3.5, 19.0] & 0.737 & 0.162 & 0.061 \\
+\bottomrule
+\end{tabular}
+\end{table}

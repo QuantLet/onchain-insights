@@ -1,40 +1,40 @@
 \begin{table}[pos=!htbp,align=\centering]
-\caption{Operational out-of-sample comparison at the 15-basis-point depeg threshold. Probability cutoffs are selected on preceding validation data using the Neyman--Pearson order-statistic rule with hourly FPR limit $\eta=0.01$ and nominal violation tolerance $\delta_{\mathrm{NP}}=0.05$. The nominal NP assumptions are not guaranteed by temporal data. The hourly FPR limit is distinct from false-alert episodes per month. Models are selected by event-level recall, with false alerts per month as the secondary criterion. Timely warnings precede onset by 2–24 hours. Recall and pooled median-lead confidence intervals resample unique realized events; alert-burden intervals resample calendar blocks. Alert burden pools false-alert counts over fully observed follow-up hours. Above-threshold crossings form one episode until 12 consecutive observed below-threshold hours reset it. The first alert requires the same observed quiet history; missing hours or scores break that history. All timely episodes are recognized, while each event contributes once to recall. AUC and AUPRC are secondary row-level ranking metrics. Best displayed values in each metric are highlighted in bold red and second-best distinct displayed values in underlined blue. Ranking metrics in this table are fold means; ROC plots additionally report pooled OOF AUC.}
+\caption{Operational out-of-sample comparison at the 15-basis-point depeg threshold. Probability cutoffs are selected on preceding validation data using the Neyman--Pearson order-statistic rule with hourly FPR limit $\eta=0.01$ and nominal violation tolerance $\delta_{\mathrm{NP}}=0.05$. The nominal NP assumptions are not guaranteed by temporal data. The hourly FPR limit is distinct from false-alert episodes per month. Models are selected by event-level recall, with false alerts per month as the secondary criterion. Timely warnings precede onset by 2–24 hours. Pooled median-lead confidence intervals resample unique realized events; alert-burden intervals resample calendar blocks. Alert burden pools false-alert counts over fully observed follow-up hours. Above-threshold crossings form one episode until 12 consecutive observed below-threshold hours reset it. The first alert requires the same observed quiet history; missing hours or scores break that history. All timely episodes are recognized, while each event contributes once to recall. AUC and AUPRC are secondary row-level ranking metrics. Best displayed values in each metric are highlighted in bold red and second-best distinct displayed values in underlined blue. Ranking metrics in this table are fold means; ROC plots additionally report pooled OOF AUC.}
 \label{tab:cv_model_alpha_results_15}
 \resizebox{\textwidth}{!}{
 \begin{tabular}{llrrrrrr}
 \toprule
 Model & $\alpha$ & Event recall & False alerts/month & Median lead (h) & AUC & AUPRC & Brier score \\
 \midrule
-\multirow{4}{*}{Catboost} & 0.1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.643 & 0.199 & 0.172 \\
- & 0.3 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.594 & 0.103 & 0.165 \\
- & 0.5 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.610 & 0.137 & 0.148 \\
- & 1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.584 & 0.119 & 0.167 \\
+\multirow{4}{*}{Catboost} & 0.1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.643 & 0.199 & 0.172 \\
+ & 0.3 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.594 & 0.103 & 0.165 \\
+ & 0.5 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.610 & 0.137 & 0.148 \\
+ & 1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.584 & 0.119 & 0.167 \\
 \midrule
-\multirow{4}{*}{XGBoost} & 0.1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.583 & 0.130 & 0.239 \\
- & 0.3 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.621 & 0.131 & 0.241 \\
- & 0.5 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.637 & 0.141 & 0.227 \\
- & 1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.636 & 0.119 & 0.194 \\
+\multirow{4}{*}{XGBoost} & 0.1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.583 & 0.130 & 0.239 \\
+ & 0.3 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.621 & 0.131 & 0.241 \\
+ & 0.5 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.637 & 0.141 & 0.227 \\
+ & 1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.636 & 0.119 & 0.194 \\
 \midrule
-\multirow{4}{*}{LightGBM} & 0.1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.598 & 0.114 & \textcolor{blue}{\underline{0.062}} \\
- & 0.3 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.530 & 0.109 & \textcolor{blue}{\underline{0.062}} \\
- & 0.5 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.525 & 0.116 & \textcolor{blue}{\underline{0.062}} \\
- & 1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.520 & 0.129 & \textcolor{blue}{\underline{0.062}} \\
+\multirow{4}{*}{LightGBM} & 0.1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.598 & 0.114 & \textcolor{blue}{\underline{0.062}} \\
+ & 0.3 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.530 & 0.109 & \textcolor{blue}{\underline{0.062}} \\
+ & 0.5 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.525 & 0.116 & \textcolor{blue}{\underline{0.062}} \\
+ & 1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.520 & 0.129 & \textcolor{blue}{\underline{0.062}} \\
 \midrule
-\multirow{4}{*}{Random Forest} & 0.1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.677 & 0.180 & \textcolor{red}{\textbf{0.061}} \\
- & 0.3 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.669 & 0.189 & \textcolor{red}{\textbf{0.061}} \\
- & 0.5 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.671 & 0.160 & \textcolor{red}{\textbf{0.061}} \\
- & 1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.637 & 0.108 & 0.064 \\
+\multirow{4}{*}{Random Forest} & 0.1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.677 & 0.180 & \textcolor{red}{\textbf{0.061}} \\
+ & 0.3 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.669 & 0.189 & \textcolor{red}{\textbf{0.061}} \\
+ & 0.5 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.671 & 0.160 & \textcolor{red}{\textbf{0.061}} \\
+ & 1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.637 & 0.108 & 0.064 \\
 \midrule
-\multirow{4}{*}{Kumo} & 0.1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.770 & 0.208 & 0.068 \\
- & 0.3 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{blue}{\underline{0.08 [0.00, 0.26]}} & NA & 0.781 & 0.202 & 0.067 \\
- & 0.5 & \textcolor{red}{\textbf{0.056 [0.000, 0.167]}} & \textcolor{blue}{\underline{0.08 [0.00, 0.26]}} & \textcolor{red}{\textbf{16.0 [16.0, 16.0]}} & 0.778 & 0.204 & 0.068 \\
- & 1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & \textcolor{red}{\textbf{0.797}} & 0.204 & 0.064 \\
+\multirow{4}{*}{Kumo} & 0.1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & 0.770 & 0.208 & 0.068 \\
+ & 0.3 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{blue}{\underline{0.08 [0.00, 0.26]}} & NA & 0.781 & 0.202 & 0.067 \\
+ & 0.5 & \textcolor{red}{\textbf{0.056 (1/18)}} & \textcolor{blue}{\underline{0.08 [0.00, 0.26]}} & \textcolor{red}{\textbf{16.0 [16.0, 16.0]}} & 0.778 & 0.204 & 0.068 \\
+ & 1 & \textcolor{blue}{\underline{0.000 (0/18)}} & \textcolor{red}{\textbf{0.00 [0.00, 0.00]}} & NA & \textcolor{red}{\textbf{0.797}} & 0.204 & 0.064 \\
 \midrule
-\multirow{4}{*}{TabICL-v2} & 0.1 & \textcolor{red}{\textbf{0.056 [0.000, 0.167]}} & 0.25 [0.00, 0.68] & \textcolor{blue}{\underline{10.0 [10.0, 10.0]}} & \textcolor{blue}{\underline{0.790}} & \textcolor{blue}{\underline{0.227}} & 0.079 \\
- & 0.3 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & 0.17 [0.00, 0.52] & NA & 0.775 & 0.211 & 0.076 \\
- & 0.5 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & 0.25 [0.00, 0.78] & NA & 0.750 & 0.203 & 0.083 \\
- & 1 & \textcolor{blue}{\underline{0.000 [0.000, 0.000]}} & 0.17 [0.00, 0.52] & NA & 0.778 & \textcolor{red}{\textbf{0.252}} & 0.076 \\
+\multirow{4}{*}{TabICL-v2} & 0.1 & \textcolor{red}{\textbf{0.056 (1/18)}} & 0.25 [0.00, 0.68] & \textcolor{blue}{\underline{10.0 [10.0, 10.0]}} & \textcolor{blue}{\underline{0.790}} & \textcolor{blue}{\underline{0.227}} & 0.079 \\
+ & 0.3 & \textcolor{blue}{\underline{0.000 (0/18)}} & 0.17 [0.00, 0.52] & NA & 0.775 & 0.211 & 0.076 \\
+ & 0.5 & \textcolor{blue}{\underline{0.000 (0/18)}} & 0.25 [0.00, 0.78] & NA & 0.750 & 0.203 & 0.083 \\
+ & 1 & \textcolor{blue}{\underline{0.000 (0/18)}} & 0.17 [0.00, 0.52] & NA & 0.778 & \textcolor{red}{\textbf{0.252}} & 0.076 \\
 \bottomrule
 \end{tabular}
 }
