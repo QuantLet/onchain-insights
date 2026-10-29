@@ -1,0 +1,7 @@
+target_threshold,model_name,alpha,np_roc_auc_nominal,np_roc_partial_auc,np_roc_partial_auc_normalized,np_roc_partial_max,pooled_roc_auc,pooled_auprc,np_delta,hourly_positives,hourly_negatives,area_definition,band_definition
+15,kumo_tabular,0.5,0.8665032223883645,0.003739534787720424,0.07479069575440848,0.05,0.7006506736279894,0.08214908304666114,0.05,414,8050,trapezoid_heldout_TPR_vs_nominal_FPR_limit,conditional_calendar_block_bootstrap_not_theoretical_NP_band
+15,tabicl_v2,0.5,0.771174924475994,0.003405198228006772,0.06810396456013543,0.05,0.6452238425300807,0.09701673451791037,0.05,414,8050,trapezoid_heldout_TPR_vs_nominal_FPR_limit,conditional_calendar_block_bootstrap_not_theoretical_NP_band
+15,catboost,0.1,0.6115945634042896,0.0002559965765923382,0.005119931531846764,0.05,0.43404401836348905,0.05094025379558208,0.05,414,8050,trapezoid_heldout_TPR_vs_nominal_FPR_limit,conditional_calendar_block_bootstrap_not_theoretical_NP_band
+15,xgboost,0.3,0.30906199677938806,0.0,0.0,0.05,0.49399645932727226,0.06732119760835585,0.05,414,8050,trapezoid_heldout_TPR_vs_nominal_FPR_limit,conditional_calendar_block_bootstrap_not_theoretical_NP_band
+15,random_forest,1.0,0.4897564412238325,0.0,0.0,0.05,0.6113303027575239,0.06470418254707173,0.05,414,8050,trapezoid_heldout_TPR_vs_nominal_FPR_limit,conditional_calendar_block_bootstrap_not_theoretical_NP_band
+15,lightgbm,1.0,0.38131642512077296,0.0,0.0,0.05,0.3515299906982327,0.04226609716534737,0.05,414,8050,trapezoid_heldout_TPR_vs_nominal_FPR_limit,conditional_calendar_block_bootstrap_not_theoretical_NP_band

@@ -1,20 +1,20 @@
 {
-  "cached_probabilities_only": true,
-  "model_fit_or_predict_calls": false,
+  "cached_cv_probabilities_only": true,
+  "cv_model_fit_or_predict_calls": false,
+  "cached_probabilities_only": false,
+  "model_fit_or_predict_calls": "selected_holdout_only_if_cache_missing",
+  "primary_policy": "np_fpr_0p1",
+  "holdout_mode": "auto",
   "minimum_lead_hours": 2.0,
   "maximum_lead_hours": 24.0,
   "threshold_methods": [
-    "empirical",
-    "neyman_pearson",
-    "event_ucb"
+    "neyman_pearson"
   ],
   "hourly_np_fpr_targets": [
-    0.005,
-    0.01,
-    0.02
+    0.1
   ],
   "np_violation_tolerance": 0.05,
-  "np_negative_spacing_hours": 1,
+  "np_negative_spacing_hours": 24.0,
   "np_assumptions": "iid negatives, stable class-conditional scores, and calibration independent of fitted scorer; not verified",
   "np_early_stopping_caveat": "Saved validation may have selected training iterations, violating independent calibration",
   "event_false_alert_budget_per_month": 5.0,
@@ -25,5 +25,8 @@
   "model_selection": "Pooled event recall, then false-alert burden; hourly metrics are also reported",
   "hourly_population": "Full-future-observed rows excluding current breaches and the final hour before onset",
   "event_population": "Unique event onsets with full 2--24h score coverage; full timelines retained for episodes",
-  "alert_cooldown_hours": 1.0
+  "alert_cooldown_hours": 12.0,
+  "nproc_definition": "nominal_hourly_FPR_limit_vs_heldout_TPR_at_validation_NP_cutoffs; empirical block-bootstrap bands",
+  "nproc_area_definition": "trapezoidal full integral on [0,1]; partial integral on [0,partial_max]; normalized partial divided by partial_max",
+  "nproc_partial_max": 0.05
 }

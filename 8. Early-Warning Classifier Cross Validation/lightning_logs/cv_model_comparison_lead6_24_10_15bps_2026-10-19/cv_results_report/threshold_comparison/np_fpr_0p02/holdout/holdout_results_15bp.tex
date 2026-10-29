@@ -1,0 +1,13 @@
+\begin{table}[pos=!htbp,align=\centering]
+\caption{Final holdout performance of the CV-selected model at the 15-basis-point depeg threshold. Probability cutoffs are selected on preceding validation data using the Neyman--Pearson order-statistic rule with hourly FPR limit $\eta=0.02$ and nominal violation tolerance $\delta_{\mathrm{NP}}=0.05$. The nominal NP assumptions are not guaranteed by temporal data. The hourly FPR limit is distinct from false-alert episodes per month. The specification is fixed by CV event recall, with lower false-alert burden breaking ties; no holdout outcome selects the model or cutoff. The selected model detects 1 of 5 eligible holdout events. Timely warnings precede onset by 2–24 hours. Recall and pooled median-lead confidence intervals resample unique realized events; alert-burden intervals resample calendar blocks. Alert burden pools false-alert counts over fully observed follow-up hours. Above-threshold crossings form one episode until 12 consecutive observed below-threshold hours reset it. The first alert requires the same observed quiet history; missing hours or scores break that history. All timely episodes are recognized, while each event contributes once to recall. AUC and AUPRC are secondary row-level ranking metrics. Best displayed values in each metric are highlighted in bold red and second-best distinct displayed values in underlined blue.}
+\label{tab:holdout_model_results_15}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llrrrrrr}
+\toprule
+Model & $\alpha$ & Event recall & False alerts/month & Median lead (h) & AUC & AUPRC & Brier score \\
+\midrule
+\multirow{1}{*}{TabICL-v2} & 0.5 & \textcolor{red}{\textbf{0.200 [0.000, 0.600]}} & \textcolor{red}{\textbf{0.81 [0.37, 1.31]}} & \textcolor{red}{\textbf{8.0 [8.0, 8.0]}} & \textcolor{red}{\textbf{0.795}} & \textcolor{red}{\textbf{0.025}} & \textcolor{red}{\textbf{0.016}} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
