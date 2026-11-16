@@ -21,22 +21,22 @@ Datafile: USDC_USDT_hourly_metrics.parquet
 
 ```
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/chaining_function.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/chaining_function.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/gpd_spliced_quantile_logit.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/gpd_spliced_quantile_logit.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/ispline_basis_power_tails.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/ispline_basis_power_tails.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/ispline_basis_uniform.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/ispline_basis_uniform.png" alt="Image" />
 </div>
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/9.%20Parametric%20quantile%20function%20characterisation/quantile_function_comparison.png" alt="Image" />
+<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/10.%20Parametric%20quantile%20function%20characterisation/quantile_function_comparison.png" alt="Image" />
 </div>
 
