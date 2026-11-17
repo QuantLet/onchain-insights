@@ -1,0 +1,47 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Forecaster range rule with each forecaster over the holdout. Asymmetric: the predictive 10\%--90\% interval over the next 6 hours (main specification). Symmetric: the same width centred on the median forecast. Columns as in Table~\ref{tab:lp_main}.}
+\label{tab:lp_forecasters}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Vault & Net & Sharpe & Sortino & Event DD & Max DD & Worst day & CVaR$_{5\%}$ & Reposit./month \\
+\midrule
+Our model, asymmetric range & 440 & 13.9 & 44.6 & $-13.5$ & $-7.8$ & $-1.2$ & $-0.50$ & 27.1 \\
+\quad + classifier freeze & 385 & 14.8 & 46.0 & $-5.0$ & $-2.2$ & $-1.2$ & $-0.56$ & 21.4 \\
+\quad + price trigger, 15\,bp & 425 & 14.5 & 47.9 & $-9.0$ & $-2.6$ & $-1.2$ & $-0.48$ & 26.2 \\
+Our model, symmetric range & 395 & 13.2 & 37.3 & $-17.1$ & $-11.7$ & $-1.1$ & $-0.38$ & 19.7 \\
+\quad + classifier freeze & 346 & 14.7 & 49.5 & $-3.5$ & $-2.0$ & $-1.1$ & $-0.41$ & 14.2 \\
+\quad + price trigger, 15\,bp & 377 & 14.6 & 48.4 & $-6.2$ & $-2.0$ & $-1.1$ & $-0.37$ & 18.9 \\
+\midrule
+TimeXer, asymmetric range & 377 & 12.8 & 36.9 & $-11.5$ & $-6.6$ & $-1.8$ & $-0.68$ & 22.9 \\
+\quad + classifier freeze & 339 & 13.8 & 37.9 & $-3.3$ & $-2.6$ & $-1.8$ & $-0.78$ & 19.8 \\
+\quad + price trigger, 15\,bp & 372 & 13.5 & 40.3 & $-6.3$ & $-3.1$ & $-1.8$ & $-0.65$ & 22.1 \\
+TimeXer, symmetric range & 356 & 12.9 & 42.8 & $-11.5$ & $-6.5$ & $-1.2$ & $-0.50$ & 15.0 \\
+\quad + classifier freeze & 309 & 14.7 & 45.6 & $-3.0$ & $-2.1$ & $-1.0$ & $-0.50$ & 12.1 \\
+\quad + price trigger, 15\,bp & 334 & 14.6 & 46.0 & $-5.3$ & $-2.1$ & $-1.2$ & $-0.48$ & 14.2 \\
+\midrule
+TiDE, asymmetric range & 471 & 13.7 & 43.1 & $-11.5$ & $-6.2$ & $-1.7$ & $-0.67$ & 40.5 \\
+\quad + classifier freeze & 408 & 14.9 & 44.0 & $-5.2$ & $-2.2$ & $-1.7$ & $-0.77$ & 31.4 \\
+\quad + price trigger, 15\,bp & 452 & 15.1 & 44.8 & $-6.1$ & $-4.0$ & $-1.4$ & $-0.64$ & 39.5 \\
+TiDE, symmetric range & 452 & 13.9 & 42.9 & $-16.2$ & $-7.4$ & $-2.2$ & $-0.74$ & 33.5 \\
+\quad + classifier freeze & 396 & 14.7 & 47.7 & $-3.7$ & $-2.4$ & $-1.4$ & $-0.69$ & 25.6 \\
+\quad + price trigger, 15\,bp & 446 & 14.7 & 48.8 & $-7.0$ & $-3.1$ & $-1.4$ & $-0.62$ & 31.5 \\
+\midrule
+GARCH, asymmetric range & 269 & 14.0 & 64.3 & $-3.4$ & $-1.6$ & $-0.7$ & $-0.28$ & 18.6 \\
+\quad + classifier freeze & 254 & 14.9 & 68.7 & $-0.9$ & $-1.4$ & $-0.7$ & $-0.26$ & 14.5 \\
+\quad + price trigger, 15\,bp & 260 & 15.0 & 64.6 & $-1.6$ & $-1.4$ & $-0.7$ & $-0.28$ & 17.6 \\
+GARCH, symmetric range & 249 & 13.1 & 68.3 & $-3.2$ & $-1.7$ & $-0.7$ & $-0.17$ & 13.2 \\
+\quad + classifier freeze & 240 & 14.0 & 75.3 & $-0.8$ & $-1.3$ & $-0.7$ & $-0.18$ & 10.1 \\
+\quad + price trigger, 15\,bp & 242 & 14.1 & 71.4 & $-1.1$ & $-1.3$ & $-0.7$ & $-0.17$ & 12.2 \\
+\midrule
+Rolling empirical, asymmetric range & 449 & 13.7 & 44.5 & $-13.9$ & $-8.6$ & $-1.3$ & $-0.46$ & 28.9 \\
+\quad + classifier freeze & 391 & 15.2 & 48.2 & $-4.6$ & $-1.8$ & $-1.0$ & $-0.51$ & 22.4 \\
+\quad + price trigger, 15\,bp & 428 & 15.8 & 49.4 & $-7.0$ & $-2.6$ & $-1.0$ & $-0.40$ & 27.4 \\
+Rolling empirical, symmetric range & 409 & 12.6 & 34.9 & $-19.2$ & $-15.4$ & $-10.0$ & $-0.81$ & 21.9 \\
+\quad + classifier freeze & 364 & 14.9 & 52.7 & $-3.3$ & $-2.1$ & $-1.1$ & $-0.43$ & 16.0 \\
+\quad + price trigger, 15\,bp & 406 & 15.0 & 54.5 & $-5.4$ & $-2.0$ & $-1.4$ & $-0.38$ & 20.1 \\
+\bottomrule
+\end{tabular}}
+\end{table}

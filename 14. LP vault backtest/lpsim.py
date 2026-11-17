@@ -176,51 +176,37 @@ class Sim:
 # metrics
 # ---------------------------------------------------------------------------
 
-def hodl(mkt, V0=1e6):
-    x = 0.5 * V0 / mkt.P0[0]; y = 0.5 * V0
-    return pd.Series(x * mkt.P + y, index=mkt.idx)
+def event_drawdown(hedged, mkt, event_idx, window=(24, 48), V0=1e6):
+    """Sum over events of the largest drawdown of cumulative hedged PnL from `window[0]` hours before to
+    `window[1]` hours after each event (bp of V0)."""
+    h, tot = np.asarray(hedged), 0.0
+    for i in event_idx:
+        c = np.cumsum(h[max(0, i - window[0]):i + window[1]]) / V0 * 1e4
+        tot += (c - np.maximum.accumulate(np.r_[0.0, c])[1:]).min()
+    return tot
 
 
-def metrics(df, mkt, V0=None, label=None, event_mask=None):
-    yrs = mkt.years
-    V0 = V0 or df.attrs.get("V0", 1e6)
-    h = df['hedged']
-    cum_h = h.cumsum()
-    dd_h = (cum_h - cum_h.cummax()).min()
-    daily_h = h.resample('1D').sum()
-    V = df['V']
-    ret_daily = V.resample('1D').last().pct_change().dropna()
-    dd_v = (V / V.cummax() - 1).min()
-    hv = hodl(mkt, V0)
+def metrics(df, mkt, event_idx=(), window=(24, 48), label=None):
+    """Annualised PnL components (bp/yr of V0) and risk measures of the hedged PnL (bp of V0)."""
+    V0, yrs, h = df.attrs.get('V0', 1e6), mkt.years, df['hedged']
+    bp = 1e4 / V0
+    cum = h.cumsum(); daily = h.resample('1D').sum()
+    mask = np.zeros(len(h), bool)
+    for i in event_idx:
+        mask[max(0, i - window[0]):i + window[1]] = True
+    down = np.sqrt(np.mean(np.minimum(h.values, 0.0) ** 2))
     r = dict(
-        fee_apr=df['fees'].sum() / V0 / yrs * 1e4,          # bps / yr
-        lvr_apr=df['lvr'].sum() / V0 / yrs * 1e4,
-        cost_apr=-(df['gas'].sum() + df['swapcost'].sum()) / V0 / yrs * 1e4,
-        net_vs_rebal_apr=h.sum() / V0 / yrs * 1e4,
-        excess_vs_hodl_apr=(V.iloc[-1] - hv.iloc[-1]) / V0 / yrs * 1e4,
-        total_ret_apr=(V.iloc[-1] / V0 - 1) / yrs * 1e4,
-        hedged_cagr=((1 + h.sum() / V0) ** (1 / yrs) - 1) * 1e4,
-        hedged_sharpe=daily_h.mean() / daily_h.std() * np.sqrt(365) if daily_h.std() > 0 else np.nan,
-        # Sortino on hourly net PnL (target 0, annualised with sqrt(8766)): the vault's losses are intraday LVR
-        # spikes that daily aggregation nets against same-day fees; the daily version is kept for reference.
-        hedged_sortino=(h.mean() / np.sqrt(np.mean(np.minimum(h.values, 0.0) ** 2)) * np.sqrt(8766)
-                        if (h < 0).any() else np.nan),
-        hedged_sortino_daily=(daily_h.mean() / np.sqrt(np.mean(np.minimum(daily_h.values, 0.0) ** 2)) * np.sqrt(365)
-                              if (daily_h < 0).any() else np.nan),
-        hedged_maxdd_bps=dd_h / V0 * 1e4,
-        hedged_cvar5_daily_bps=daily_h[daily_h <= daily_h.quantile(0.05)].mean() / V0 * 1e4,
-        worst_day_bps=daily_h.min() / V0 * 1e4,
-        mtm_maxdd_bps=dd_v * 1e4,
-        time_in_range=df['inrange'].mean(),
-        rebalances=int(df['reb'].sum()),
-        rebal_per_month=df['reb'].sum() / (yrs * 12),
-        compounds_per_month=df['compounds'].sum() / (yrs * 12) if 'compounds' in df else 0.0,
-        avg_width_ticks=(df['tb'] - df['ta']).mean(),
+        fees=df['fees'].sum() * bp / yrs, lvr=df['lvr'].sum() * bp / yrs,
+        costs=-(df['gas'].sum() + df['swapcost'].sum()) * bp / yrs, net=h.sum() * bp / yrs,
+        sharpe=daily.mean() / daily.std() * np.sqrt(365) if daily.std() > 0 else np.nan,
+        sortino=h.mean() / down * np.sqrt(8766) if down > 0 else np.nan,
+        event_dd=event_drawdown(h.values, mkt, event_idx, window, V0),
+        max_dd=(cum - cum.cummax()).min() * bp,
+        worst_day=daily.min() * bp,
+        cvar5=daily[daily <= daily.quantile(0.05)].mean() * bp,
+        reposition_per_month=df['reb'].sum() / (yrs * 12),
+        avg_width=(df['tb'] - df['ta']).mean(),
+        ev_fees=df['fees'][mask].sum() * bp, ev_lvr=df['lvr'][mask].sum() * bp,
+        ev_costs=-(df['gas'] + df['swapcost'])[mask].sum() * bp, ev_net=h[mask].sum() * bp,
     )
-    if event_mask is not None:
-        r['event_hedged_bps'] = h[event_mask].sum() / V0 * 1e4
-        r['event_lvr_bps'] = df['lvr'][event_mask].sum() / V0 * 1e4
-        r['event_fees_bps'] = df['fees'][event_mask].sum() / V0 * 1e4
-        r['event_cost_bps'] = -(df['gas'] + df['swapcost'])[event_mask].sum() / V0 * 1e4
-        r['calm_hedged_apr'] = h[~event_mask].sum() / V0 / yrs * 1e4
     return pd.Series(r, name=label)

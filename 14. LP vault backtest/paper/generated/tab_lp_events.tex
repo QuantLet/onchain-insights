@@ -1,0 +1,21 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Drawdown of net profit within each holdout event window (bp; 24 hours before to 48 hours after the first 15\,bp breach).}
+\label{tab:lp_events}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+Event & 19 Jan 25 & 3 Feb 25 & 10 Oct 25 & 29 Jan 26 & 4 Feb 26 \\
+Largest $|d|$ (bp) & 18 & 16 & 17 & 15 & 29 \\
+\midrule
+Gamma-style $\pm2$ & $-2.9$ & $-2.7$ & $-2.4$ & $-0.4$ & $-12.1$ \\
+\quad + classifier freeze & $-1.2$ & $-1.0$ & $-0.7$ & $-0.2$ & $-1.3$ \\
+\quad + price trigger, 15\,bp & $-1.2$ & $-2.7$ & $-1.1$ & $-0.4$ & $-2.5$ \\
+\midrule
+Forecaster range & $-2.1$ & $-1.5$ & $-1.7$ & $-0.4$ & $-7.8$ \\
+\quad + classifier freeze (two-model vault) & $-0.7$ & $-0.8$ & $-1.6$ & $-0.4$ & $-1.6$ \\
+\quad + price trigger, 15\,bp & $-2.0$ & $-1.5$ & $-2.6$ & $-0.7$ & $-2.1$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

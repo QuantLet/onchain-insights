@@ -1,0 +1,15 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Stress scenario: USDC depeg of 10--20 March 2023. Losses from LVR and repositioning costs (bp of a \$1M vault); fee income is not observed in this period and is excluded. Freezes start at the first 15\,bp breach (21:00 UTC on 10 March) or the stated number of hours before it. A static $\pm5$ range loses $-1.8$\,bp.}
+\label{tab:lp_stress}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrr}
+\toprule
+Vault & no freeze & at breach & 2\,h before & 9\,h before \\
+\midrule
+Gamma-style $\pm2$ & $-2{,}712.0$ & $-4.0$ & $-4.0$ & $-0.2$ \\
+Forecaster range (rolling empirical) & $-2{,}313.1$ & $-6.3$ & $-2.7$ & $-0.9$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

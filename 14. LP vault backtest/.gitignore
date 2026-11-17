@@ -1,0 +1,3 @@
+.panel_cache.pkl
+.rolling_empirical_*.npz
+__pycache__/

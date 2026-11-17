@@ -1,27 +1,15 @@
-"""Reduce full forecast artifacts (Q: origins x 24 x 256) to the 26 quantile levels used by the
-LP backtest. Run from the repository root after downloading the section-12 release:
+"""Reduce the forecast artifacts (origins x 24 x 256 quantiles) to the 26 levels used by the backtest.
 
-    python "14. LP vault backtest/extract_quantiles.py"
-
-Writes 14. LP vault backtest/forecast_quantiles/q_<name>.npz for every artifact found.
+    python extract_quantiles.py            # all forecasters in config.FORECAST_ARTIFACTS
+    python extract_quantiles.py "Our model"
+Writes forecast_quantiles/q_<name>.npz (Qsel, and ds = target timestamps when the artifact stores them).
 """
-import json
-import sys
-from pathlib import Path
+import json, sys
 import numpy as np
+import config as C
 
 IDX = [3, 4, 7, 8, 17, 18, 34, 35, 61, 62, 111, 112, 127, 128, 143, 144, 193, 194, 220, 221,
-       237, 238, 247, 248, 251, 252]
-HERE = Path(__file__).resolve().parent
-SEC = HERE.parent / '12. Evaluation of Probabilistic Forecasts'
-ARTIFACTS = {
-    'ours': SEC / 'model_logs/final_retrain_run/preds_test_set.compact.npz',
-    'timexer': SEC / 'benchmark_outputs/timeXer_hist_exog/preds_test_set.compact.npz',
-    'tide': SEC / 'benchmark_outputs/tide_hist_exog/preds_test_set.compact.npz',
-    'garch': SEC / 'benchmark_outputs/garch_student_t/preds_test_set.compact.npz',
-    'naive': SEC / 'benchmark_outputs/naive/preds_test_set.compact.npz',
-    'arima': SEC / 'benchmark_outputs/arima/preds_test_set.compact.npz',
-}
+       237, 238, 247, 248, 251, 252]       # pairs bracketing 0.5,1,2.5,5,10,25,50,75,90,95,97.5,99,99.5%
 
 
 def extract(src, dst):
@@ -29,23 +17,18 @@ def extract(src, dst):
     md = json.loads(str(z['__metadata__'].item()))
     names = {str(k.get('value')): v for k, v in md['tree']['items']}
     Q = z[names['Q']['name']]
-    out = {'Qsel': Q[:, :, IDX].astype(np.float64), 'idx': np.array(IDX)}
+    out = {'Qsel': Q[:, :, IDX].astype(np.float64)}
     if 'ds' in names and names['ds']['type'] == 'ndarray':
         out['ds'] = z[names['ds']['name']].astype('datetime64[s]').astype(np.int64)
     np.savez_compressed(dst, **out)
-    print(f'{src} {Q.shape} -> {dst}')
+    print(f'{src.name} {Q.shape} -> {dst.name}')
 
 
 if __name__ == '__main__':
-    od = HERE / 'forecast_quantiles'; od.mkdir(exist_ok=True)
-    only = set(sys.argv[1:])
-    for name, src in ARTIFACTS.items():
-        if only and name not in only:
+    C.QDIR.mkdir(exist_ok=True)
+    for name, src in C.FORECAST_ARTIFACTS.items():
+        if len(sys.argv) > 1 and name not in sys.argv[1:]:
             continue
-        dst = od / f'q_{name}.npz'
         if not src.exists():
             print(f'missing: {src}'); continue
-        try:
-            extract(src, dst)
-        except Exception as e:  # truncated download etc.
-            print(f'FAILED {name}: {e!r}')
+        extract(src, C.QDIR / f"q_{name.lower().replace(' ', '_')}.npz")

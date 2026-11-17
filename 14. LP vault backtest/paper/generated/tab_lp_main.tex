@@ -1,0 +1,25 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Liquidity-provision backtest over the holdout (5 events of 15\,bp; \$1M vault). Fees, LVR, costs and net profit are annualised (bp per year); net profit is measured against the rebalancing portfolio, which therefore has zero profit and risk by construction. Sharpe ratio of daily and Sortino ratio of hourly net profit. Event DD: sum over events of the largest drawdown of cumulative net profit from 24 hours before to 48 hours after each event; Max DD, worst day and CVaR$_{5\%}$ of daily net profit, in bp. Classifier freeze: no repositioning during alert episodes. Price trigger: no repositioning while $|d_k|\ge15$\,bp. Oracle: no repositioning from 24 hours before each event.}
+\label{tab:lp_main}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrrrrr}
+\toprule
+Vault & Fees & LVR & Costs & Net & Sharpe & Sortino & Event DD & Max DD & Worst day & CVaR$_{5\%}$ & Reposit./month \\
+\midrule
+Rebalancing portfolio & 0 & 0 & 0 & 0 & -- & -- & 0 & 0 & 0 & 0 & 0 \\
+Static $\pm5$ around parity & 219 & $-44$ & 0 & 174 & 14.3 & 249.2 & $-0.5$ & $-0.5$ & $-0.1$ & 0.00 & 0.1 \\
+\midrule
+Gamma-style $\pm2$ & 717 & $-185$ & $-186$ & 345 & 10.6 & 23.5 & $-20.5$ & $-12.1$ & $-11.1$ & $-1.37$ & 18.8 \\
+\quad + classifier freeze & 574 & $-131$ & $-135$ & 308 & 13.4 & 27.7 & $-4.4$ & $-4.5$ & $-1.5$ & $-0.81$ & 13.6 \\
+\quad + price trigger, 15\,bp & 673 & $-162$ & $-167$ & 343 & 12.7 & 27.3 & $-8.0$ & $-4.5$ & $-2.4$ & $-0.90$ & 16.9 \\
+\quad + oracle & 629 & $-149$ & $-164$ & 317 & 12.9 & 25.6 & $-6.1$ & $-4.6$ & $-2.4$ & $-0.97$ & 16.5 \\
+\midrule
+Forecaster range & 756 & $-177$ & $-139$ & 440 & 13.9 & 44.6 & $-13.5$ & $-7.8$ & $-1.2$ & $-0.50$ & 27.1 \\
+\quad + classifier freeze (two-model vault) & 640 & $-137$ & $-119$ & 385 & 14.8 & 46.0 & $-5.0$ & $-2.2$ & $-1.2$ & $-0.56$ & 21.4 \\
+\quad + price trigger, 15\,bp & 728 & $-164$ & $-138$ & 425 & 14.5 & 47.9 & $-9.0$ & $-2.6$ & $-1.2$ & $-0.48$ & 26.2 \\
+\quad + oracle & 687 & $-155$ & $-133$ & 399 & 15.1 & 46.1 & $-7.1$ & $-2.5$ & $-1.2$ & $-0.54$ & 25.1 \\
+\bottomrule
+\end{tabular}}
+\end{table}
