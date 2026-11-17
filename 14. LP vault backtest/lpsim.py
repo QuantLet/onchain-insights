@@ -209,4 +209,16 @@ def metrics(df, mkt, event_idx=(), window=(24, 48), label=None):
         ev_fees=df['fees'][mask].sum() * bp, ev_lvr=df['lvr'][mask].sum() * bp,
         ev_costs=-(df['gas'] + df['swapcost'])[mask].sum() * bp, ev_net=h[mask].sum() * bp,
     )
+    # total value relative to HODL (the initial 50/50 token mix): LP profit plus the profit from deviating from
+    # the 50/50 inventory; identical in USDC or USDT terms to first order
+    x0, y0 = 0.5 * V0 / mkt.P0[0], 0.5 * V0
+    ex = (df['V'] - (x0 * df['P'] + y0)) * bp                      # cumulative excess value, bp of V0
+    exd = ex.resample('1D').last().diff().fillna(ex.resample('1D').last().iloc[0])
+    r.update(
+        vs_hodl=ex.iloc[-1] / yrs, inventory=(ex.iloc[-1] - h.sum() * bp) / yrs,
+        vs_hodl_sharpe=exd.mean() / exd.std() * np.sqrt(365) if exd.std() > 0 else np.nan,
+        vs_hodl_max_dd=(ex - ex.cummax()).min(), vs_hodl_worst_day=exd.min(),
+        vs_hodl_event_dd=event_drawdown(np.diff(np.r_[0.0, ex.values]) * V0 / 1e4, mkt, event_idx, window, V0),
+        time_out_of_lp=float(df['mode'].isin([2, 3]).mean()),
+    )
     return pd.Series(r, name=label)
