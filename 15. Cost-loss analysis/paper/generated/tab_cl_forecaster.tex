@@ -1,0 +1,48 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Economic value of acting on forecast exceedance probabilities over the holdout. At each hour a user protects against $|d_{t+h}|\geq\theta$ when the forecast probability exceeds the cost-loss ratio $c/L$. BSS: Brier skill score against the sample base rate. $V(c/L)$: relative economic value against the better of always and never protecting.}
+\label{tab:cl_forecaster}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Forecaster & BSS & $V(0.02)$ & $V(0.05)$ & $V(0.1)$ & $V(0.2)$ \\
+\midrule
+\multicolumn{6}{l}{\emph{$|d_{t+6}|\geq10$\,bp (base rate 3.6\%)}} \\
+Our model & 0.61 & 0.83 & 0.85 & 0.80 & 0.71 \\
+TimeXer & 0.56 & 0.80 & 0.83 & 0.77 & 0.65 \\
+TiDE & 0.54 & 0.79 & 0.84 & 0.78 & 0.71 \\
+GARCH & 0.42 & 0.68 & 0.70 & 0.60 & 0.57 \\
+Rolling empirical & 0.58 & 0.83 & 0.85 & 0.81 & 0.70 \\
+\multicolumn{6}{l}{\emph{$|d_{t+6}|\geq15$\,bp (base rate 0.4\%)}} \\
+Our model & 0.32 & 0.70 & 0.57 & 0.45 & 0.40 \\
+TimeXer & 0.10 & 0.65 & 0.54 & 0.38 & 0.12 \\
+TiDE & 0.32 & 0.61 & 0.55 & 0.48 & 0.38 \\
+GARCH & $-0.22$ & 0.31 & $-0.20$ & $-0.72$ & $-0.81$ \\
+Rolling empirical & 0.14 & 0.75 & 0.60 & 0.45 & 0.35 \\
+\multicolumn{6}{l}{\emph{$|d_{t+12}|\geq10$\,bp (base rate 3.6\%)}} \\
+Our model & 0.47 & 0.73 & 0.77 & 0.69 & 0.59 \\
+TimeXer & 0.38 & 0.67 & 0.72 & 0.63 & 0.50 \\
+TiDE & 0.39 & 0.64 & 0.76 & 0.69 & 0.60 \\
+GARCH & 0.36 & 0.61 & 0.65 & 0.55 & 0.49 \\
+Rolling empirical & 0.40 & 0.68 & 0.78 & 0.70 & 0.57 \\
+\multicolumn{6}{l}{\emph{$|d_{t+12}|\geq15$\,bp (base rate 0.4\%)}} \\
+Our model & 0.18 & 0.56 & 0.38 & 0.31 & 0.27 \\
+TimeXer & $-0.24$ & 0.45 & 0.17 & 0.06 & $-0.37$ \\
+TiDE & 0.04 & 0.47 & 0.39 & 0.28 & 0.11 \\
+GARCH & $-0.29$ & 0.24 & $-0.21$ & $-0.75$ & $-1.00$ \\
+Rolling empirical & $-0.06$ & 0.69 & 0.38 & 0.24 & 0.05 \\
+\multicolumn{6}{l}{\emph{$|d_{t+24}|\geq10$\,bp (base rate 3.6\%)}} \\
+Our model & 0.27 & 0.58 & 0.66 & 0.57 & 0.46 \\
+TimeXer & 0.07 & 0.48 & 0.55 & 0.39 & 0.18 \\
+TiDE & 0.13 & 0.52 & 0.63 & 0.55 & 0.36 \\
+GARCH & 0.28 & 0.57 & 0.63 & 0.50 & 0.38 \\
+Rolling empirical & 0.18 & 0.63 & 0.62 & 0.57 & 0.40 \\
+\multicolumn{6}{l}{\emph{$|d_{t+24}|\geq15$\,bp (base rate 0.4\%)}} \\
+Our model & $-0.12$ & 0.25 & 0.11 & $-0.11$ & $-0.12$ \\
+TimeXer & $-0.94$ & $-0.19$ & $-0.53$ & $-0.96$ & $-1.33$ \\
+TiDE & $-0.21$ & 0.15 & $-0.04$ & $-0.13$ & $-0.26$ \\
+GARCH & $-0.48$ & 0.13 & $-0.36$ & $-0.93$ & $-1.23$ \\
+Rolling empirical & $-0.53$ & 0.42 & 0.13 & $-0.20$ & $-0.53$ \\
+\bottomrule
+\end{tabular}
+\end{table}

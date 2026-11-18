@@ -1,0 +1,15 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Joint use of the two models over the holdout: relative economic value $V(c/L)$. The joint rule acts on a classifier warning only if the forecast probability of a 15\,bp breach in the next 2 to 24 hours exceeds the cost-loss ratio; the forecaster alone acts whenever that probability exceeds the ratio.}
+\label{tab:cl_joint}
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Rule & $V(0.005)$ & $V(0.01)$ & $V(0.02)$ & $V(0.05)$ & $V(0.1)$ & $V(0.2)$ \\
+\midrule
+Classifier: act on every warning & 0.96 & 0.92 & 0.84 & 0.62 & 0.14 & $-0.85$ \\
+Forecaster alone & 0.32 & 0.70 & 0.70 & 0.49 & 0.44 & 0.00 \\
+Joint: act on warnings the forecaster confirms & 0.58 & 0.59 & 0.58 & 0.57 & 0.38 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}

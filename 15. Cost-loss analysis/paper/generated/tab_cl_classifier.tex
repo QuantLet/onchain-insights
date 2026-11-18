@@ -1,0 +1,31 @@
+\begin{table}[pos=!htbp,align=\centering]
+\centering
+\caption{Economic value of acting on early warnings. Each warning (alert episode) triggers an intervention of cost $c$; an eligible 15\,bp event without an alert-episode onset 2 to 24 hours before its first breach causes a loss $L$. Anticipated: events with such an onset. Break-even $c/L$: anticipated events per warning, the largest cost-loss ratio at which acting on the warnings beats never acting; ``pays if $L/c>$'' is its inverse,  the number of interventions a missed event must outweigh. $V(c/L)$: relative economic value, the share of the saving of a perfect warning system that the rule realises. Price precursors warn when $|d_t|$ reaches the stated level, with the same 12-hour quiet reset; their thresholds were not tuned.}
+\label{tab:cl_classifier}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrrrrr}
+\toprule
+Warning rule & Anticipated & Warnings & Break-even $c/L$ & Pays if $L/c>$ & $V(0.01)$ & $V(0.05)$ & $V(0.1)$ \\
+\midrule
+\multicolumn{8}{l}{\emph{Cross-validation, 2024 (18 events)}} \\
+Kumo Tabular ($\alpha=1$) (selected) & 11/18 & 53 & 0.21 & 4.8 & 0.59 & 0.49 & 0.35 \\
+TabICLv2 ($\alpha=0.3$) & 7/18 & 52 & 0.13 & 7.4 & 0.36 & 0.26 & 0.11 \\
+Price precursor, $|d|\geq8$\,bp & 10/18 & 64 & 0.16 & 6.4 & 0.53 & 0.40 & 0.22 \\
+Price precursor, $|d|\geq10$\,bp & 12/18 & 45 & 0.27 & 3.8 & 0.65 & 0.57 & 0.46 \\
+Price precursor, $|d|\geq12$\,bp & 11/18 & 39 & 0.28 & 3.5 & 0.60 & 0.53 & 0.44 \\
+\midrule
+\multicolumn{8}{l}{\emph{Holdout}} \\
+Kumo Tabular ($\alpha=1$) (selected) & 5/5 & 43 & 0.12 & 8.6 & 0.92 & 0.60 & 0.16 \\
+Price precursor, $|d|\geq8$\,bp & 3/5 & 33 & 0.09 & 11.0 & 0.54 & 0.28 & $-0.07$ \\
+Price precursor, $|d|\geq10$\,bp & 2/5 & 18 & 0.11 & 9.0 & 0.37 & 0.23 & 0.04 \\
+Price precursor, $|d|\geq12$\,bp & 2/5 & 10 & 0.20 & 5.0 & 0.38 & 0.32 & 0.22 \\
+\midrule
+\multicolumn{8}{l}{\emph{Cross-validation and holdout pooled}} \\
+Kumo Tabular (selected) & 16/23 & 96 & 0.17 & 6.0 & 0.66 & 0.51 & 0.31 \\
+Price precursor, $|d|\geq8$\,bp & 13/23 & 97 & 0.13 & 7.5 & 0.53 & 0.37 & 0.16 \\
+Price precursor, $|d|\geq10$\,bp & 14/23 & 63 & 0.22 & 4.5 & 0.59 & 0.50 & 0.37 \\
+Price precursor, $|d|\geq12$\,bp & 13/23 & 49 & 0.27 & 3.8 & 0.55 & 0.48 & 0.39 \\
+\bottomrule
+\end{tabular}}
+\end{table}
