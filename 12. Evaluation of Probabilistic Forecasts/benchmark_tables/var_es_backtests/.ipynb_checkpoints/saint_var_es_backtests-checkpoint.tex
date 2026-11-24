@@ -1,0 +1,22 @@
+% Requires \usepackage[table]{xcolor} and \usepackage{booktabs}.
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l c c c c c c}
+\toprule
+Model & Horizon & $\alpha$ & VaR lower & VaR upper & ES lower & ES upper \\
+\midrule
+SAINT & 12h & 0.5% & \cellcolor{green!35}0.152 & \cellcolor{red!35}0.036 & \cellcolor{green!35}0.901 & \cellcolor{green!35}0.979 \\
+SAINT & 12h & 1.0% & \cellcolor{green!35}0.221 & \cellcolor{green!35}0.392 & \cellcolor{green!35}0.941 & \cellcolor{green!35}0.925 \\
+SAINT & 12h & 2.0% & \cellcolor{red!35}0.0314 & \cellcolor{green!35}0.818 & \cellcolor{green!35}0.153 & \cellcolor{green!35}0.616 \\
+\midrule
+SAINT & 24h & 0.5% & \cellcolor{green!35}0.312 & \cellcolor{green!35}0.802 & \cellcolor{green!35}0.767 & \cellcolor{green!35}0.596 \\
+SAINT & 24h & 1.0% & \cellcolor{green!35}0.722 & \cellcolor{green!35}0.332 & \cellcolor{green!35}0.736 & \cellcolor{green!35}0.262 \\
+SAINT & 24h & 2.0% & \cellcolor{green!35}0.0962 & \cellcolor{red!35}0.00605 & \cellcolor{green!35}0.196 & \cellcolor{red!35}0.0315 \\
+\midrule
+\bottomrule
+\end{tabular}
+\caption{VaR unconditional-coverage (Kupiec) and expected-shortfall (Acerbi--Sz\'ekely $Z_2$) backtest p-values for lower and upper tails at the selected tail levels. Green cells indicate p-values $\geq 0.05$; red cells indicate rejection at 5\%. ES p-values are one-sided Monte Carlo values.}
+\label{tab:saint_var_es_backtests}
+\end{table}
