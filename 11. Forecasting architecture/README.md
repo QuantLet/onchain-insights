@@ -20,9 +20,16 @@ Submitted: 06.05.2026
 Datafile: 
 
 ```
+
+## Interactive ANGEL architecture
+
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
+<a href="https://quantlet.github.io/onchain-insights/angel-architecture.html">
+<img src="./angel-architecture.png" alt="Open the interactive ANGEL architecture diagram" />
+</a>
 </div>
+
+[Open the interactive diagram](https://quantlet.github.io/onchain-insights/angel-architecture.html). Click a block to explore RevIN, dilated causal convolutions, horizon tokens, covariate selection, or fusion. The [standalone HTML file](./angel-architecture.html) also runs offline after download.
 
 <div align="center">
 <img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/stacked_dilated_residual_blocks.png" alt="Image" />

@@ -438,10 +438,12 @@ Run the notebook:
 ### Description and Output
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/QuantLet/onchain-insights/main/11.%20Forecasting%20architecture/architecture_ML.png" alt="Image" />
+<a href="https://quantlet.github.io/onchain-insights/angel-architecture.html">
+<img src="./11.%20Forecasting%20architecture/angel-architecture.png" alt="Open the interactive ANGEL architecture diagram" />
+</a>
 </div>
 <p align="center">
-  <b>Our custom Neural Network Forecasting architecture</b>
+  <a href="https://quantlet.github.io/onchain-insights/angel-architecture.html">Explore the interactive ANGEL architecture</a>
 </p>
 
 <div align="center">
