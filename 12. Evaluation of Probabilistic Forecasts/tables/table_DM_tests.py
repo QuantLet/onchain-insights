@@ -552,7 +552,7 @@ def bootstrap_ci_and_pvalue(
 
 def build_pairwise_forecast_comparison_table(
     runs,
-    main_model="SAINT",
+    main_model="ANGEL",
     metrics=("CRPS", "twCRPS"),
     horizons_ahead=24,
     tw_threshold_low=-10.0,
@@ -908,7 +908,7 @@ def make_section_529_statistical_comparison_outputs(
     model_paths=None,
     runs=None,
     out_dir="./benchmark_tables/5.2.9",
-    main_model="SAINT",
+    main_model="ANGEL",
     metrics=("CRPS", "twCRPS"),
     horizons_ahead=24,
     tw_threshold_low=-10.0,
@@ -1025,22 +1025,26 @@ def make_section_529_statistical_comparison_outputs(
 # Example usage
 # ============================================================
 
-section_529_result = make_section_529_statistical_comparison_outputs(
-    model_paths=model_paths,
-    out_dir="./benchmark_tables/dm_tests",
-    main_model="SAINT",
-    metrics=("CRPS", "twCRPS"),
-    horizons_ahead=24,
-    tw_threshold_low=-10.0,
-    tw_threshold_high=10.0,
-    tw_smooth_h=1.0,
-    nw_lag=None,          # None uses horizon-based default
-    block_length=48,      # hourly dependence; try 48 or 72 as robustness
-    n_boot=5000,
-    random_state=1233,
-    run_simple_mcs=True,
-)
+# 24h-ahead only, and all horizons 1-24h pooled (file suffix _1_24h; matches the benchmark table's averages)
+section_529_results = {}
+for horizons in (24, None):
+    section_529_results[horizons] = make_section_529_statistical_comparison_outputs(
+        model_paths=model_paths,
+        out_dir="./benchmark_tables/dm_tests",
+        main_model="ANGEL",
+        metrics=("CRPS", "twCRPS"),
+        horizons_ahead=horizons,
+        tw_threshold_low=-10.0,
+        tw_threshold_high=10.0,
+        tw_smooth_h=1.0,
+        nw_lag=None,          # None uses horizon-based default
+        block_length=48,      # hourly dependence; try 48 or 72 as robustness
+        n_boot=5000,
+        random_state=1233,
+        run_simple_mcs=True,
+    )
 
+section_529_result = section_529_results[24]
 pairwise_comparison_table = section_529_result["pairwise_table"]
 loss_tables = section_529_result["loss_tables"]
 mcs_tables = section_529_result["mcs_tables"]

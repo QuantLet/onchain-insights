@@ -1,5 +1,5 @@
 # ============================================================
-# Ablation study table: performance degradation vs SAINT
+# Ablation study table: performance degradation vs ANGEL
 #
 # Metrics reported:
 #   CRPS     - standard continuous ranked probability score
@@ -11,9 +11,9 @@
 #   ablation_table.tex  - LaTeX table
 #   ablation_table.csv  - raw numbers
 #
-# SAINT is the reference model. All other models show the
-# percentage performance degradation relative to SAINT.
-# Positive values mean worse than SAINT.
+# ANGEL is the reference model. All other models show the
+# percentage performance degradation relative to ANGEL.
+# Positive values mean worse than ANGEL.
 # ============================================================
 
 import sys

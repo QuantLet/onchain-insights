@@ -14,8 +14,9 @@ Outputs (benchmark_tables/var_es_backtests/):
   angel_var_es_backtests.{csv,tex}            ANGEL, every horizon in HORIZONS and level in LEVELS
   var_es_backtests_all_models.csv              ANGEL and every benchmark, all levels (12 h and 24 h)
   var_es_backtests_24h_comparison.{csv,tex}    ANGEL and every benchmark at 0.5% and 1% (12 h and 24 h)
-TimeXer and TiDE are reported with both heads: the multi-quantile (MQ) loss head and the head used by ANGEL
-(I-spline body + spliced GPD tails, benchmark_scripts/*_forecast.py --head spline_gpd).
+TimeXer and TiDE use the head of ANGEL (I-spline body + spliced GPD tails; benchmark_scripts/*_forecast.py
+--head spline_gpd, the version in the section12-forecasts-v1 release). Their multi-quantile-loss versions
+(--head mqloss, benchmark_outputs/*_hist_exog_mq/) are added as "(MQ)" rows when present locally.
 """
 
 from __future__ import annotations
@@ -39,15 +40,14 @@ MODEL = "ANGEL"
 BENCHMARK_ARTIFACTS = {
     "ARIMA": "benchmark_outputs/arima/preds_test_set.compact.npz",
     "GARCH": "benchmark_outputs/garch_student_t/preds_test_set.compact.npz",
-    "TimeXer (MQ)": "benchmark_outputs/timeXer_hist_exog/preds_test_set.compact.npz",
-    "TiDE (MQ)": "benchmark_outputs/tide_hist_exog/preds_test_set.compact.npz",
+    "TimeXer": "benchmark_outputs/timeXer_hist_exog/preds_test_set.compact.npz",
+    "TiDE": "benchmark_outputs/tide_hist_exog/preds_test_set.compact.npz",
     "Naive": "benchmark_outputs/naive/preds_test_set.compact.npz",
-    "TimeXer (spline-GPD)": "benchmark_outputs/timeXer_hist_exog_spline_gpd/preds_test_set.compact.npz",
-    "TiDE (spline-GPD)": "benchmark_outputs/tide_hist_exog_spline_gpd/preds_test_set.compact.npz",
+    "TimeXer (MQ)": "benchmark_outputs/timeXer_hist_exog_mq/preds_test_set.compact.npz",
+    "TiDE (MQ)": "benchmark_outputs/tide_hist_exog_mq/preds_test_set.compact.npz",
 }
 # Row order of the comparison table
-TABLE_ORDER = (MODEL, "TimeXer (spline-GPD)", "TiDE (spline-GPD)", "TimeXer (MQ)", "TiDE (MQ)", "GARCH", "ARIMA",
-               "Naive")
+TABLE_ORDER = (MODEL, "TimeXer", "TiDE", "GARCH", "ARIMA", "Naive", "TimeXer (MQ)", "TiDE (MQ)")
 
 
 def q_at(q: np.ndarray, grid: np.ndarray, level: float) -> np.ndarray:
@@ -267,7 +267,7 @@ def main() -> None:
     for offset, (model, relative_path) in enumerate(BENCHMARK_ARTIFACTS.items(), start=1):
         artifact_path = SECTION / relative_path
         if not artifact_path.exists():
-            print(f"skipped {model}: missing {artifact_path}")
+            print(f"skipped {model}: not present ({artifact_path})")
             continue
         artifact = load_forecast_artifact(artifact_path)
         if not np.array_equal(np.asarray(artifact["true"], dtype=float), reference_y):

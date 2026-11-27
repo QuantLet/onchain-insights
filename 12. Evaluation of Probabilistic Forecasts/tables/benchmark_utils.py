@@ -21,7 +21,7 @@ except Exception:
 # ============================================================
 
 model_paths = {
-    "SAINT": "./model_logs/final_retrain_run/preds_test_set.compact.npz",
+    "ANGEL": "./model_logs/final_retrain_run/preds_test_set.compact.npz",
     "GARCH": "./benchmark_outputs/garch_student_t/preds_test_set.compact.npz",
     "TimeXer": "./benchmark_outputs/timeXer_hist_exog/preds_test_set.compact.npz",
     "TiDE": "./benchmark_outputs/tide_hist_exog/preds_test_set.compact.npz",
@@ -30,10 +30,10 @@ model_paths = {
 }
 
 # model_paths = {
-#     "SAINT": "3328/33ac86cb6ca74b35af2fdaeb36af462a/preds_test_set.compact.npz",
-#     "SAINT_crps": "3328/7d14ee95d5cc4e24a5bdd42cce75e3ef/preds_test_set.compact.npz",
+#     "ANGEL": "3328/33ac86cb6ca74b35af2fdaeb36af462a/preds_test_set.compact.npz",
+#     "ANGEL_crps": "3328/7d14ee95d5cc4e24a5bdd42cce75e3ef/preds_test_set.compact.npz",
 #     # "SAIN_nogpd": "3328/c3880ff2526449de975d3572041b16d4/preds_test_set.compact.npz",
-#     # "SAINT_gaussian": "3328/02c3fcf87230438192a9aa5cf095fdf5/preds_test_set.compact.npz",
+#     # "ANGEL_gaussian": "3328/02c3fcf87230438192a9aa5cf095fdf5/preds_test_set.compact.npz",
 # }
 
 

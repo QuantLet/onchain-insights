@@ -359,7 +359,7 @@ def build_distributional_benchmark_table(
 
 def compute_main_model_improvements(
     df,
-    main_model="SAINT",
+    main_model="ANGEL",
     lower_better=None,
     higher_better=None,
 ):
@@ -606,7 +606,7 @@ def make_section_522_benchmark_outputs(
     model_paths=None,
     runs=None,
     out_dir="./benchmark_tables/5.2.2",
-    main_model="SAINT",
+    main_model="ANGEL",
     tw_threshold_low=-10.0,
     tw_threshold_high=10.0,
     tw_smooth_h=1.0,
@@ -703,7 +703,7 @@ def make_section_522_benchmark_outputs(
 bench_result = make_section_522_benchmark_outputs(
     model_paths=model_paths,
     out_dir="./benchmark_tables/full_benchmark",
-    main_model="SAINT",
+    main_model="ANGEL",
     tw_threshold_low=-10.0,
     tw_threshold_high=10.0,
     tw_smooth_h=1.0,

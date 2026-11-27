@@ -2,8 +2,17 @@
 # NeuralForecast TiDE benchmark with full historical exogenous features
 # ============================================================
 #
+# Probabilistic head (--head):
+#   spline_gpd  : our I-spline body + spliced GPD tails head, trained with the
+#                 combined CRPS/twCRPS loss (see spliced_quantile_head.py) (default;
+#                 the version used in the paper and in the section12-forecasts-v1 release)
+#   mqloss      : NeuralForecast MQLoss, one output per quantile
+#
+#   python benchmark_scripts/TiDE_forecast.py --head spline_gpd
+#
 # Output:
-#   ./benchmark_outputs/tide_hist_exog/preds_test_set.pkl
+#   ./benchmark_outputs/tide_hist_exog/preds_test_set.pkl      (--head spline_gpd)
+#   ./benchmark_outputs/tide_hist_exog_mq/preds_test_set.pkl   (--head mqloss)
 #
 # This file has:
 #   A["true"]   : (B,H)
@@ -14,12 +23,40 @@
 #
 # ============================================================
 
+import argparse
+import os
 import re
+import sys
 import pickle as pkl
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+
+parser = argparse.ArgumentParser(description="TiDE hist-exog benchmark")
+parser.add_argument(
+    "--head",
+    choices=["mqloss", "spline_gpd"],
+    default="spline_gpd",
+    help="mqloss: one output per quantile; spline_gpd: I-spline + GPD-tail head",
+)
+ARGS, _ = parser.parse_known_args()
+
+# Make spliced_quantile_head.py importable however the script is launched
+try:
+    _SCRIPT_DIR = Path(__file__).resolve().parent
+except NameError:  # e.g. exec'd from a notebook
+    _SCRIPT_DIR = Path("./benchmark_scripts").resolve()
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+
+OUT_DIR = (
+    "./benchmark_outputs/tide_hist_exog"
+    if ARGS.head == "spline_gpd"
+    else "./benchmark_outputs/tide_hist_exog_mq"
+)
+print("Probabilistic head:", ARGS.head)
 
 
 # ============================================================
@@ -91,7 +128,7 @@ print("First 20 hist exog features:")
 print(hist_exog_list[:20])
 
 # Optional: save feature list for reproducibility
-out_dir = Path("./benchmark_outputs/tide_hist_exog")
+out_dir = Path(OUT_DIR)
 out_dir.mkdir(parents=True, exist_ok=True)
 
 pd.Series(hist_exog_list, name="hist_exog").to_csv(
@@ -179,7 +216,7 @@ def central_levels_from_u_grid(u_grid, decimals=6):
     return sorted(set(levels))
 
 
-REFERENCE_PICKLE = "3328/a4b021c593f044fabee4a9207a5d090f/preds_test_set.pkl"
+REFERENCE_PICKLE = "model_logs/final_retrain_run/preds_test_set.pkl"
 
 u_grid = load_reference_u_grid(REFERENCE_PICKLE)
 levels = central_levels_from_u_grid(u_grid)
@@ -404,6 +441,7 @@ def fit_save_tide_hist_exog(
     max_steps=1000,
     val_size=24 * 30,
     random_seed=1,
+    head="mqloss",
 ):
     from neuralforecast import NeuralForecast
     from neuralforecast.models import TiDE
@@ -412,7 +450,16 @@ def fit_save_tide_hist_exog(
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    loss = MQLoss(level=levels)
+    if head == "mqloss":
+        loss = MQLoss(level=levels)
+    elif head == "spline_gpd":
+        from spliced_quantile_head import SplicedSplineQuantileLoss, PAPER_HEAD_CONFIG
+
+        # Train on the paper's 256-pt power-tail grid; output on u_grid
+        # (identical when the reference pickle is available).
+        loss = SplicedSplineQuantileLoss(output_quantiles=u_grid, **PAPER_HEAD_CONFIG)
+    else:
+        raise ValueError(f"Unknown head: {head}")
 
     model = TiDE(
         h=h,
@@ -424,7 +471,7 @@ def fit_save_tide_hist_exog(
         loss=loss,
         valid_loss=loss,
         max_steps=max_steps,
-        scaler_type="robust",
+        scaler_type="standard",
         random_seed=random_seed,
 
         # Training settings
@@ -459,15 +506,25 @@ def fit_save_tide_hist_exog(
     print(cv_df.head())
     print(cv_df.columns)
 
-    point_col = detect_tide_point_col(cv_df)
+    if head == "mqloss":
+        point_col = detect_tide_point_col(cv_df)
 
-    A_tide = cv_df_to_quantile_pickle_dict(
-        cv_df=cv_df,
-        u_grid=u_grid,
-        point_col=point_col,
-        interval_prefix="TiDE",
-        enforce_monotone=True,
-    )
+        A_tide = cv_df_to_quantile_pickle_dict(
+            cv_df=cv_df,
+            u_grid=u_grid,
+            point_col=point_col,
+            interval_prefix="TiDE",
+            enforce_monotone=True,
+        )
+    else:
+        from spliced_quantile_head import cv_df_to_quantile_pickle_dict_from_loss
+
+        A_tide = cv_df_to_quantile_pickle_dict_from_loss(
+            cv_df=cv_df,
+            loss=nf.models[0].loss,
+            model_name="TiDE",
+            extra={"hist_exog_list": hist_exog_list, "head_config": PAPER_HEAD_CONFIG},
+        )
 
     preds_path = out_dir / "preds_test_set.pkl"
     save_preds_pickle(A_tide, preds_path)
@@ -482,12 +539,13 @@ tide_cv_df, tide_path, A_tide = fit_save_tide_hist_exog(
     n_windows=n_windows,
     levels=levels,
     u_grid=u_grid,
-    out_dir="./benchmark_outputs/tide_hist_exog",
+    out_dir=os.environ.get("BENCH_OUT", OUT_DIR),
     freq="h",
     input_size=64,
     max_steps=1000,
     val_size=val_size,
-    random_seed=1,
+    random_seed=int(os.environ.get("BENCH_SEED", 1)),
+    head=ARGS.head,
 )
 
 print("\nSaved TiDE hist-exog benchmark path:")

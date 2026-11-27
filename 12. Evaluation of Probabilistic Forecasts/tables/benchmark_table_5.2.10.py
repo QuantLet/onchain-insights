@@ -2112,9 +2112,9 @@ if __name__ == "__main__":
         out_dir="./comparison_nn_vs_arima/section_5210_interpretability_angel",
 
         # Change this to the key used in your model_paths dict.
-        # For example, if model_paths has "SAINT": ..., use model="SAINT".
+        # For example, if model_paths has "ANGEL": ..., use model="ANGEL".
         # If you renamed the new model "ANGEL", use model="ANGEL".
-        model="SAINT",
+        model="ANGEL",
 
         horizons_ahead=24,
         threshold=15.0,
@@ -2137,7 +2137,7 @@ if __name__ == "__main__":
 
         print_keys=True,
     )
-    A = section_5210_result["runs"]["SAINT"]  # or "ANGEL", depending on your key
+    A = section_5210_result["runs"]["ANGEL"]  
 
     audit = audit_angel_cross_attention(
         A,
