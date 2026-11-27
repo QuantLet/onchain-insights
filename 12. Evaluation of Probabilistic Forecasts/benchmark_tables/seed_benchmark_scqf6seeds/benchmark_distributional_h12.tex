@@ -1,0 +1,14 @@
+% Requires \usepackage{xcolor}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Model & CRPS & twCRPS & twCRPS lower (<-10) & twCRPS upper (>10) & QL 1% & QL 5% & QL 95% & QL 99% \\
+\midrule
+SCQF & \textcolor{red}{\textbf{0.8646}} & \textcolor{red}{\textbf{0.0719}} & \textcolor{red}{\textbf{0.0133}} & \textcolor{red}{\textbf{0.0586}} & \textcolor{red}{\textbf{0.0753}} & \textcolor{red}{\textbf{0.2239}} & \textcolor{red}{\textbf{0.2066}} & \textcolor{red}{\textbf{0.0656}} \\
+GARCH & 2.2202 & 0.1066 & 0.0311 & 0.0755 & \textcolor{blue}{\underline{0.1180}} & 0.3960 & 0.3208 & 0.1032 \\
+TimeXer & \textcolor{blue}{\underline{1.0448}} & \textcolor{blue}{\underline{0.0872}} & \textcolor{blue}{\underline{0.0150}} & \textcolor{blue}{\underline{0.0723}} & 0.1221 & \textcolor{blue}{\underline{0.2828}} & \textcolor{blue}{\underline{0.2596}} & \textcolor{blue}{\underline{0.1017}} \\
+TiDE & 1.3449 & 0.0986 & 0.0189 & 0.0797 & 0.2177 & 0.4446 & 0.4472 & 0.1712 \\
+ARIMA & 4.8203 & 1.4500 & 0.7375 & 0.7125 & 0.4524 & 1.5979 & 1.6079 & 0.4544 \\
+Naive & 5.6707 & 2.1669 & 1.1154 & 1.0515 & 0.5351 & 1.8917 & 1.8916 & 0.5351 \\
+\bottomrule
+\multicolumn{9}{l}{\footnotesize Trained models: mean over seeds (SCQF 6, TiDE and TimeXer 3); GARCH, ARIMA and Naive are deterministic.} \\
+\end{tabular}

@@ -7,35 +7,23 @@
 \toprule
 Model & Horizon & $\alpha$ & VaR lower & VaR upper & ES lower & ES upper \\
 \midrule
-ANGEL & 12h & 0.5% & \cellcolor{green!35}0.152 & \cellcolor{red!35}0.036 & \cellcolor{green!35}0.924 & \cellcolor{green!35}0.982 \\
-ANGEL & 12h & 1.0% & \cellcolor{green!35}0.221 & \cellcolor{green!35}0.392 & \cellcolor{green!35}0.941 & \cellcolor{green!35}0.924 \\
+ANGEL & 12h & 0.5% & \cellcolor{green!35}0.581 & \cellcolor{green!35}0.152 & \cellcolor{green!35}0.47 & \cellcolor{green!35}0.924 \\
+ANGEL & 12h & 1.0% & \cellcolor{red!35}0.0136 & \cellcolor{green!35}0.872 & \cellcolor{red!35}0.0475 & \cellcolor{green!35}0.65 \\
 \midrule
-ANGEL & 24h & 0.5% & \cellcolor{green!35}0.312 & \cellcolor{green!35}0.802 & \cellcolor{green!35}0.78 & \cellcolor{green!35}0.584 \\
-ANGEL & 24h & 1.0% & \cellcolor{green!35}0.722 & \cellcolor{green!35}0.332 & \cellcolor{green!35}0.722 & \cellcolor{green!35}0.276 \\
+ANGEL & 24h & 0.5% & \cellcolor{green!35}0.802 & \cellcolor{green!35}0.336 & \cellcolor{green!35}0.723 & \cellcolor{green!35}0.27 \\
+ANGEL & 24h & 1.0% & \cellcolor{green!35}0.722 & \cellcolor{green!35}0.0811 & \cellcolor{green!35}0.712 & \cellcolor{green!35}0.104 \\
 \midrule
-TimeXer (spline-GPD) & 12h & 0.5% & \cellcolor{green!35}0.909 & \cellcolor{red!35}3.88e-08 & \cellcolor{green!35}0.509 & \cellcolor{red!35}0.0005 \\
-TimeXer (spline-GPD) & 12h & 1.0% & \cellcolor{green!35}0.0536 & \cellcolor{red!35}2.28e-12 & \cellcolor{green!35}0.175 & \cellcolor{red!35}0.0005 \\
+TimeXer & 12h & 0.5% & \cellcolor{green!35}0.909 & \cellcolor{red!35}3.88e-08 & \cellcolor{green!35}0.491 & \cellcolor{red!35}0.0005 \\
+TimeXer & 12h & 1.0% & \cellcolor{green!35}0.0536 & \cellcolor{red!35}2.28e-12 & \cellcolor{green!35}0.18 & \cellcolor{red!35}0.0005 \\
 \midrule
-TimeXer (spline-GPD) & 24h & 0.5% & \cellcolor{green!35}0.312 & \cellcolor{red!35}1.18e-15 & \cellcolor{green!35}0.783 & \cellcolor{red!35}0.0005 \\
-TimeXer (spline-GPD) & 24h & 1.0% & \cellcolor{green!35}0.172 & \cellcolor{red!35}2.37e-20 & \cellcolor{green!35}0.321 & \cellcolor{red!35}0.0005 \\
+TimeXer & 24h & 0.5% & \cellcolor{green!35}0.312 & \cellcolor{red!35}1.18e-15 & \cellcolor{green!35}0.798 & \cellcolor{red!35}0.0005 \\
+TimeXer & 24h & 1.0% & \cellcolor{green!35}0.172 & \cellcolor{red!35}2.37e-20 & \cellcolor{green!35}0.348 & \cellcolor{red!35}0.0005 \\
 \midrule
-TiDE (spline-GPD) & 12h & 0.5% & \cellcolor{red!35}4.31e-125 & \cellcolor{red!35}1.01e-29 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
-TiDE (spline-GPD) & 12h & 1.0% & \cellcolor{red!35}2.47e-165 & \cellcolor{red!35}1.63e-57 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
+TiDE & 12h & 0.5% & \cellcolor{red!35}4.31e-125 & \cellcolor{red!35}1.01e-29 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
+TiDE & 12h & 1.0% & \cellcolor{red!35}2.47e-165 & \cellcolor{red!35}1.63e-57 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
 \midrule
-TiDE (spline-GPD) & 24h & 0.5% & \cellcolor{red!35}5.35e-115 & \cellcolor{red!35}2.56e-30 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
-TiDE (spline-GPD) & 24h & 1.0% & \cellcolor{red!35}1.39e-119 & \cellcolor{red!35}3.12e-43 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
-\midrule
-TimeXer (MQ) & 12h & 0.5% & \cellcolor{green!35}0.581 & \cellcolor{green!35}0.334 & \cellcolor{green!35}0.368 & \cellcolor{green!35}0.359 \\
-TimeXer (MQ) & 12h & 1.0% & \cellcolor{green!35}0.28 & \cellcolor{green!35}0.872 & \cellcolor{green!35}0.21 & \cellcolor{green!35}0.455 \\
-\midrule
-TimeXer (MQ) & 24h & 0.5% & \cellcolor{green!35}0.312 & \cellcolor{green!35}0.312 & \cellcolor{green!35}0.806 & \cellcolor{green!35}0.854 \\
-TimeXer (MQ) & 24h & 1.0% & \cellcolor{green!35}0.387 & \cellcolor{green!35}0.387 & \cellcolor{green!35}0.834 & \cellcolor{green!35}0.811 \\
-\midrule
-TiDE (MQ) & 12h & 0.5% & \cellcolor{red!35}8.04e-09 & \cellcolor{green!35}0.388 & \cellcolor{red!35}0.0005 & \cellcolor{green!35}0.685 \\
-TiDE (MQ) & 12h & 1.0% & \cellcolor{red!35}1.54e-10 & \cellcolor{green!35}0.17 & \cellcolor{red!35}0.0005 & \cellcolor{green!35}0.104 \\
-\midrule
-TiDE (MQ) & 24h & 0.5% & \cellcolor{red!35}8.3e-11 & \cellcolor{red!35}0.001 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
-TiDE (MQ) & 24h & 1.0% & \cellcolor{red!35}7.58e-12 & \cellcolor{red!35}1.57e-07 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
+TiDE & 24h & 0.5% & \cellcolor{red!35}5.35e-115 & \cellcolor{red!35}2.56e-30 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
+TiDE & 24h & 1.0% & \cellcolor{red!35}1.39e-119 & \cellcolor{red!35}3.12e-43 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
 \midrule
 GARCH & 12h & 0.5% & \cellcolor{red!35}0.000575 & \cellcolor{red!35}7.85e-07 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
 GARCH & 12h & 1.0% & \cellcolor{red!35}0.0136 & \cellcolor{red!35}9.32e-06 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
@@ -54,6 +42,18 @@ Naive & 12h & 1.0% & \cellcolor{red!35}1.24e-05 & \cellcolor{red!35}1.24e-05 & \
 \midrule
 Naive & 24h & 0.5% & \cellcolor{red!35}0.0291 & \cellcolor{red!35}0.0291 & \cellcolor{green!35}1 & \cellcolor{green!35}1 \\
 Naive & 24h & 1.0% & \cellcolor{red!35}0.002 & \cellcolor{red!35}0.002 & \cellcolor{green!35}1 & \cellcolor{green!35}1 \\
+\midrule
+TimeXer (MQ) & 12h & 0.5% & \cellcolor{green!35}0.581 & \cellcolor{green!35}0.334 & \cellcolor{green!35}0.375 & \cellcolor{green!35}0.357 \\
+TimeXer (MQ) & 12h & 1.0% & \cellcolor{green!35}0.28 & \cellcolor{green!35}0.872 & \cellcolor{green!35}0.188 & \cellcolor{green!35}0.489 \\
+\midrule
+TimeXer (MQ) & 24h & 0.5% & \cellcolor{green!35}0.312 & \cellcolor{green!35}0.312 & \cellcolor{green!35}0.797 & \cellcolor{green!35}0.838 \\
+TimeXer (MQ) & 24h & 1.0% & \cellcolor{green!35}0.387 & \cellcolor{green!35}0.387 & \cellcolor{green!35}0.819 & \cellcolor{green!35}0.835 \\
+\midrule
+TiDE (MQ) & 12h & 0.5% & \cellcolor{red!35}8.04e-09 & \cellcolor{green!35}0.388 & \cellcolor{red!35}0.0005 & \cellcolor{green!35}0.679 \\
+TiDE (MQ) & 12h & 1.0% & \cellcolor{red!35}1.54e-10 & \cellcolor{green!35}0.17 & \cellcolor{red!35}0.0005 & \cellcolor{green!35}0.0985 \\
+\midrule
+TiDE (MQ) & 24h & 0.5% & \cellcolor{red!35}8.3e-11 & \cellcolor{red!35}0.001 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
+TiDE (MQ) & 24h & 1.0% & \cellcolor{red!35}7.58e-12 & \cellcolor{red!35}1.57e-07 & \cellcolor{red!35}0.0005 & \cellcolor{red!35}0.0005 \\
 \midrule
 \bottomrule
 \end{tabular}
